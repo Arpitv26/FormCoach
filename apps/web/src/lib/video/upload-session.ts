@@ -1,5 +1,5 @@
 import { ApiError } from "../api/client";
-import type { AnalysisResponse } from "../api/types";
+import type { AnalysisResponse, PoseTrack, VideoAnalysisResponse } from "../api/types";
 
 export const MAX_VIDEO_BYTES = 250 * 1024 * 1024;
 const serverMayContinue = "The server may still be processing. Wait before trying again.";
@@ -39,9 +39,10 @@ export interface UploadState {
   validationError: string | null;
   message: string | null;
   result: AnalysisResponse | null;
+  poseTrack: PoseTrack | null;
 }
 export const emptyUploadState: UploadState = {
-  selection: null, phase: "ready", preview: "loading", validationError: null, message: null, result: null,
+  selection: null, phase: "ready", preview: "loading", validationError: null, message: null, result: null, poseTrack: null,
 };
 
 /** Owns each file/response pair and releases obsolete requests and object URLs. */
@@ -52,7 +53,7 @@ export class UploadSession {
   private disposed = false;
 
   constructor(
-    private readonly analyze: (file: File, signal: AbortSignal) => Promise<AnalysisResponse>,
+    private readonly analyze: (file: File, signal: AbortSignal) => Promise<AnalysisResponse | VideoAnalysisResponse>,
     private readonly onChange: (state: UploadState) => void,
     private readonly urls: Pick<typeof URL, "createObjectURL" | "revokeObjectURL"> = URL,
   ) {}
@@ -96,11 +97,12 @@ export class UploadSession {
     const generation = ++this.generation;
     const controller = new AbortController();
     this.controller = controller;
-    this.update({ phase: "analyzing", message: null, result: null });
+    this.update({ phase: "analyzing", message: null, result: null, poseTrack: null });
     try {
       const result = await this.analyze(selection.file, controller.signal);
       if (generation !== this.generation || this.disposed) return;
-      this.update({ phase: "complete", result });
+      this.update({ phase: "complete", result: "analysis" in result ? result.analysis : result,
+        poseTrack: "poseTrack" in result ? result.poseTrack : null });
     } catch (error) {
       if (generation !== this.generation || this.disposed) return;
       this.update({ phase: "error", message: uploadError(error) });

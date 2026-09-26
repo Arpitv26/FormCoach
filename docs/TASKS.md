@@ -48,7 +48,8 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [B] Results dashboard entirely from canonical mock; null and error states.
 - [ ] [B] Camera permission, framing/readiness states, exercise selector.
 - [x] [B] Upload selection/preview and honest loading/error states (PR #1).
-- [ ] [B] Browser pose adapter and correctly mirrored skeleton overlay.
+- [x] [A, authorized by user] Browser pose adapter and correctly mirrored skeleton overlay; simulated-camera verified, physical check pending (POSE_OVERLAY.md).
+- [x] [A, authorized by user] Uploaded pose-track endpoint and synchronized landscape/portrait playback overlay.
 - [ ] [B] Cumulative live requests, session reset/finalization, response replacement.
 - [ ] [B] Per-rep cards, metric graphs, issue timeline, lowest-score highlight.
 - [ ] [B] Worst-rep jump against synchronized video.

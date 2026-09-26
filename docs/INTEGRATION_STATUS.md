@@ -1,5 +1,17 @@
 # Computer A / Computer B integration checkpoint
 
+## New overlay checkpoint — 2026-09-26
+
+`pose-overlay` branches from published backend PR #2 at `f049013`; #2 remains unchanged.
+User explicitly authorized A to implement the camera/upload overlay UI because B was not
+editing those screens. Remote frontend rechecked: still `5dd6bb4`.
+Read **POSE_OVERLAY.md** for setup, changed seams and test evidence. The new endpoint is
+additive; existing AnalysisResponse stays unchanged. Landscape and portrait upload overlays
+and simulated live-camera tracking are verified. Physical webcam check and live counting
+remain next. Review/merge #2 before this feature, then B can pull the integrated main.
+
+The section below records the earlier integration baseline.
+
 ## Reviewed and integrated — 2026-09-26
 
 Frontend PR #1, `5dd6bb4`, was reviewed and merged into `main` as `9c16f22`.

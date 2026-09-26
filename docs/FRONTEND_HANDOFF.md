@@ -68,10 +68,11 @@ counts elbow cycles and returns `minSmoothedLeftElbowAngleDeg` or its right-side
 `durationMs`, and `minimum_elbow_angle` moments, with scores still null. Real HTTP uploads
 are now available after optional CV setup, with four clips matching counts of 3/1/1/2.
 Read **apps/api/HTTP_UPLOAD.md**: set a separate **240-second upload timeout**, show loading
-and typed errors, retain the matching local video, and test seeking. No pose frames/video
-URL are returned, so a skeleton overlay needs later coordination. The old squat mock is a legacy UI fixture, not a push-up analysis; never
+and typed errors, retain the matching local video, and test seeking. The original endpoint returns no pose frames/video URL. The additive
+`/videos/analyze-with-pose` endpoint returns analysis and poses from one extraction; the current
+upload client uses it. Read POSE_OVERLAY.md before changing camera or playback rendering. The old squat mock is a legacy UI fixture, not a push-up analysis; never
 relabel its knee measurements or issue as push-up findings. Coordinate a new realistic fixture
-when actual push-up metrics exist. Existing v1.0 types need no changes.
+when actual push-up metrics exist. The analysis shape is unchanged; new VideoAnalysisResponse/PoseTrack types are generated.
 
 The backend replay tool and labeled synthetic elbow capture are documented in
 apps/api/examples/README.md. Actual recording evidence is in apps/api/VALIDATION.md.
@@ -137,3 +138,13 @@ Render existing issue cards/timeline as **Changes to review**; show explanations
 reference reps, differences, and thresholds. Confidence and all scores remain null.
 Do not label these as bad form, fatigue, injury risk, or a worst-rep score. Missing comparison
 keys mean unavailable; one/two-rep clips cannot yet be compared. No new TypeScript schema.
+
+## Skeleton feature handoff
+
+User authorized A to implement camera/upload overlays on `pose-overlay`, based on backend PR #2.
+Read [POSE_OVERLAY.md](POSE_OVERLAY.md) and integrate the branch after #2 is merged. B retains
+frontend ownership afterward. Run `npm ci` and `npm run pose:setup` in apps/web. Live skeleton
+tracking works locally; live rep counting remains the next integration. Uploads use
+`analyzeVideoWithPose`, with one extraction and no added server storage. The UI also hides
+unmeasured elbow columns, de-emphasizes missing scores, fixes the file label, and collapses
+lengthy technical limitations while keeping key uncertainty visible.

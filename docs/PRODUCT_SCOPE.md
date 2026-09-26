@@ -8,15 +8,15 @@ unchecked items require feature work. Prioritize a reliable short demo, with pre
 - [x] Frontend loads with a minimal FormCoach page.
 - [x] Backend loads and health endpoint responds.
 - [x] Stable contract, canonical mock, and two-team handoffs.
-- [ ] Upload UI and honest processing/error states.
-- [ ] Pose skeleton from a pretrained provider.
-- [ ] Real-video push-up analysis and completed-rep counting (pose counter is implemented).
+- [x] Upload UI and honest processing/error states.
+- [x] Live and uploaded-video pose skeleton from a pretrained provider (physical webcam demo check pending).
+- [x] Real-video push-up analysis and completed-rep counting (four clips match human counts).
 - [ ] Per-rep measurements/metrics and explainable summary.
 - [ ] Polished responsive results experience.
 
 ## Should have
 
-- [ ] Webcam UI and framing/permission states.
+- [x] Webcam UI and framing/permission states.
 
 - [ ] Live feedback through the existing HTTP contract.
 - [ ] Lunges.

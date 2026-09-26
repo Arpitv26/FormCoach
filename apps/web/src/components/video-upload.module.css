@@ -7,7 +7,7 @@
 .uploadPanel, .guide, .results { border: 1px solid var(--line); border-radius: 22px; padding: 28px; background: #101a27; min-width: 0; }
 .uploadPanel h2, .guide h2 { font-size: 1.4rem; margin: 0; }
 .fileLabel { display: block; font-weight: 600; margin: 26px 0 10px; }
-.fileInput { display: block; width: 100%; min-width: 0; color: var(--muted); font: inherit; font-size: .85rem; }
+.fileInput { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 .fileInput::file-selector-button { background: #233343; color: #f0f4f8; border: 1px solid #46576d; border-radius: 9px; padding: 12px 16px; margin-right: 12px; cursor: pointer; }
 .fileInput:focus-visible, .player:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
 .emptyPreview { min-height: 260px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 1px dashed #41546a; border-radius: 15px; margin-top: 24px; padding: 24px; background: radial-gradient(ellipse at top, #18394a, #0a111a 75%); }
@@ -16,7 +16,11 @@
 .emptyPreview p { color: var(--muted); font-size: .9rem; line-height: 1.7; }
 .fileInfo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin: 22px 0 12px; font-size: .85rem; overflow-wrap: anywhere; }
 .fileInfo span:last-child { color: var(--muted); }
-.player { display: block; width: 100%; max-height: 440px; background: #05080d; border-radius: 12px; }
+.playerStage { position: relative; }
+.overlayToggle { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: .85rem; }
+.overlayToggle input { width: 18px; height: 18px; accent-color: var(--lime); }
+.evidence summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+.player { object-fit: contain; display: block; width: 100%; max-height: 440px; background: #05080d; border-radius: 12px; }
 .actions { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin: 24px 0 16px; }
 .actions > button { margin-top: 0; }
 .secondary, .rep button { background: #172738; color: #e0edfa; border: 1px solid #40546c; border-radius: 9px; padding: 12px 16px; cursor: pointer; font: inherit; font-size: .85rem; }
@@ -36,14 +40,14 @@
 .guideNote p { font-size: .9rem; line-height: 1.65; }
 .results { margin-top: 28px; }
 .results h2 { font-size: 1.5rem; }
-.summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 26px 0 16px; }
+.summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 26px 0 16px; }
 .summary > div { background: #0a121e; border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
 .summary dt, .measurements dt { color: var(--muted); font-size: .8rem; }
 .summary dd { font-size: clamp(1.1rem, 2vw, 1.7rem); color: var(--lime); margin: 12px 0 0; overflow-wrap: anywhere; }
 .rep { padding: 24px 0; border-top: 1px solid var(--line); }
 .repHeading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .repHeading h3 { margin: 0; }
-.measurements { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.measurements { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .measurements dd { margin: 8px 0 18px; font-size: .9rem; }
 .moments { display: flex; flex-wrap: wrap; gap: 10px; }
 .evidence { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 12px; line-height: 1.7; }

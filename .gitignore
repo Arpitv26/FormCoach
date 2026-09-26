@@ -22,6 +22,7 @@ next-env.d.ts
 out/
 coverage/
 *.tsbuildinfo
+apps/web/public/pose/
 
 # Local recordings and output; never commit people's gym videos
 *.mp4

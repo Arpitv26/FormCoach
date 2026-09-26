@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { exercises, type ExerciseOption } from "@/lib/exercises";
 import { CameraPreview, initialCameraState, type CameraState } from "@/lib/camera/preview";
+import { LiveOverlay } from "./live-overlay";
 import styles from "./webcam-setup.module.css";
 
 const labels: Record<CameraState["phase"], string> = {
@@ -63,10 +64,11 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
       <section className={styles.cameraPanel} aria-labelledby="preview-heading">
         <header className={styles.panelHeader}>
           <h2 id="preview-heading">{exercise.name}</h2>
-          <span className="outline-tag">Preview only</span>
+          <span className="outline-tag">Live skeleton</span>
         </header>
         <div className={styles.viewport}>
           <video ref={videoRef} autoPlay muted playsInline aria-label="Mirrored live camera preview" className={live ? styles.video : `${styles.video} ${styles.hiddenVideo}`} />
+          {live && <LiveOverlay video={videoRef} />}
           {!live && (
             <div className={styles.placeholder}>
               <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="7" y="13" width="26" height="23" rx="6" /><path d="m33 20 9-5v19l-9-5" /><path d="M17 24h6m-3-3v6" /></svg>
@@ -87,7 +89,7 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
             </button>
             {(busy || live) && <button className={styles.secondaryButton} onClick={() => previewRef.current?.stop()}>{busy ? "Cancel" : "Stop camera"}</button>}
           </div>
-          <p className={styles.privacyNote}>Video stays in this browser preview. This screen does not record, upload, or use your microphone.</p>
+          <p className={styles.privacyNote}>Skeleton tracking runs in this browser. This screen does not record, upload camera frames, or use your microphone.</p>
         </div>
       </section>
 
@@ -112,8 +114,8 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
         </section>
         <section className={`${styles.nextStep} panel`} aria-labelledby="next-heading">
           <p className="eyebrow">One step at a time</p>
-          <h2 id="next-heading">Preview comes first.</h2>
-          <p>{exercise.group === "live" ? "For push-up analysis, upload a recorded video. Live tracking is not connected yet." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} Camera access alone does not check your framing, count reps, or produce scores.</p>
+          <h2 id="next-heading">See how you move.</h2>
+          <p>{exercise.group === "live" ? "For push-up analysis, upload a recorded video. Live skeleton tracking is available here; live rep counting is the next integration." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} The skeleton shows estimated joint positions, not an assessment of form. Camera angle and full-body visibility are not automatically verified.</p>
           {exercise.group === "live" && <Link href="/upload">Analyze a push-up video →</Link>}
           <Link href="/" className={styles.demoLink}>Choose another exercise <span aria-hidden="true">↗</span></Link>
         </section>
