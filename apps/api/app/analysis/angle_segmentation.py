@@ -74,6 +74,8 @@ class _AngleCycleCounter:
         self.start_ms: int | None = None
         self.bottom_ms = 0
         self.min_angle = 180.0
+        self.max_angle = 0.0
+        self.angle_measurement_start_ms = 0
 
     def _reset(self) -> None:
         self.phase = "unknown"
@@ -108,6 +110,8 @@ class _AngleCycleCounter:
         if self.start_ms is not None and self.last_angle < self.min_angle:
             self.min_angle = self.last_angle
             self.bottom_ms = timestamp
+        if self.start_ms is not None:
+            self.max_angle = max(self.max_angle, self.last_angle)
 
         target = self._target(self.last_angle)
         if target is None:
@@ -144,6 +148,8 @@ class _AngleCycleCounter:
         if target == "descent":
             self.start_ms = self.candidate_since
             self.min_angle = self.last_angle
+            self.max_angle = self.last_angle
+            self.angle_measurement_start_ms = timestamp
             self.bottom_ms = timestamp
         elif target == "extended":
             if (
@@ -157,6 +163,8 @@ class _AngleCycleCounter:
                         self.bottom_ms,
                         timestamp,
                         self.min_angle,
+                        self.max_angle,
+                        self.angle_measurement_start_ms,
                     )
                 )
             self.start_ms = None
@@ -176,7 +184,8 @@ def segment_angle_cycles(
 
     Boundaries use observed timestamps of the causal smoothed signal: start is the first
     sample of a confirmed descent; end confirms extension; bottom is the earliest observed
-    minimum after descent confirmation. Smoothing/confirmation add latency. No interpolation.
+    minimum after descent confirmation. Angle extrema cover that confirmation through
+    completion, inclusive. Smoothing/confirmation add latency. No interpolation.
     """
     for previous, current in zip(samples, samples[1:], strict=False):
         if current.timestamp_ms <= previous.timestamp_ms:

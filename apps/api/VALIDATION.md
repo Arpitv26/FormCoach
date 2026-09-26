@@ -133,3 +133,25 @@ size/type/selection errors, unavailable setup, sanitized internal errors, concur
 handling, health responsiveness, and preservation of real-analysis unknowns. Native inference
 is tested separately with the local recordings, so CI needs no model/video download.
 Local HTTP responses/timings are ignored under `artifacts/upload-check/`.
+
+## Follow-up: descriptive measurements on saved real poses
+
+The measurement checkpoint replays the four saved captures through HTTP route handling
+(TestClient), including cumulative and repeated-final checks. Counts remain 3/1/1/2;
+all seven start/end times and minimum-angle moments match the prior real-upload responses.
+An independent causal-median calculation reproduces each maximum, minimum, and excursion
+within the reported angle window. No new native extraction was needed for this math change.
+
+| Clip / rep | Counted time | Time to minimum | Time after minimum | Observed elbow excursion |
+| --- | --- | --- | --- | --- |
+| 6937 / 1 | 2535 ms | 1268 ms | 1267 ms | 102.5° |
+| 6937 / 2 | 1933 ms | 866 ms | 1067 ms | 105.6° |
+| 6937 / 3 | 2333 ms | 1133 ms | 1200 ms | 101.4° |
+| 6938 / 1 | 2001 ms | 801 ms | 1200 ms | 107.8° |
+| 6939 / 1 | 2002 ms | 1000 ms | 1002 ms | 104.8° |
+| 6940 / 1 | 2001 ms | 1001 ms | 1000 ms | 100.4° |
+| 6940 / 2 | 2068 ms | 1200 ms | 868 ms | 102.0° |
+
+These are descriptive 2D observations, not quality rankings across angles or calibrated
+anatomical motion. See MEASUREMENTS.md for the window and timing limitations.
+Backend suite: **242 tests pass**. Local replay evidence: `artifacts/measurement-check/`.

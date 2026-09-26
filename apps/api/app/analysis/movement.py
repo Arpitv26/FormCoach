@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.pushup_measurements import pushup_measurements
 from app.analysis.exercises.pushup_segmentation import segment_pushups
 from app.analysis.exercises.squat_segmentation import segment_squats
 from app.analysis.geometry import AngleMeasurement, measure_joint_angle
@@ -69,16 +70,19 @@ def _joint_measurements(
 
 
 def _rep_result(segment: RepSegment, number: int, side: str, joint: str) -> RepAnalysis:
+    measurements = {
+        f"minSmoothed{side.title()}{joint.title()}AngleDeg": segment.min_angle_deg,
+        "durationMs": segment.end_ms - segment.start_ms,
+    }
+    if joint == "elbow":
+        measurements.update(pushup_measurements(segment, side))
     return RepAnalysis(
         rep_number=number,
         start_ms=segment.start_ms,
         end_ms=segment.end_ms,
         score=None,
         metrics=RepMetrics(range_of_motion=None, symmetry=None, tempo=None, stability=None),
-        measurements={
-            f"minSmoothed{side.title()}{joint.title()}AngleDeg": segment.min_angle_deg,
-            "durationMs": segment.end_ms - segment.start_ms,
-        },
+        measurements=measurements,
         issues=[],
         key_moments=[
             KeyMoment(
@@ -166,7 +170,14 @@ class RuleBasedAnalyzer:
                 f"Uses the {side} {joint} throughout this set (first usable side; left wins ties). "
                 "Three-sample median smoothing and phase confirmation delay event timestamps."
             )
-        else:
+        if profile.id == "push-up":
+            limitations.append(
+                "Elbow excursion is the observed 2D maximum minus minimum from confirmed "
+                "descent through completion, not a calibrated full range-of-motion score. "
+                "Time to/from minimum splits the counted interval at its first lowest angle; "
+                "it includes pauses and confirmation delay, not isolated lowering/lifting time."
+            )
+        if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable:
             camera_issues.append(

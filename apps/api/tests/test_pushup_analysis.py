@@ -54,6 +54,11 @@ def test_pushup_http_measures_elbow_not_knee_and_keeps_scores_unknown(client, si
     assert rep.measurements == {
         f"minSmoothed{side.title()}ElbowAngleDeg": pytest.approx(90),
         "durationMs": 1700,
+        f"maxSmoothed{side.title()}ElbowAngleDeg": pytest.approx(170),
+        f"smoothed{side.title()}ElbowExcursionDeg": pytest.approx(80),
+        "angleMeasurementStartMs": 800,
+        "timeToMinElbowAngleMs": 500,
+        "timeFromMinElbowAngleMs": 1200,
     }
     assert (rep.start_ms, rep.end_ms) == (600, 2300)
     assert rep.key_moments[0].type == "minimum_elbow_angle"

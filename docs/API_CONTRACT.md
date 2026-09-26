@@ -162,6 +162,22 @@ side-locking, timing, and finalization policies apply, using the straight-arm to
 instead of standing. The triplet is shoulder-elbow-wrist; initial thresholds are top >=160
 and bottom <=100 degrees. Results use `minSmoothedLeftElbowAngleDeg` or
 `minSmoothedRightElbowAngleDeg`, plus `durationMs` and a `minimum_elbow_angle` key moment.
+Additional push-up `measurements` keys (the dictionary is extensible; old results may lack them):
+
+| Key | Meaning |
+| --- | --- |
+| `maxSmoothedLeftElbowAngleDeg` / `maxSmoothedRightElbowAngleDeg` | Maximum on the selected side over the same window as the existing minimum |
+| `smoothedLeftElbowExcursionDeg` / `smoothedRightElbowExcursionDeg` | That maximum minus minimum, in degrees |
+| `angleMeasurementStartMs` | Inclusive timestamp of descent confirmation; extrema cover this through `endMs` |
+| `timeToMinElbowAngleMs` | Existing minimum key-moment timestamp minus `startMs` |
+| `timeFromMinElbowAngleMs` | `endMs` minus the minimum key-moment timestamp |
+
+The two time parts sum to `durationMs`; they include pauses and confirmation delay, not
+isolated lowering/lifting durations. Extrema exclude the initial top position before descent
+confirmation and later samples after rep completion. They describe observed 2D excursion,
+not a range-of-motion score. All `metrics` score fields remain null. See
+[measurement definitions](../apps/api/MEASUREMENTS.md) and the explicitly synthetic
+`contracts/examples/pushup-analysis.json` example. Missing keys mean unavailable, never zero.
 No body-alignment, depth-quality, or injury claim is implied by these provisional cycles.
 The user-selected push-up demo replaces the earlier squat demo priority; wire shapes are unchanged.
 

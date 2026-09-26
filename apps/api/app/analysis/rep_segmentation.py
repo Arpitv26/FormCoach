@@ -29,6 +29,8 @@ class RepSegment:
     bottom_ms: int
     end_ms: int
     min_angle_deg: float
+    max_angle_deg: float
+    angle_measurement_start_ms: int
 
 
 @dataclass(frozen=True)
