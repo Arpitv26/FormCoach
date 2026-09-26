@@ -22,13 +22,45 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `app/api/routes` | HTTP validation, routing, status codes |
 | `app/core` | Local settings and CORS |
 | `app/domain` | Stable v1.0 JSON types and semantic validation |
-| `app/analysis` | Analyzer interface and honest placeholder; future math/rep/scoring helpers |
+| `app/analysis` | Geometry and visibility helpers; analyzer placeholder; future rep/scoring helpers |
 | `app/analysis/exercises` | Example/planned configuration profiles |
 | `app/services` | Future pose/video/OpenAI adapters; local coach fallback |
 | `tests` | Route, validation, fixture, and score arithmetic checks |
 
 Live analysis returns `not_implemented` with null measurements. Upload returns 501. Coach is
 always local in bootstrap. The SDK/CV integrations belong to later backend work.
+
+## Feature checkpoint 1: joint angles and landmark visibility
+
+`app/analysis/geometry.py` now measures 2D angles. `measure_joint_angle` takes a `PoseFrame`,
+three canonical joint names (the middle name is the angle's vertex), image dimensions,
+and an explicit visibility threshold such as `SQUAT_PROFILE.minimum_visibility`.
+It converts normalized coordinates back to equal-scale image axes before calculating.
+The result is an internal `AngleMeasurement`, not an additional public API response.
+
+`app/analysis/visibility.py` checks only the requested joints. Missing joints, estimates outside
+the image, unknown visibility, and visibility below the supplied threshold block measurement.
+The helper reports each blocked joint and its reason. Undefined geometry, such as a hip
+at exactly the same image position as its knee, also returns `angle_deg=None` with a reason.
+A visibility check passing does not establish a suitable camera view or correct movement.
+Depth is unused: these are image-plane angles, not calibrated 3D measurements.
+
+These helpers are tested building blocks; the live endpoint remains an explicit placeholder
+until rep counting and analyzer integration are ready. No new packages or API keys are needed.
+
+To try the math, run these from `apps/api` with the existing virtual environment:
+
+```bash
+source .venv/bin/activate
+python -c 'from app.analysis.geometry import angle_degrees; print(angle_degrees((1, 0), (0, 0), (0, 1)))'
+python -m pytest -q tests/test_geometry.py tests/test_visibility.py
+```
+
+The first command activates the project's Python environment. The second prints `90.0`:
+the three points form a right angle. The tests should show **57 passed**. They cover known
+angles, image aspect ratios, missing/hidden/outside landmarks, and invalid configuration.
+
+## Backend checks
 
 With `.venv` active:
 
