@@ -26,8 +26,8 @@ def test_live_returns_honest_unknowns_and_is_repeatable(client, live_example):
     response = client.post("/api/v1/live/analyze-batch", json=live_example)
     assert response.status_code == 200
     analysis = AnalysisResponse.model_validate(response.json())
-    assert analysis.status == "not_implemented"
-    assert analysis.provenance.kind == "placeholder"
+    assert analysis.status == "insufficient_data"
+    assert analysis.provenance.kind == "measured"
     assert analysis.summary.overall_score is None
     assert analysis.summary.total_reps is None
     assert analysis.exercise.confidence is None
@@ -83,7 +83,7 @@ def test_coach_fallback_without_key(client, analysis_example, monkeypatch):
     assert coach.evidence == ["summary.overallScore"]
 
 
-def test_coach_does_not_invent_findings_for_placeholder(client, live_example):
+def test_coach_does_not_invent_findings_for_unavailable_analysis(client, live_example):
     analysis = client.post("/api/v1/live/analyze-batch", json=live_example).json()
     response = client.post("/api/v1/coach", json={"analysis": analysis, "mode": "next_set"})
     assert response.status_code == 200

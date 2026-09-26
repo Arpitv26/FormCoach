@@ -22,13 +22,13 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `app/api/routes` | HTTP validation, routing, status codes |
 | `app/core` | Local settings and CORS |
 | `app/domain` | Stable v1.0 JSON types and semantic validation |
-| `app/analysis` | Geometry, visibility, and squat segmentation; analyzer placeholder; future scoring |
+| `app/analysis` | Geometry, visibility, squat segmentation and analyzer; future scoring |
 | `app/analysis/exercises` | Example/planned configuration profiles |
 | `app/services` | Future pose/video/OpenAI adapters; local coach fallback |
 | `tests` | Route, validation, fixture, and score arithmetic checks |
 
-Live analysis returns `not_implemented` with null measurements. Upload returns 501. Coach is
-always local in bootstrap. The SDK/CV integrations belong to later backend work.
+Live analysis counts squat reps from supplied poses. Other exercise hints (or no hint) return
+`not_implemented`. Upload returns 501. Coach remains local. SDK/CV integration is future work.
 
 ## Feature checkpoint 1: joint angles and landmark visibility
 
@@ -45,8 +45,8 @@ at exactly the same image position as its knee, also returns `angle_deg=None` wi
 A visibility check passing does not establish a suitable camera view or correct movement.
 Depth is unused: these are image-plane angles, not calibrated 3D measurements.
 
-These helpers are tested building blocks; the live endpoint remains an explicit placeholder
-until rep counting and analyzer integration are ready. No new packages or API keys are needed.
+These helpers are tested building blocks used by the live endpoint through the analyzer.
+No new packages or API keys are needed.
 
 To try the math, run these from `apps/api` with the existing virtual environment:
 
@@ -92,7 +92,7 @@ an independently verified anatomical bottom. All times use the original sample c
 
 Replay the complete cumulative set on every call. Returned reps replace the prior result;
 do not add the latest count to the previous count. A final snapshot never completes an
-unfinished rep automatically. The live route is still a placeholder until checkpoint 3.
+unfinished rep automatically. Checkpoint 3 below connects this counter to the live route.
 
 Run the focused tests from `apps/api`, with `.venv` active:
 
@@ -103,12 +103,52 @@ python -m pytest -q tests/test_squat_segmentation.py
 Expect **43 passed**. The tests use synthetic angle sequences and known synthetic body
 landmarks; no real-camera accuracy has been established yet.
 
+## Feature checkpoint 3: live API integration
+
+`app/analysis/movement.py` implements `MovementAnalyzer`. The live route now selects
+`RuleBasedAnalyzer`, which measures the supplied poses and replays the squat counter.
+No contract fields, schemas, frontend files, or dependencies changed.
+
+- Send `exerciseHint: "squat"`. No hint or another registered exercise remains unimplemented.
+- The first usable hip-knee-ankle triplet selects the side; left wins if both work in that
+  frame. Keep this side throughout the set, including during tracking loss. Visibility must
+  be at least 0.7 for each joint. Coordinates must be in-frame, with non-degenerate geometry.
+- Completed reps include start/end timestamps, `durationMs`, and either
+  `minSmoothedLeftKneeAngleDeg` or `minSmoothedRightKneeAngleDeg`. The minimum is from the
+  causal smoothed signal after descent confirmation. It is not a raw-sample minimum.
+- The `minimum_knee_angle` key moment and timeline refer to this smoothed minimum, not a
+  verified anatomical bottom. Scores, confidence, full-body visibility, and scoring remain null.
+- Before stable standing is observed, count is null and status is `insufficient_data`.
+  Once ready, zero means no completed cycles observed. During a set, status is `partial`.
+  A final snapshot is `complete` only when standing with no unavailable frames/tracking breaks.
+  Final interrupted sets remain `partial`; read `limitations`, even after Stop.
+- `provenance.kind: "measured"` means the algorithm ran on supplied poses. The server cannot
+  verify they came from a camera. Synthetic test inputs must still be presented as synthetic.
+- This is a tested pose-to-response path; real-camera accuracy is still unverified. Use a
+  side view, keep one whole leg visible, and stand still briefly before and after each set.
+
+From `apps/api`, with `.venv` active:
+
+```bash
+python -m pytest -q tests/test_live_analysis.py
+```
+
+The tests send synthetic body landmarks through real HTTP route handling. They cover known
+angles/times, cumulative replay, side locking, visibility failures, gaps, finalization,
+unchanged JSON Schema, and coach compatibility. No camera or API key is needed.
+
+To inspect a request manually, start the API using the commands at the top of this document,
+open http://localhost:8000/docs, expand **POST /api/v1/live/analyze-batch**, and click
+**Try it out**. Paste `contracts/examples/live-pose-batch.json` into the request box and click
+**Execute**. Expect HTTP 200 with `status: "insufficient_data"` and `totalReps: null`: that tiny
+two-frame example deliberately has too little data to count a rep. It never returns demo reps.
+
 ## Remaining backend plan
 
 1. Completed: geometry and visibility helpers.
 2. Completed: conservative squat segmentation, smoothing, and failure-case tests.
-3. Next: connect measured poses and completed reps to the existing live API contract.
-4. Integrate browser poses with Computer B and compare against visible repetitions in a clip.
+3. Completed: connect measured poses and completed reps to the existing live API contract.
+4. Next: integrate browser poses with Computer B and compare against visible reps in a clip.
 5. Add per-rep measurements, supported feedback, and explainable scoring.
 6. Add uploaded-video pose extraction through the same analyzer.
 7. Add evidence-only OpenAI coaching, then consider additional exercises.

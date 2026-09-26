@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.analysis.exercises.registry import PROFILES
 from app.analysis.interfaces import MovementAnalyzer
-from app.analysis.placeholder import PlaceholderAnalyzer
+from app.analysis.movement import RuleBasedAnalyzer
 from app.domain.analysis import AnalysisResponse, Source
 from app.domain.models import ErrorResponse
 from app.domain.pose import LiveBatchRequest
@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 def get_analyzer() -> MovementAnalyzer:
-    return PlaceholderAnalyzer()
+    return RuleBasedAnalyzer()
 
 
 @router.post(
