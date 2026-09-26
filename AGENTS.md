@@ -89,9 +89,9 @@ read apps/api/MEASUREMENTS.md. The new contracts/examples/pushup-analysis.json i
 Push-up comparisons now flag substantial duration changes or reduced observed excursion
 against two preceding stable reps, with evidence and unknown confidence; see apps/api/COMPARISONS.md.
 Real clips retain counts 3/1/1/2 and produce no flags; positive cases are synthetic so far.
-B can integrate later. Evidence-only coaching and mocked SDK tests are implemented; no live
-OpenAI request is verified yet. Next for A: real positive-case validation and an opt-in live
-coach check (apps/api/COACH_SETUP.md). Recheck origin/frontend periodically and update
+B can integrate later. Evidence-only coaching, mocked SDK tests, and one live OpenAI QA
+request are verified (2026-09-26, synthetic timing question, 3.22 seconds; docs/AI_COACH.md).
+Next for A: real positive-case comparison validation. Recheck origin/frontend periodically and update
 docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

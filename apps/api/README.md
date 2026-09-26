@@ -182,7 +182,7 @@ evidence, the short-clip timing fix, repeat commands, and limits of this check.
 6. Completed: HTTP upload integration, cleanup/error tests. Next: frontend playback/timeout coordination.
 7. Descriptive measurements and causal comparison flags implemented; see [MEASUREMENTS.md](MEASUREMENTS.md) and [COMPARISONS.md](COMPARISONS.md). Validate real positive cases before scoring.
 8. Completed: useful local coaching and optional OpenAI evidence selection with mocked SDK tests.
-   See COACH_SETUP.md for the pending live-key check. Browser tracking follows when B is ready.
+   One live timing-question check passed; see COACH_SETUP.md and ../../docs/AI_COACH.md. Browser tracking follows when B is ready.
 
 The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
 It uses optional pinned MediaPipe/OpenCV packages, writes poses and upload analysis locally,

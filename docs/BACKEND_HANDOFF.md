@@ -22,7 +22,7 @@ remains a legacy fixture. See apps/api/examples/README.md for the replay workflo
 
 Geometry/visibility, median smoothing, and both counters are connected to the live API.
 The optional local CV adapter powers HTTP uploads (apps/api/HTTP_UPLOAD.md). There is no
-form scorer. Optional OpenAI evidence selection is implemented but has not made a verified live call;
+form scorer. Optional OpenAI evidence selection passed one live synthetic timing-question check;
 see apps/api/COACH_SETUP.md and docs/AI_COACH.md. Authored fixture angles are not video measurements.
 
 ## Current work order
@@ -36,7 +36,7 @@ see apps/api/COACH_SETUP.md and docs/AI_COACH.md. Authored fixture angles are no
 | B, when ready | Coordinate upload loading/timeout, measured results, and video seeking | Before demo rehearsal |
 | Completed | Causal timing/range comparison flags with thresholds, reference evidence, and replay tests | Changes to review, not quality scores |
 | Completed | Evidence-only local coach and optional OpenAI selector with simulated HTTP tests | Stable v1.0 shape |
-| Next for A | Real positive-case comparison validation and opt-in live OpenAI check | Requires new footage / local key; scoring still deferred |
+| Next for A | Real positive-case comparison validation | Requires suitable footage; scoring still deferred |
 | Later | Browser tracking, lunge/other exercises | Only after the recorded push-up demo works |
 | Stretch | Automatic exercise detection, ghost comparison, custom ML, history | Only if demo is stable |
 

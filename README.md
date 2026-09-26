@@ -6,7 +6,7 @@ UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measure
 legacy mock squat results, and tested push-up counting from supplied poses are ready.
 Local video pose extraction and evidence-based coaching are available; browser pose tracking
 and form scoring remain unfinished. Coaching works locally; optional OpenAI evidence selection
-has mocked API tests but still needs a live-key check. See [video setup](apps/api/VIDEO_SETUP.md)
+has mocked API tests and one successful live timing-question check. See [video setup](apps/api/VIDEO_SETUP.md)
 and [coach setup](apps/api/COACH_SETUP.md).
 No API key, database, Docker, or GPU is needed to run this foundation.
 

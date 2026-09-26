@@ -49,8 +49,8 @@ irrelevant statement cannot introduce new wording or findings.
 Default `COACH_PROVIDER=fallback` makes no paid calls, even if a key is present.
 Optional setup requires **both** `COACH_PROVIDER=openai` and a backend-only API key,
 plus `requirements-coach.txt`. Instructions: [COACH_SETUP.md](../apps/api/COACH_SETUP.md).
-The default model is the fixed `gpt-4.1-mini-2025-04-14` snapshot; account access has not
-been checked on this machine. `OPENAI_MODEL` can override it with a model supporting
+The default model is the fixed `gpt-4.1-mini-2025-04-14` snapshot; one live request verified account access
+on Computer A on 2026-09-26. `OPENAI_MODEL` can override it with a model supporting
 Responses structured output. Do not put keys in frontend variables.
 
 The adapter uses an 8-second SDK timeout, a 10-second overall selection deadline, zero
@@ -72,8 +72,13 @@ video, or landmarks. Questions themselves may contain user-entered personal info
 - Tests cover evidence paths, malformed measurements, injected prose, partial/camera
   limits, key gating, unsupported questions, invalid selections, deadline cancellation,
   and the installed SDK parsing simulated HTTP success/refusal/error responses.
-- **No live OpenAI request verified:** no key was configured at this checkpoint. Model
-  relevance, account access, real latency, and real billing behavior require the opt-in check.
+- **Live check passed on 2026-09-26:** after saving a backend-only key and enabling
+  `COACH_PROVIDER=openai`, called the actual coaching service once with the synthetic
+  comparison fixture and “How long did rep 3 take?”. The result used `provider: openai`,
+  took 3.22 seconds, and selected rep-3 timing evidence: 3.20 s versus the reference median
+  1.70 s. Demo labeling and unknown score remained intact. No key was displayed or committed.
+  This verifies one service-level network request, not frontend integration, general QA
+  relevance, real-video accuracy, or a latency guarantee. No billing amount was checked.
 
 ## Official references
 

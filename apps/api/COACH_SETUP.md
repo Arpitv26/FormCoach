@@ -1,8 +1,7 @@
 # Try the coach — Computer A
 
 The local coach already works without an account or key. It summarizes supplied measurements.
-Optional OpenAI selects relevant evidence; the server writes the final wording. Real API
-access has not yet been verified on this machine. Read ../../docs/AI_COACH.md for limits.
+Optional OpenAI selects relevant evidence; the server writes the final wording. One live API timing-question check passed on Computer A on 2026-09-26 (3.22 seconds). Read ../../docs/AI_COACH.md for limits.
 
 ## 1. Start the backend with local coaching
 

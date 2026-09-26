@@ -31,7 +31,7 @@ checkpoint; coordinate semantics through API_CONTRACT.md and this note.
 
 ## What remains before the demo
 
-- A: test optional OpenAI with a real locally configured key; currently only mocked API tests.
+- A completed one live OpenAI timing-question check on 2026-09-26 (3.22 seconds). Integrated frontend coaching still needs rehearsal.
 - A: obtain/validate a real comfortable variation that triggers the comparison rules. Existing
   clips match 3/1/1/2 reps but produce zero review flags. Synthetic positive cases are not proof
   of real-video detection accuracy.

@@ -37,7 +37,7 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Integrate validated video processing into HTTP uploads, including cleanup/errors and busy handling.
 - [ ] [B] Use separate 240-second upload timeout and connect measured results/playback (apps/api/HTTP_UPLOAD.md).
 - [x] [A] Phase 5: Optional OpenAI evidence selector, useful local fallback, evidence/uncertainty tests.
-- [ ] [A] Verify one live OpenAI request with a locally configured key (mocked SDK tests pass).
+- [x] [A] Verify one live OpenAI request with a locally configured key (2026-09-26: synthetic rep-3 timing QA, provider openai, 3.22 seconds).
 - [ ] [SHARED] Recheck frontend branch periodically; see INTEGRATION_STATUS.md for current gaps.
 - [ ] [A] Phase 6: optional automatic exercise classification.
 - [ ] [A] Phase 7: advanced ML/reference features only if demo is stable.
