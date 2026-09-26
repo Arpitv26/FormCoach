@@ -4,7 +4,10 @@ Read AGENTS.md, API_CONTRACT.md, ARCHITECTURE.md, and PRODUCT_SCOPE.md first. Yo
 is `frontend`; your primary ownership is **apps/web/**. Follow BEGINNER_SETUP.md to run it.
 Do not wait for backend work. No Python or OpenAI key is needed to build the mock interface.
 
-## Starting point
+## Bootstrap starting point
+
+The following describes the shared foundation. For the latest reviewed remote frontend
+progress and integration gaps, see INTEGRATION_STATUS.md. B's branch now has additional UI.
 
 The app is Next.js App Router + TypeScript + Tailwind. The homepage intentionally has only a
 FormCoach title, fixture summary, six rep scores, and a health button. You own the detailed design.

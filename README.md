@@ -4,8 +4,10 @@ UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measure
 
 **FormCoach is in development.** The frontend/backend foundation, shared data formats,
 legacy mock squat results, and tested push-up counting from supplied poses are ready.
-Local video pose extraction is available with optional setup; browser pose tracking, form scoring,
-and AI coaching are still being built. See [video setup](apps/api/VIDEO_SETUP.md).
+Local video pose extraction and evidence-based coaching are available; browser pose tracking
+and form scoring remain unfinished. Coaching works locally; optional OpenAI evidence selection
+has mocked API tests but still needs a live-key check. See [video setup](apps/api/VIDEO_SETUP.md)
+and [coach setup](apps/api/COACH_SETUP.md).
 No API key, database, Docker, or GPU is needed to run this foundation.
 
 ## How it works
@@ -59,9 +61,9 @@ works locally and through HTTP upload; browser tracking is a later integration. 
   and explainable exercise feedback. We start with mathematical rules that we can test.
   For example, following the shoulder-elbow-wrist angle helps identify a push-up's
   downward movement and return to the straight-arm top position.
-- **AI coach:** We plan to use an OpenAI model to explain the measured results in simple
-  language. It must not invent form problems or fill in missing measurements. When the
-  camera cannot provide reliable evidence, FormCoach should say that the result is unavailable.
+- **AI coach:** The backend builds short explanations from measured results. Optional OpenAI
+  selects relevant evidence, and the server renders checked wording. Unknown scores stay
+  unknown, and camera limitations remain visible. No key is required for the local coach.
 
 The same movement-analysis code will handle live and uploaded video because both paths
 produce the same joint-position format. Our main contribution is this analysis layer and
@@ -81,6 +83,7 @@ analysis is ready.
 - Computer A / backend agent: read [AGENTS.md](AGENTS.md), then [Backend handoff](docs/BACKEND_HANDOFF.md).
 - Computer B / frontend agent: read [AGENTS.md](AGENTS.md), then [Frontend handoff](docs/FRONTEND_HANDOFF.md).
 - Before branching: read [Git workflow](docs/GIT_WORKFLOW.md).
+- Current A/B alignment: [Integration checkpoint](docs/INTEGRATION_STATUS.md).
 
 ## Run locally
 
@@ -132,7 +135,7 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 | `GET /api/v1/health` | Returns `{"status":"ok","service":"formcoach-api"}` |
 | `POST /api/v1/live/analyze-batch` | Counts selected push-up/squat cycles from supplied poses; per-rep times and joint angles; scores remain null |
 | `POST /api/v1/videos/analyze` | Analyzes selected push-up/squat video through optional local CV; returns measured analysis |
-| `POST /api/v1/coach` | Deterministic local fallback; no OpenAI calls, even if a key is set |
+| `POST /api/v1/coach` | Local measured-evidence summary; optional OpenAI evidence selection with explicit opt-in |
 
 Mock results are labeled **MOCK DEMO DATA**. Select `push-up` for the intended demo exercise.
 The earlier squat counter still works; other profiles remain unimplemented. The original squat

@@ -306,10 +306,13 @@ type CoachRequest = {
 
 HTTP 200: `contractVersion`, `sessionId`, `mode`, `provider: "fallback" | "openai"`,
 `message`, `evidence` (dot paths into the analysis), and `limitations`.
-The bootstrap always uses `fallback`, makes no network call, states that data is synthetic
-when applicable, quotes the supplied score only when available, and admits that free-form
-QA is not implemented. It does not echo arbitrary issue/cue text as advice. API keys do
-not enable unfinished functionality. The future adapter must follow AI_COACH.md.
+Default `fallback` makes no network call. It summarizes supplied counts, push-up timing,
+observed elbow excursion/comparisons, or the legacy supplied score. Synthetic data stays
+labeled and unknown scores stay unknown. Local free-form QA is unsupported.
+Optional `COACH_PROVIDER=openai` plus a backend key and SDK enables bounded evidence
+selection; the backend renders reviewed wording. Provider failures fall back honestly.
+`evidence` uses zero-based array dot paths; display `limitations` alongside `message`.
+No contract fields changed. See AI_COACH.md and apps/api/COACH_SETUP.md.
 
 ## Errors and frontend behavior
 

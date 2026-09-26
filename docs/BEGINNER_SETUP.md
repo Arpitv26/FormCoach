@@ -99,7 +99,7 @@ The download ends with `Successfully installed ...` or `Requirement already sati
 repeating it would overwrite your local settings. Leave `OPENAI_API_KEY=` empty.
 
 The backend reads **apps/api/.env**. The root `.env.example` is a reference, not a file
-the apps automatically load. No key is needed; bootstrap coaching is always local.
+the apps automatically load. No key is needed; coaching defaults to local. Optional OpenAI setup is in apps/api/COACH_SETUP.md.
 Never paste keys into Python/TypeScript files, Git commits, screenshots, or `NEXT_PUBLIC_` variables.
 
 ## 6. Start the backend

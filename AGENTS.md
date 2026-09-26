@@ -35,7 +35,8 @@ Keep the legacy squat fixture for compatibility, not as the intended presentatio
 - Version `1.0` JSON contract; Python models -> checked-in schemas -> generated TS types.
 - Stateless cumulative HTTP batches first. No database or WebSocket requirement.
 - AI explains measured evidence. It cannot invent detections, diagnose, or predict injury.
-- Bootstrap fallback never calls OpenAI. Mock JSON is explicitly synthetic.
+- Coaching defaults to local. OpenAI requires explicit provider opt-in plus a backend key;
+  it selects evidence IDs and the server renders wording. Read docs/AI_COACH.md. Mock JSON is synthetic.
 
 ## Ownership
 
@@ -76,8 +77,8 @@ If a contract must change:
 
 Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
-hint remain `not_implemented`. Scores stay null. Upload runs the optional local CV pipeline; coach uses a local fallback.
-Frontend foundation renders the six-rep fixture and can check health. A local MediaPipe video adapter is available with optional dependencies; no form scorer is
+hint remain `not_implemented`. Scores stay null. Upload runs the optional local CV pipeline; coach defaults to a useful local fallback with an optional OpenAI evidence selector.
+Frontend progress is tracked by remote commit in docs/INTEGRATION_STATUS.md. A local MediaPipe video adapter is available with optional dependencies; no form scorer is
 integrated. Four real MOV recordings match human counts of 3, 1, 1, and 2 after a
 phase-confirmation timing fix; see apps/api/VALIDATION.md for evidence and limitations.
 HTTP upload integration now includes cleanup/error tests and a single-extraction gate.
@@ -88,7 +89,9 @@ read apps/api/MEASUREMENTS.md. The new contracts/examples/pushup-analysis.json i
 Push-up comparisons now flag substantial duration changes or reduced observed excursion
 against two preceding stable reps, with evidence and unknown confidence; see apps/api/COMPARISONS.md.
 Real clips retain counts 3/1/1/2 and produce no flags; positive cases are synthetic so far.
-B can integrate later. Next for A: real positive-case validation and evidence-only coaching;
-keep form scoring deferred until its measurement and calibration requirements are met.
+B can integrate later. Evidence-only coaching and mocked SDK tests are implemented; no live
+OpenAI request is verified yet. Next for A: real positive-case validation and an opt-in live
+coach check (apps/api/COACH_SETUP.md). Recheck origin/frontend periodically and update
+docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

@@ -22,7 +22,8 @@ demo problem, and record the reason here so future agents do not restart the arc
 | Nulls plus status/provenance | Prevent fake measurements and misleading empty results | UI must distinguish unknown, synthetic, incomplete, and real results |
 | Generated schema and TS types | A frozen boundary must not drift silently across machines | Contract commits regenerate/check all representations |
 | Real synchronous uploads after clip validation | Four push-up clips establish a concrete counting checkpoint | Optional local model, worker-thread processing, one extraction per process, explicit errors, no fake fallback |
-| Bootstrap coach always local | No key or spend should be required to run the foundation | Configuring a key alone does not enable the future adapter |
+| Coach local by default | No key or spend should be required to run the app | Paid calls need COACH_PROVIDER=openai, SDK, and key; key alone does not enable them |
+| OpenAI selects reviewed evidence statements | Structured output alone does not guarantee factual prose | Validate selected IDs, render wording server-side, preserve uncertainty; free-form generation remains deferred |
 | Per-app dependencies and env files | Beginners can run one app without installing the other | No root npm workspace; run npm commands from apps/web |
 | Node 24, Python 3.12 team defaults | Match both machines and CI with small pinned dependency sets | Create separate local environments; do not share installed dependency folders |
 | Explicit ESLint step | Current Next.js builds do not run lint automatically | CI runs lint, typecheck, tests, and build separately |

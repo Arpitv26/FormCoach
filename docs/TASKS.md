@@ -36,7 +36,9 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Optional local video decoding + MediaPipe pose adapter + bounded inputs and cleanup.
 - [x] [A] Integrate validated video processing into HTTP uploads, including cleanup/errors and busy handling.
 - [ ] [B] Use separate 240-second upload timeout and connect measured results/playback (apps/api/HTTP_UPLOAD.md).
-- [ ] [A] Phase 5: OpenAI adapter and evidence/uncertainty guardrails.
+- [x] [A] Phase 5: Optional OpenAI evidence selector, useful local fallback, evidence/uncertainty tests.
+- [ ] [A] Verify one live OpenAI request with a locally configured key (mocked SDK tests pass).
+- [ ] [SHARED] Recheck frontend branch periodically; see INTEGRATION_STATUS.md for current gaps.
 - [ ] [A] Phase 6: optional automatic exercise classification.
 - [ ] [A] Phase 7: advanced ML/reference features only if demo is stable.
 
