@@ -17,6 +17,14 @@ class VideoInputError(ValueError):
     """An unsupported or unreadable local recording; never replaced with demo results."""
 
 
+class VideoSetupError(VideoInputError):
+    """Optional local packages/model are unavailable; this is not a bad client recording."""
+
+
+class VideoProcessingTimeout(VideoInputError):
+    """Cooperative processing budget expired between native calls."""
+
+
 def map_landmarks(poses: list) -> list[PoseLandmark]:
     """Use normalized coordinates, never world-meter coordinates or fabricated poses."""
     if len(poses) != 1:
@@ -50,12 +58,12 @@ class MediaPipePoseProvider:
         if not 0 < video_path.stat().st_size <= MAX_VIDEO_BYTES:
             raise VideoInputError("Video must be nonempty and at most 250 MiB.")
         if not self.model_path.is_file():
-            raise VideoInputError("Pose model is missing. Follow apps/api/VIDEO_SETUP.md.")
+            raise VideoSetupError("Pose model is missing. Follow apps/api/VIDEO_SETUP.md.")
         try:
             import cv2
             import mediapipe as mp
         except ImportError as error:
-            raise VideoInputError(
+            raise VideoSetupError(
                 "Install optional packages: python -m pip install -r requirements-cv.txt"
             ) from error
 
@@ -105,7 +113,9 @@ class MediaPipePoseProvider:
         # Decoder progress is checked at every frame; native read/inference calls may block.
         for frame_index in range(MAX_DECODED_FRAMES + 1):
             if monotonic() - started > 180:
-                raise VideoInputError("Video processing exceeded 180 seconds; use a shorter clip.")
+                raise VideoProcessingTimeout(
+                    "Video processing exceeded 180 seconds; use a shorter clip."
+                )
             ok, bgr = capture.read()
             if not ok:
                 if expected_frames > 0 and frame_index < expected_frames - 1:

@@ -11,6 +11,7 @@ API_ROOT = Path(__file__).resolve().parents[2]
 class Settings:
     cors_origins: tuple[str, ...]
     openai_api_key: str = field(repr=False)
+    pose_model_path: Path = API_ROOT / "artifacts/models/pose_landmarker_full.task"
 
 
 def get_settings() -> Settings:
@@ -25,4 +26,6 @@ def get_settings() -> Settings:
             if origin.strip()
         ),
         openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+        pose_model_path=API_ROOT
+        / os.getenv("POSE_MODEL_PATH", "artifacts/models/pose_landmarker_full.task"),
     )

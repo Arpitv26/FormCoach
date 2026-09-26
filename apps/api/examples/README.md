@@ -1,8 +1,8 @@
 # Live capture replay — checkpoint 4 preparation
 
 The backend can now replay a saved set against a running API and compare its count with
-your human count. **Real-camera validation is still pending.** A passing synthetic replay
-checks software integration; it does not establish accuracy on a person.
+your human count. Four real recordings have been checked; see [VALIDATION.md](../VALIDATION.md).
+A passing synthetic replay checks software integration, not accuracy on a person.
 
 `synthetic-pushup-capture.json` is authored geometry, not a recording. It contains 25 frames,
 spaced 100 ms apart, with only the left shoulder/elbow/wrist. It represents one artificial pushup.

@@ -28,7 +28,8 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `tests` | Route, validation, fixture, and score arithmetic checks |
 
 Pose analysis counts push-up and squat reps from supplied poses. Other hints (or no hint) return
-`not_implemented`. Upload returns 501. Coach remains local. Local CV extraction is available; HTTP upload integration is next.
+`not_implemented`. Upload uses optional local CV extraction. Coach remains local. Follow
+[HTTP_UPLOAD.md](HTTP_UPLOAD.md) to test the endpoint and hand it off to Computer B.
 
 ## Feature checkpoint 1: joint angles and landmark visibility
 
@@ -178,14 +179,14 @@ evidence, the short-clip timing fix, repeat commands, and limits of this check.
 3. Completed: connect measured poses and completed reps to the existing live API contract.
 4. Completed: push-up elbow counting and capture replay checker, tested with synthetic inputs.
 5. Completed: local video extraction and count/sequence review on four actual recordings.
-6. Next: HTTP upload integration, cleanup/error tests, and frontend playback/timeout coordination.
+6. Completed: HTTP upload integration, cleanup/error tests. Next: frontend playback/timeout coordination.
 7. Add supported push-up metrics and explainable scoring.
 8. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
 
 The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
 It uses optional pinned MediaPipe/OpenCV packages, writes poses and upload analysis locally,
-and leaves the HTTP upload route at 501 until route integration. Actual-footage counts
-are checked; UI seeking accuracy and broader counting reliability remain to be tested.
+and powers the HTTP upload route described in [HTTP_UPLOAD.md](HTTP_UPLOAD.md). Actual-footage
+counts are checked; UI seeking accuracy and broader counting reliability remain to be tested.
 
 Keep each checkpoint small: implement, test, review, commit, and push `backend-cv`.
 

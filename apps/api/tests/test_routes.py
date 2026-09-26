@@ -62,16 +62,6 @@ def test_live_rejects_invalid_batches(client, live_example, mutation):
     assert client.post("/api/v1/live/analyze-batch", json=live_example).status_code == 422
 
 
-def test_upload_explicitly_not_implemented(client):
-    response = client.post(
-        "/api/v1/videos/analyze",
-        files={"file": ("sample.mp4", b"not-real-video", "video/mp4")},
-        data={"exerciseHint": "squat"},
-    )
-    assert response.status_code == 501
-    assert response.json()["detail"]["code"] == "VIDEO_ANALYSIS_NOT_IMPLEMENTED"
-
-
 def test_coach_fallback_without_key(client, analysis_example, monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "")
     response = client.post("/api/v1/coach", json={"analysis": analysis_example, "mode": "summary"})

@@ -1,9 +1,12 @@
 # Prerecorded push-up video — local backend checkpoint
 
-**Current scope:** a local command extracts poses from a video and writes measured analysis.
-The HTTP upload route still returns 501; connecting it is the next checkpoint after the
-four-clip count check documented in [VALIDATION.md](VALIDATION.md).
+**Current scope:** the local command and HTTP upload route extract poses and return measured
+analysis. Follow [HTTP_UPLOAD.md](HTTP_UPLOAD.md) for the upload request and frontend handoff.
+The four-clip count check is documented in [VALIDATION.md](VALIDATION.md).
 The frontend camera is not required. No API key or cloud upload is used by this command.
+The API model path defaults to `apps/api/artifacts/models/pose_landmarker_full.task` regardless
+of the shell working directory. Optional `POSE_MODEL_PATH` in `apps/api/.env` overrides it;
+relative overrides resolve from `apps/api`. Restart the API after changing this setting.
 
 We use Google's pretrained [MediaPipe Pose Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/python)
 to estimate body landmarks. Our Python code counts elbow cycles from those landmarks.

@@ -107,6 +107,29 @@ files or turn the recordings into public test fixtures.
 - Processing the 4K clips took tens of seconds with other review work running. This was
   not a controlled speed benchmark. Measure response time and coordinate the frontend's
   request timeout/loading state before enabling synchronous HTTP uploads.
-- **Next checkpoint:** connect the validated provider/analyzer to `POST /api/v1/videos/analyze`
-  with upload limits, explicit dependency/decode errors, temporary-file cleanup, and tests.
-  It currently returns 501. Then check Computer B's playback against these same timestamps.
+- HTTP upload integration is now implemented and tested; see the follow-up below.
+  Next check Computer B's playback against these same timestamps.
+
+## Follow-up: actual HTTP video uploads
+
+The real MOV bytes were sent as multipart requests to a running local Uvicorn server,
+with `exerciseHint=push-up`. Each request ran fresh MediaPipe extraction and returned the
+existing measured `AnalysisResponse`; these were not cached pose replays.
+
+| Clip | HTTP | Expected / returned count | Status | Wall time on Computer A |
+| --- | --- | --- | --- | --- |
+| 6939 | 200 | 1 / 1 | complete | 8.82 s |
+| 6938 | 200 | 1 / 1 | complete | 10.51 s |
+| 6940 | 200 | 2 / 2 | complete | 13.08 s |
+| 6937 | 200 | 3 / 3 | complete | 39.06 s |
+
+Health checks during those uploads returned in 23–93 ms. A corrupt MOV returned HTTP 400
+`INVALID_VIDEO`. These are single runs on this Mac, not latency guarantees. The longest
+clip exceeds the frontend's existing 15-second timeout; Computer B must set a separate
+240-second upload timeout before integration. See [HTTP_UPLOAD.md](HTTP_UPLOAD.md).
+
+The backend suite now passes **234 tests**, including upload cleanup after success/failure,
+size/type/selection errors, unavailable setup, sanitized internal errors, concurrent busy
+handling, health responsiveness, and preservation of real-analysis unknowns. Native inference
+is tested separately with the local recordings, so CI needs no model/video download.
+Local HTTP responses/timings are ignored under `artifacts/upload-check/`.
