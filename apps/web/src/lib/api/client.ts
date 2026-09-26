@@ -18,17 +18,30 @@ export function createApiClient(
   baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000",
   fetcher: typeof fetch = fetch,
 ) {
-  async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  async function request<T>(path: string, init?: RequestInit, timeoutMs = 15_000): Promise<T> {
     let response: Response;
+    let body;
+    const deadline = AbortSignal.timeout(timeoutMs);
+    const signal = init?.signal ? AbortSignal.any([init.signal, deadline]) : deadline;
     try {
+      signal.throwIfAborted();
       response = await fetcher(`${baseUrl.replace(/\/$/, "")}/api/v1${path}`, {
         ...init,
-        signal: init?.signal ?? AbortSignal.timeout(15_000),
+        signal,
       });
+      body = await response.json().catch((error) => {
+        signal.throwIfAborted();
+        if (error instanceof SyntaxError) return null;
+        throw error;
+      });
+      signal.throwIfAborted();
     } catch {
+      if (signal.aborted) {
+        const timedOut = signal.reason?.name === "TimeoutError";
+        throw new ApiError(0, timedOut ? "The request timed out." : "The request was cancelled.", timedOut ? "REQUEST_TIMEOUT" : "REQUEST_ABORTED");
+      }
       throw new ApiError(0, "Cannot reach the API. Check that the backend is running and try again.");
     }
-    const body = await response.json().catch(() => null);
     if (!response.ok) {
       const detail = body?.detail;
       const message = typeof detail?.message === "string"
@@ -54,12 +67,12 @@ export function createApiClient(
   return {
     health: () => request<HealthResponse>("/health"),
     analyzeLiveBatch: (batch: LiveBatchRequest) => post<AnalysisResponse>("/live/analyze-batch", batch),
-    analyzeVideo: (file: File, exerciseHint?: string) => {
+    analyzeVideo: (file: File, exerciseHint?: string, signal?: AbortSignal) => {
       const form = new FormData();
       form.append("file", file);
       if (exerciseHint) form.append("exerciseHint", exerciseHint);
       // The browser supplies the multipart boundary; do not set Content-Type yourself.
-      return request<AnalysisResponse>("/videos/analyze", { method: "POST", body: form });
+      return request<AnalysisResponse>("/videos/analyze", { method: "POST", body: form, signal }, 240_000);
     },
     coach: (input: CoachRequest) => post<CoachResponse>("/coach", input),
   };

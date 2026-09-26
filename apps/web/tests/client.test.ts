@@ -13,12 +13,12 @@ test("health uses the centralized versioned URL", async () => {
 test("video sends multipart and surfaces the 501 placeholder without substituting demo data", async () => {
   const fetcher: typeof fetch = async (_input, init) => {
     assert.ok(init?.body instanceof FormData);
-    assert.equal(init.body.get("exerciseHint"), "squat");
+    assert.equal(init.body.get("exerciseHint"), "push-up");
     assert.equal(init.headers, undefined);
     return Response.json({ detail: { code: "VIDEO_ANALYSIS_NOT_IMPLEMENTED", message: "Not implemented" } }, { status: 501 });
   };
   await assert.rejects(
-    createApiClient("http://localhost:8000", fetcher).analyzeVideo(new File(["demo"], "test.mp4"), "squat"),
+    createApiClient("http://localhost:8000", fetcher).analyzeVideo(new File(["demo"], "test.mp4"), "push-up"),
     (error: unknown) => error instanceof ApiError && error.status === 501 && error.code === "VIDEO_ANALYSIS_NOT_IMPLEMENTED",
   );
 });
@@ -34,4 +34,35 @@ test("incompatible successful responses are rejected", async () => {
     createApiClient("http://localhost:8000", fetcher).analyzeVideo(new File(["demo"], "test.mp4")),
     /unsupported or invalid response/,
   );
+});
+
+
+test("upload timeout is four minutes; health remains fifteen seconds", async (t) => {
+  const durations: number[] = [];
+  t.mock.method(AbortSignal, "timeout", (ms: number) => { durations.push(ms); return new AbortController().signal; });
+  const api = createApiClient("http://localhost:8000", async () => Response.json({ contractVersion: "1.0" }));
+  await api.health();
+  await api.analyzeVideo(new File(["video"], "clip.mp4"), "push-up");
+  assert.deepEqual(durations, [15_000, 240_000]);
+});
+test("caller cancellation is distinct from network failure", async () => {
+  const controller = new AbortController();
+  controller.abort();
+  let called = false;
+  const api = createApiClient("http://localhost:8000", async () => { called = true; return Response.json({}); });
+  await assert.rejects(api.analyzeVideo(new File(["video"], "clip.mp4"), "push-up", controller.signal),
+    (error: unknown) => error instanceof ApiError && error.code === "REQUEST_ABORTED");
+  assert.equal(called, false);
+});
+test("deadline covers reading the response body", async (t) => {
+  const deadline = new AbortController();
+  t.mock.method(AbortSignal, "timeout", () => deadline.signal);
+  const response = Response.json({});
+  t.mock.method(response, "json", async () => {
+    deadline.abort(new DOMException("timeout", "TimeoutError"));
+    throw deadline.signal.reason;
+  });
+  const api = createApiClient("http://localhost:8000", async () => response);
+  await assert.rejects(api.analyzeVideo(new File(["video"], "clip.mp4"), "push-up"),
+    (error: unknown) => error instanceof ApiError && error.code === "REQUEST_TIMEOUT");
 });

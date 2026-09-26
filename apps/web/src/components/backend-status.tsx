@@ -20,12 +20,14 @@ export function BackendStatus() {
   }
 
   return (
-    <section aria-labelledby="backend-heading">
-      <h2 id="backend-heading">Backend connection</h2>
-      <p role="status">{status}</p>
-      <button onClick={checkHealth} disabled={checking}>
-        {checking ? "Checking…" : "Check backend health"}
-      </button>
-    </section>
+    <details className="connection-details">
+      <summary>Connection tools <span className="muted">Optional for this demo</span></summary>
+      <div className="connection-content">
+        <p role="status">{status}</p>
+        <button onClick={checkHealth} disabled={checking}>
+          {checking ? "Checking…" : "Check backend health"}
+        </button>
+      </div>
+    </details>
   );
 }
