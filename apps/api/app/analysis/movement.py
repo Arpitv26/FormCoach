@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.pushup_comparisons import compare_pushup_reps
 from app.analysis.exercises.pushup_measurements import pushup_measurements
 from app.analysis.exercises.pushup_segmentation import segment_pushups
 from app.analysis.exercises.squat_segmentation import segment_squats
@@ -148,13 +149,15 @@ class RuleBasedAnalyzer:
         side, measurements = _joint_measurements(
             frames, profile, image_width, image_height, movement.joints
         )
-        result = movement.segment(
-            [
-                AngleSample(frame.timestamp_ms, measurement.angle_deg)
-                for frame, measurement in zip(frames, measurements, strict=True)
-            ]
-        )
+        samples = [
+            AngleSample(frame.timestamp_ms, measurement.angle_deg)
+            for frame, measurement in zip(frames, measurements, strict=True)
+        ]
+        result = movement.segment(samples)
         reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
+        if profile.id == "push-up" and side:
+            reps = compare_pushup_reps(reps, samples, side, profile)
+        issues = [issue for rep in reps for issue in rep.issues]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
         limitations = [
@@ -162,7 +165,8 @@ class RuleBasedAnalyzer:
             "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
             f"Uncalibrated {profile.id} rules count observed extension-flexion-extension cycles. "
             "Shallow, fast, or interrupted attempts may not count; this is not a form judgment.",
-            "Scores, form issues, and automatic exercise recognition are not implemented. "
+            "Scores, biomechanical form assessment, and automatic exercise recognition "
+            "are not implemented. "
             "The exercise is a user selection. Empty issues do not establish good form.",
         ]
         if side:
@@ -176,6 +180,12 @@ class RuleBasedAnalyzer:
                 "descent through completion, not a calibrated full range-of-motion score. "
                 "Time to/from minimum splits the counted interval at its first lowest angle; "
                 "it includes pauses and confirmation delay, not isolated lowering/lifting time."
+            )
+            limitations.append(
+                "Comparison flags are uncalibrated review heuristics, not bad-form or fatigue "
+                "detections. Each rep needs two preceding completed reps with continuous tracking; "
+                "unstable reference metrics are skipped. Camera/view stability is not evaluated. "
+                "Absent comparison keys mean unavailable, not no change."
             )
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
@@ -215,6 +225,24 @@ class RuleBasedAnalyzer:
         if is_final and result.current_phase in {"descent", "bottom", "ascent"}:
             limitations.append("The set ended during an unfinished repetition; it was not counted.")
 
+        if issues:
+            headline = (
+                f"{len(reps)} completed push-up reps; {len(issues)} measured changes flagged "
+                "for review. Scores are not available yet."
+            )
+        timeline = _timeline(reps)
+        timeline.extend(
+            TimelineEvent(
+                timestamp_ms=issue.start_ms,
+                type="issue",
+                rep_number=rep.rep_number,
+                issue_id=issue.id,
+                label=issue.title,
+            )
+            for rep in reps
+            for issue in rep.issues
+        )
+        timeline.sort(key=lambda event: event.timestamp_ms)
         return AnalysisResponse(
             contract_version="1.0",
             session_id=session_id,
@@ -226,15 +254,15 @@ class RuleBasedAnalyzer:
             summary=Summary(
                 overall_score=None,
                 total_reps=len(reps) if has_evidence else None,
-                primary_focus=None,
+                primary_focus="rep_consistency_review" if issues else None,
                 headline=headline,
             ),
             metrics=SessionMetrics(
                 range_of_motion=None, symmetry=None, tempo=None, stability=None, consistency=None
             ),
             reps=reps,
-            issues=[],
-            timeline=_timeline(reps),
+            issues=issues,
+            timeline=timeline,
             limitations=limitations,
             scoring=None,
         )

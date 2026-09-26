@@ -2,6 +2,7 @@
 
 Both computers depend on this directory. `contractVersion` is **1.0**.
 
+- `examples/pushup-comparison-analysis.json`: explicitly synthetic three-rep example with two evidence-backed review flags; no video or scores.
 - `examples/pushup-analysis.json`: explicitly synthetic one-rep timing/angle fixture; null scores, no matching video.
 - `examples/squat-analysis.json`: explicitly synthetic six-rep UI fixture. Not a CV result.
 - `examples/live-pose-batch.json`: two synthetic frames showing the request shape. Not enough to count a rep.

@@ -40,7 +40,8 @@ range over this window, not a calibrated anatomical/full-exercise range of motio
 - Angle values depend on the camera view and pose estimates. Compare descriptive values
   cautiously within a fixed-view set; do not rank clips filmed from different angles.
 - Greater excursion or faster/slower movement is not automatically better form. There
-  are no ideal tempo targets, good/bad thresholds, issues, or new scores in this checkpoint.
+  are no ideal tempo targets or quality scores. The subsequent [comparison checkpoint](COMPARISONS.md)
+  adds evidence-backed review flags for differences, not good/bad form classifications.
 - Scores in `metrics` remain null, including `rangeOfMotion` and `tempo`. Never put degrees
   or milliseconds into those 0–100 score fields. No known worst rep exists yet.
 - Missing/low-confidence landmarks and gaps still discard unfinished reps. Those attempts

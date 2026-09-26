@@ -21,7 +21,8 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 - `limitations` explains missing scores, uncalibrated heuristics, view limits, or unavailable features.
 - Push-up and squat counting from supplied poses is implemented; four real push-up clips
   match human counts. This is not a general accuracy benchmark.
-  Other exercise profiles describe planned capability. Scores and form issues remain unavailable.
+  Other exercise profiles describe planned capability. Push-ups support descriptive timing/range
+  comparison flags; scores and biomechanical form assessment remain unavailable.
 - Extra fields are rejected by the backend models. Coordinate shared additions deliberately.
 
 ## GET /api/v1/health
@@ -179,6 +180,27 @@ not a range-of-motion score. All `metrics` score fields remain null. See
 [measurement definitions](../apps/api/MEASUREMENTS.md) and the explicitly synthetic
 `contracts/examples/pushup-analysis.json` example. Missing keys mean unavailable, never zero.
 No body-alignment, depth-quality, or injury claim is implied by these provisional cycles.
+**Push-up comparison flags:** from rep 3 onward, compare with the immediately preceding two
+completed reps. Require continuous usable angles across that entire reference/current span,
+including between reps. Duration references must differ by at most 20% of their median;
+excursion references by at most 10°. Eligible comparisons emit numeric evidence even without a flag.
+
+- `PUSHUP_REP_DURATION_CHANGED`: absolute duration change >= max(500 ms, 30% of reference median).
+- `PUSHUP_ELBOW_EXCURSION_REDUCED`: excursion reduction >= max(15°, 20% of reference median).
+
+These are uncalibrated review heuristics. Issue severity is `low`, confidence is null,
+explanations contain measured values/reference reps/thresholds, and IDs link rep/session
+issues to timeline events at the current rep start. No bad-form, fatigue, or injury inference.
+`summary.primaryFocus` becomes `rep_consistency_review` when flags exist; scores remain null.
+Earlier rep results never change when frames are appended, including later tracking loss.
+
+New optional measurement keys: `comparisonReferenceStartRep`, `comparisonReferenceEndRep`,
+`referenceMedianDurationMs`, `durationDeltaMs`, `durationDeltaPercent`, `durationChangeThresholdMs`,
+`referenceMedianElbowExcursionDeg`, `elbowExcursionDeltaDeg`, `elbowExcursionDeltaPercent`,
+`elbowExcursionReductionThresholdDeg`. Deltas are current minus reference. Missing keys mean
+unavailable (too few reps, tracking loss, unstable/missing reference metric), not zero change.
+See [comparison policy](../apps/api/COMPARISONS.md) for exact units and limitations and
+`contracts/examples/pushup-comparison-analysis.json` for a clearly synthetic flagged example.
 The user-selected push-up demo replaces the earlier squat demo priority; wire shapes are unchanged.
 
 Registered IDs: `squat`, `push-up`, `lunge`, `barbell-squat`, `bicep-curl`, `shoulder-press`,

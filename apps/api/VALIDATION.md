@@ -155,3 +155,21 @@ within the reported angle window. No new native extraction was needed for this m
 These are descriptive 2D observations, not quality rankings across angles or calibrated
 anatomical motion. See MEASUREMENTS.md for the window and timing limitations.
 Backend suite: **242 tests pass**. Local replay evidence: `artifacts/measurement-check/`.
+
+## Follow-up: within-set comparison rules
+
+The four saved real pose captures were replayed through route handling with cumulative and
+repeated-final checks. Counts, rep boundaries, and past rep results remain unchanged.
+**No flags were produced.** The one/two-rep clips lack two prior references. In 6937, rep 3's
+reference elbow excursion is 104.022°, its change is -2.604° (-2.503%), and the configured
+reduction threshold is 20.804°: no range flag. The duration reference is ineligible because
+2535 ms and 1933 ms differ by approximately 26.9% of their 2234 ms median (limit 20%).
+
+This is evidence of correct arithmetic and conservative behavior on these clips, not proof
+of form quality or positive-case detection accuracy. Positive duration/range flags are tested
+with authored geometry and the explicitly synthetic three-rep fixture. A separate real
+positive example still needs video review. Thresholds were not fitted to force a demo flag.
+Local reports: `artifacts/comparison-check/`. Policy: COMPARISONS.md.
+
+Comparison checkpoint: **263 backend tests pass**; lint, formatting, Python schema checks,
+and frontend generated-type checks pass. No new runtime dependencies or schema fields.
