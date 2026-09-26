@@ -5,6 +5,7 @@
  */
 export interface ApiContract {
   analysisResponse: AnalysisResponse;
+  videoAnalysisResponse: VideoAnalysisResponse;
   liveBatchRequest: LiveBatchRequest;
   coachRequest: CoachRequest;
   coachResponse: CoachResponse;
@@ -161,19 +162,25 @@ export interface ScoringInfo {
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema
- * via the `definition` "LiveBatchRequest".
+ * via the `definition` "VideoAnalysisResponse".
  */
-export interface LiveBatchRequest {
+export interface VideoAnalysisResponse {
   contractVersion?: "1.0";
-  sessionId: string;
-  exerciseHint?: string | null;
+  analysis: AnalysisResponse;
+  poseTrack: PoseTrack;
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "PoseTrack".
+ */
+export interface PoseTrack {
+  imageWidth: number;
+  imageHeight: number;
+  durationMs: number;
   /**
    * @maxItems 1800
    */
   frames: PoseFrame[];
-  isFinal?: boolean;
-  imageWidth: number;
-  imageHeight: number;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema
@@ -198,6 +205,22 @@ export interface PoseLandmark {
   y: number;
   z?: number | null;
   visibility?: number | null;
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "LiveBatchRequest".
+ */
+export interface LiveBatchRequest {
+  contractVersion?: "1.0";
+  sessionId: string;
+  exerciseHint?: string | null;
+  /**
+   * @maxItems 1800
+   */
+  frames: PoseFrame[];
+  isFinal?: boolean;
+  imageWidth: number;
+  imageHeight: number;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema

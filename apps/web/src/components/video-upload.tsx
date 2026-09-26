@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api/client";
 import { emptyUploadState, UploadSession } from "@/lib/video/upload-session";
+import { PlaybackOverlay } from "./playback-overlay";
 import { UploadedResults } from "./uploaded-results";
 import styles from "./video-upload.module.css";
 
@@ -10,10 +11,12 @@ export function VideoUpload() {
   const [state, setState] = useState(emptyUploadState);
   const session = useRef<UploadSession | null>(null);
   const video = useRef<HTMLVideoElement | null>(null);
+  const chooser = useRef<HTMLButtonElement | null>(null);
   const input = useRef<HTMLInputElement | null>(null);
+  const [showSkeleton, setShowSkeleton] = useState(true);
   const [playbackMessage, setPlaybackMessage] = useState("");
   useEffect(() => {
-    const current = new UploadSession((file, signal) => api.analyzeVideo(file, "push-up", signal), setState);
+    const current = new UploadSession((file, signal) => api.analyzeVideoWithPose(file, "push-up", signal), setState);
     session.current = current;
     return () => { current.dispose(); session.current = null; };
   }, []);
@@ -39,7 +42,8 @@ export function VideoUpload() {
         <section className={styles.uploadPanel} aria-labelledby="clip-heading">
           <div className="section-heading"><h2 id="clip-heading">Your push-up clip</h2><span className="outline-tag">01 / UPLOAD</span></div>
           <label className={styles.fileLabel} htmlFor="video-file">{selection ? "Choose a different video" : "Choose your video"}</label>
-          <input ref={input} id="video-file" className={styles.fileInput} type="file" accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm" aria-describedby="file-help" onChange={(event) => {
+          <button ref={chooser} type="button" className={styles.secondary} onClick={() => input.current?.click()}>{selection ? "Replace clip" : "Choose file"}</button>
+          <input tabIndex={-1} ref={input} id="video-file" className={styles.fileInput} type="file" accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm" aria-describedby="file-help" onChange={(event) => {
             const file = event.currentTarget.files?.[0];
             if (file) { session.current?.select(file); setPlaybackMessage(""); }
             event.currentTarget.value = "";
@@ -48,10 +52,14 @@ export function VideoUpload() {
           {selection ? (
             <>
               <div className={styles.fileInfo}><span>{selection.file.name}</span><span>{(selection.file.size / 1024 / 1024).toFixed(1)} MiB</span></div>
+              <div className={styles.playerStage}>
               <video key={selection.url} ref={video} className={styles.player} src={selection.url} controls playsInline preload="metadata" aria-label={`Preview of ${selection.file.name}`} onLoadedMetadata={(event) => {
                 const player = event.currentTarget;
                 session.current?.metadata(selection.url, player.duration, player.videoWidth, player.videoHeight);
               }} onError={() => session.current?.previewFailed(selection.url)} />
+              <PlaybackOverlay video={video} track={state.poseTrack} enabled={showSkeleton && state.preview === "ready" && state.result?.provenance.kind === "measured"} />
+              </div>
+              {state.poseTrack && state.preview === "ready" && <label className={styles.overlayToggle}><input type="checkbox" checked={showSkeleton} onChange={(event) => setShowSkeleton(event.target.checked)} /> Show skeleton · estimated visible joints</label>}
               {state.preview === "loading" && <p className="muted small" role="status">Loading video preview… You can still submit it if your browser cannot read the metadata.</p>}
               {state.preview === "unplayable" && <p className={styles.notice}>This browser cannot preview this codec. You can still try analysis, but timestamp playback is unavailable. For playback, export an H.264 MP4 and analyze that same export.</p>}
               <p className="small" role="status">{playbackMessage}</p>
@@ -60,7 +68,7 @@ export function VideoUpload() {
           {state.validationError && <p className={styles.error} role="alert">{state.validationError}</p>}
           <div className={styles.actions}>
             <button className="primary-action" type="button" disabled={!selection || !!state.validationError || busy} onClick={() => { setPlaybackMessage(""); void session.current?.submit(); }}>{busy ? "Analyzing video…" : state.phase === "error" ? "Try analysis again" : "Analyze push-ups"}<span aria-hidden="true">↗</span></button>
-            {busy ? <button className={styles.secondary} type="button" onClick={() => session.current?.cancel()}>Stop waiting</button> : selection && <button className={styles.secondary} type="button" onClick={() => { session.current?.select(null); setPlaybackMessage(""); input.current?.focus(); }}>Remove clip</button>}
+            {busy ? <button className={styles.secondary} type="button" onClick={() => session.current?.cancel()}>Stop waiting</button> : selection && <button className={styles.secondary} type="button" onClick={() => { session.current?.select(null); setPlaybackMessage(""); chooser.current?.focus(); }}>Remove clip</button>}
           </div>
           <div role="status" aria-live="polite">
             {busy && <p className={styles.notice}>Analyzing your uploaded video. This can take a few minutes. Keep this page open; no need to submit again.</p>}

@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 from app.domain.analysis import AnalysisResponse
 from app.domain.base import ContractModel
 from app.domain.pose import LiveBatchRequest
+from app.domain.video import VideoAnalysisResponse
 
 
 class HealthResponse(ContractModel):
@@ -49,6 +50,7 @@ class ApiContract(ContractModel):
     """Schema bundle for generating matching frontend types; not an API endpoint."""
 
     analysis_response: AnalysisResponse
+    video_analysis_response: VideoAnalysisResponse
     live_batch_request: LiveBatchRequest
     coach_request: CoachRequest
     coach_response: CoachResponse

@@ -6,6 +6,7 @@ Both computers depend on this directory. `contractVersion` is **1.0**.
 - `examples/pushup-analysis.json`: explicitly synthetic one-rep timing/angle fixture; null scores, no matching video.
 - `examples/squat-analysis.json`: explicitly synthetic six-rep UI fixture. Not a CV result.
 - `examples/live-pose-batch.json`: two synthetic frames showing the request shape. Not enough to count a rep.
+- `examples/pushup-video-with-pose.json`: synthetic analysis/pose-track envelope; authored geometry, no matching video. New additive endpoint, old analysis shape unchanged.
 - `analysis.schema.json`: standalone analysis JSON Schema, draft 2020-12.
 - `api.schema.json`: schema bundle for all JSON request/response types. The bundle wrapper is not an endpoint.
 

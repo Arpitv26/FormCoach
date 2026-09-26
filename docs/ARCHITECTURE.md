@@ -5,7 +5,7 @@ input paths and one movement analyzer:
 
 ```mermaid
 flowchart TD
-  Camera[Live webcam in Next.js] --> BrowserPose[Future browser pose adapter]
+  Camera[Live webcam in Next.js] --> BrowserPose[Browser pose adapter]
   BrowserPose --> Batch[HTTP cumulative PoseFrame batch]
   Batch --> Analyzer[Python MovementAnalyzer]
   Upload[Uploaded video] --> Video[Frame extraction + pretrained pose adapter]
@@ -22,8 +22,9 @@ flowchart TD
 Contracts, interfaces, profiles, geometry, visibility checks, and push-up/squat rep counting through
 the live route are implemented. Local backend video pose extraction is available through an optional MediaPipe adapter.
 HTTP upload now calls that adapter. Push-up timing/range comparisons emit descriptive review
-flags with supporting evidence. Browser extraction, biomechanical form assessment, and scoring
-remain future work. Coaching uses a local fallback.
+flags with supporting evidence. Browser extraction now renders a live skeleton locally. Sending live poses to the analyzer,
+biomechanical form assessment, and scoring remain future work. Coaching uses a local fallback
+with optional OpenAI evidence selection. See POSE_OVERLAY.md for the current overlay checkpoint.
 
 ## Application boundaries
 
@@ -34,7 +35,7 @@ CORS permits browser calls from `localhost:3000` and `127.0.0.1:3000` by default
 
 | Component | Owns | Must not own |
 | --- | --- | --- |
-| Next.js | Camera permission, eventual browser pose adapter, rendering, playback, user choices | Python scoring/rep algorithms, API credentials |
+| Next.js | Camera permission, browser pose adapter, rendering, playback, user choices | Python scoring/rep algorithms, API credentials |
 | Route handlers | HTTP input validation and response/error shapes | Movement math |
 | Domain models | Provider-independent poses and versioned analysis | MediaPipe classes, UI components |
 | Movement analyzer | Visibility gating, geometry, segmentation, metrics, issue evidence | Video decoding, HTTP, natural-language inventions |

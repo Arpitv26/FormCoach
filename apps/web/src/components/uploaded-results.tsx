@@ -25,7 +25,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
       <dl className={styles.summary}>
         <div><dt>Counted reps</dt><dd>{analysis.summary.totalReps ?? "Unavailable"}</dd></div>
         <div><dt>Video duration</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>
-        <div><dt>Form score</dt><dd>{analysis.summary.overallScore == null ? "Unavailable" : `${analysis.summary.overallScore}/100`}</dd></div>
+        {analysis.summary.overallScore != null && <div><dt>Form score</dt><dd>{analysis.summary.overallScore}/100</dd></div>}
       </dl>
       {analysis.summary.overallScore == null && <p className="muted small">No form score was returned. Elbow measurements describe observed movement; they are not a quality rating.</p>}
       {analysis.status === "partial" && <p className={styles.notice}>This is the final response for this upload. Some evidence or a rep may be incomplete; check the limitations below.</p>}
@@ -35,7 +35,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
           <div className={styles.repHeading}><h3>Rep {rep.repNumber}</h3><button type="button" disabled={!seekEnabled} onClick={() => onSeek(rep.startMs)}>View at {seconds(rep.startMs)} <span aria-hidden="true">↗</span></button></div>
           <p className="muted small">{seconds(rep.startMs)} – {seconds(rep.endMs)} · Counted duration: {seconds(rep.measurements.durationMs)}</p>
           <dl className={styles.measurements}>
-            {(["Left", "Right"] as const).map((side) => (
+            {(["Left", "Right"] as const).filter((side) => rep.measurements[`minSmoothed${side}ElbowAngleDeg`] != null).map((side) => (
               <div key={side}><dt>{side} elbow · min / max</dt><dd>{angle(rep.measurements[`minSmoothed${side}ElbowAngleDeg`])} / {angle(rep.measurements[`maxSmoothed${side}ElbowAngleDeg`])}</dd><dt>Observed angle range</dt><dd>{angle(rep.measurements[`smoothed${side}ElbowExcursionDeg`])}</dd></div>
             ))}
             <div><dt>Time to minimum angle</dt><dd>{seconds(rep.measurements.timeToMinElbowAngleMs)}</dd><dt>Time after minimum angle</dt><dd>{seconds(rep.measurements.timeFromMinElbowAngleMs)}</dd></div>
@@ -45,13 +45,14 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
         </article>
       ))}
       <p className="muted small">Angles are smoothed 2D observations and depend on the camera view. Timing can include pauses and rep confirmation; it does not identify lifting or lowering phases.</p>
-      <div className={styles.evidence}>
-        <h3>Visibility &amp; limitations</h3>
+      <p className="muted small">Only visible, sufficiently tracked joints are measured. Full-body visibility and camera angle are not verified.</p>
+      <details className={styles.evidence}>
+        <summary>How these measurements work · visibility &amp; limitations</summary>
         <p>Full body visible: {analysis.cameraQuality.fullBodyVisible === null ? "Unknown" : analysis.cameraQuality.fullBodyVisible ? "Yes" : "No"}. Camera quality: {analysis.cameraQuality.score ?? "Unavailable"}.</p>
         <p className="muted small">Push-ups are your selected exercise. Selection alone does not confirm exercise detection.</p>
         {[...analysis.cameraQuality.issues, ...analysis.limitations].length > 0 && <ul>{[...analysis.cameraQuality.issues, ...analysis.limitations].map((item, index) => <li key={index}>{item}</li>)}</ul>}
         {analysis.issues.map((issue) => <p key={issue.id}>{issue.title}: {issue.explanation}</p>)}
-      </div>
+      </details>
     </section>
   );
 }

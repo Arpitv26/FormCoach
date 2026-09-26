@@ -585,6 +585,45 @@
       "title": "PoseLandmark",
       "type": "object"
     },
+    "PoseTrack": {
+      "additionalProperties": false,
+      "properties": {
+        "imageWidth": {
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "Imagewidth",
+          "type": "integer"
+        },
+        "imageHeight": {
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "Imageheight",
+          "type": "integer"
+        },
+        "durationMs": {
+          "maximum": 120000,
+          "minimum": 0,
+          "title": "Durationms",
+          "type": "integer"
+        },
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/PoseFrame"
+          },
+          "maxItems": 1800,
+          "title": "Frames",
+          "type": "array"
+        }
+      },
+      "required": [
+        "imageWidth",
+        "imageHeight",
+        "durationMs",
+        "frames"
+      ],
+      "title": "PoseTrack",
+      "type": "object"
+    },
     "Provenance": {
       "additionalProperties": false,
       "properties": {
@@ -997,6 +1036,29 @@
       ],
       "title": "TimelineEvent",
       "type": "object"
+    },
+    "VideoAnalysisResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "contractVersion": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Contractversion",
+          "type": "string"
+        },
+        "analysis": {
+          "$ref": "#/$defs/AnalysisResponse"
+        },
+        "poseTrack": {
+          "$ref": "#/$defs/PoseTrack"
+        }
+      },
+      "required": [
+        "analysis",
+        "poseTrack"
+      ],
+      "title": "VideoAnalysisResponse",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -1004,6 +1066,9 @@
   "properties": {
     "analysisResponse": {
       "$ref": "#/$defs/AnalysisResponse"
+    },
+    "videoAnalysisResponse": {
+      "$ref": "#/$defs/VideoAnalysisResponse"
     },
     "liveBatchRequest": {
       "$ref": "#/$defs/LiveBatchRequest"
@@ -1023,6 +1088,7 @@
   },
   "required": [
     "analysisResponse",
+    "videoAnalysisResponse",
     "liveBatchRequest",
     "coachRequest",
     "coachResponse",

@@ -11,6 +11,7 @@ from fastapi import UploadFile
 from app.analysis.exercises.registry import PROFILES
 from app.analysis.interfaces import MovementAnalyzer
 from app.domain.analysis import AnalysisResponse, Source
+from app.domain.video import PoseTrack, VideoAnalysisResponse
 from app.services.mediapipe_pose import MAX_VIDEO_BYTES
 from app.services.pose_provider import PoseProvider
 
@@ -27,6 +28,10 @@ class VideoRequestError(Exception):
 class VideoProcessor(Protocol):
     def analyze(self, file: UploadFile, exercise_hint: str | None) -> AnalysisResponse: ...
 
+    def analyze_with_pose(
+        self, file: UploadFile, exercise_hint: str | None
+    ) -> VideoAnalysisResponse: ...
+
 
 class UploadedVideoProcessor:
     def __init__(self, provider: PoseProvider, analyzer: MovementAnalyzer) -> None:
@@ -36,6 +41,11 @@ class UploadedVideoProcessor:
         self._gate = _EXTRACTION_GATE
 
     def analyze(self, file: UploadFile, exercise_hint: str | None) -> AnalysisResponse:
+        return self.analyze_with_pose(file, exercise_hint).analysis
+
+    def analyze_with_pose(
+        self, file: UploadFile, exercise_hint: str | None
+    ) -> VideoAnalysisResponse:
         if not exercise_hint:
             raise VideoRequestError(400, "EXERCISE_REQUIRED", "Select push-up before uploading.")
         if exercise_hint not in PROFILES:
@@ -73,7 +83,15 @@ class UploadedVideoProcessor:
                     "Poses extracted with MediaPipe Pose Landmarker Full. No-pose/multiple-person "
                     "frames are unavailable. Model estimates and rep counts need video review."
                 )
-                return result
+                return VideoAnalysisResponse(
+                    analysis=result,
+                    pose_track=PoseTrack(
+                        image_width=sequence.image_width,
+                        image_height=sequence.image_height,
+                        duration_ms=sequence.duration_ms,
+                        frames=sequence.frames,
+                    ),
+                )
         finally:
             self._gate.release()
 

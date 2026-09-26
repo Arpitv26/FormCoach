@@ -1,5 +1,25 @@
 # Computer A / Computer B integration checkpoint
 
+## New overlay checkpoint — 2026-09-26
+
+[Overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3) contains the complete feature,
+fixes and refreshed handoff. `pose-overlay` branches from backend PR #2 at `f049013`;
+#2 remains unchanged. Merge #2 first, then #3 after its checks pass.
+User explicitly authorized A to implement the camera/upload overlay UI because B was not
+editing those screens. Remote frontend rechecked: still `5dd6bb4`.
+Read **POSE_OVERLAY.md** for setup, changed seams and test evidence. The new endpoint is
+additive; existing AnalysisResponse stays unchanged. Landscape and portrait upload overlays
+and simulated live-camera tracking are verified. The human also reports physical-camera
+tracking works with some flicker. The follow-up `dde10e2` fixes false XNNPACK console errors
+and adds display-only smoothing; 35 frontend tests and the dev-browser regression check pass.
+Physical-camera recheck after that fix and live counting remain next. Review/merge #2 before this feature, then B can pull the integrated main.
+
+The refreshed FRONTEND_HANDOFF.md is the current entry point for B, including all features,
+fixes, mock data, setup commands and next work. PR #2 alone does not contain the overlays.
+
+The section below records the earlier integration baseline; its test counts and preview-only
+status describe that earlier snapshot, not the overlay branch.
+
 ## Reviewed and integrated — 2026-09-26
 
 Frontend PR #1, `5dd6bb4`, was reviewed and merged into `main` as `9c16f22`.

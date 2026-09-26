@@ -4,6 +4,7 @@ import type {
   CoachResponse,
   HealthResponse,
   LiveBatchRequest,
+  VideoAnalysisResponse,
 } from "./types";
 
 export class ApiError extends Error {
@@ -75,6 +76,12 @@ export function createApiClient(
       return request<AnalysisResponse>("/videos/analyze", { method: "POST", body: form, signal }, 240_000);
     },
     coach: (input: CoachRequest) => post<CoachResponse>("/coach", input),
+    analyzeVideoWithPose: (file: File, exerciseHint: string, signal?: AbortSignal) => {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("exerciseHint", exerciseHint);
+      return request<VideoAnalysisResponse>("/videos/analyze-with-pose", { method: "POST", body: form, signal }, 240_000);
+    },
   };
 }
 

@@ -92,7 +92,14 @@ against two preceding stable reps, with evidence and unknown confidence; see app
 Real clips retain counts 3/1/1/2 and produce no flags; positive cases are synthetic so far.
 B can integrate later. Evidence-only coaching, mocked SDK tests, and one live OpenAI QA
 request are verified (2026-09-26, synthetic timing question, 3.22 seconds; docs/AI_COACH.md).
-Next for A: real positive-case comparison validation. Recheck origin/frontend periodically and update
+User authorized A to implement live camera and uploaded-video skeleton overlays on the
+`pose-overlay` branch, based on backend PR #2. Read docs/POSE_OVERLAY.md before changing
+camera/upload code. Live skeleton works locally; live counting is not connected. Existing
+AnalysisResponse is unchanged; additive VideoAnalysisResponse includes the exact pose track.
+The human reports physical-camera tracking works with some flicker. The `dde10e2` follow-up
+fixes false Next.js startup errors and adds display-only smoothing. FRONTEND_HANDOFF.md is
+refreshed for the complete checkpoint; B must integrate both backend and overlay PRs.
+Next: physical webcam recheck after the fix, live counting integration, and real positive-case comparison validation. Recheck origin/frontend periodically and update
 docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

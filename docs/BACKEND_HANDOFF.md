@@ -37,7 +37,8 @@ see apps/api/COACH_SETUP.md and docs/AI_COACH.md. Authored fixture angles are no
 | Completed | Causal timing/range comparison flags with thresholds, reference evidence, and replay tests | Changes to review, not quality scores |
 | Completed | Evidence-only local coach and optional OpenAI selector with simulated HTTP tests | Stable v1.0 shape |
 | Next for A | Real positive-case comparison validation | Requires suitable footage; scoring still deferred |
-| Later | Browser tracking, lunge/other exercises | Only after the recorded push-up demo works |
+| Completed | Additive uploaded pose-track response and live browser skeleton (user-authorized A UI work) | See POSE_OVERLAY.md |
+| Later | Live counting integration, lunge/other exercises | Only after the recorded push-up demo works |
 | Stretch | Automatic exercise detection, ghost comparison, custom ML, history | Only if demo is stable |
 
 Computer B owns browser camera extraction and playback. Computer A owns movement
