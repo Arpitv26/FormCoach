@@ -118,7 +118,11 @@ class _AngleCycleCounter:
             self.candidate_since = timestamp
         elif timestamp - self.candidate_since >= self.config.minimum_phase_ms:
             self._transition(target, timestamp)
-            self.candidate = None
+            # This same observation may already satisfy the next phase's threshold
+            # (e.g. the arm is extended when ascent is confirmed). Start its dwell
+            # now; waiting for another frame adds a needless sample of latency.
+            self.candidate = self._target(self.last_angle)
+            self.candidate_since = timestamp
 
     def _target(self, angle: float) -> MovementPhase | None:
         config = self.config

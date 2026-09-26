@@ -1,0 +1,112 @@
+# Recorded push-up validation — September 26, 2026
+
+## Result
+
+All four supplied recordings decode on Computer A without conversion. They are HEVC
+videos in MOV containers, roughly 60 fps. The portrait clip's rotation metadata is applied
+before pose extraction. Google's pretrained MediaPipe Pose Landmarker Full produced the
+poses; our existing Python elbow-cycle analyzer produced the counts.
+
+| Local file | Duration (approx.) | Size | Upright dimensions | Human count | Before fix | After fix |
+| --- | --- | --- | --- | --- | --- | --- |
+| `IMG_6937.MOV` | 19.11 s | 121.7 MiB | 3840 × 2160 | 3 | 3 | 3 |
+| `IMG_6938.MOV` | 3.52 s | 22.2 MiB | 2160 × 3840 | 1 | 0 | 1 |
+| `IMG_6939.MOV` | 3.07 s | 19.7 MiB | 3840 × 2160 | 1 | 1 | 1 |
+| `IMG_6940.MOV` | 6.94 s | 44.1 MiB | 3840 × 2160 | 2 | 2 | 2 |
+
+The participant supplied the human counts. Visual review of frame sequences at 0.25–0.35 s
+spacing also matched these seven cycles. These are development clips, including one used
+to find a bug; this is not an independent accuracy benchmark or proof of generalization.
+
+All four final responses are `complete`. Cumulative replay through the actual HTTP live
+endpoint matched the counts, preserved completed reps across batches, and returned an
+identical response when the final request was repeated. Counts passed for both the left
+elbow (6937–6939) and right elbow (6940), selected by the existing visibility rules.
+
+## Timing fix
+
+The short portrait clip initially returned zero completed reps. At 3268 ms, one observation
+both confirmed ascent and met the straight-arm threshold. The old counter discarded that
+observation for the next phase, delaying the top-position confirmation timer by one sample.
+The recording ended before that unnecessarily delayed timer completed.
+
+The shared counter now starts the next phase's timer on the transition observation when
+that observation meets its threshold. It still requires the full 150 ms confirmation;
+angle thresholds, smoothing, and finalization rules are unchanged. Synthetic regression
+tests cover completion at the boundary, insufficient dwell, and a brief extension spike.
+The fix was checked against the cached real poses from all four clips and the existing
+squat tests. No clip names or special-case thresholds appear in the algorithm.
+The complete backend suite passes **213 tests**; Ruff lint/format and schema checks pass.
+
+Observed rep intervals after the fix (seconds from the start of each clip):
+
+| Clip | Rep intervals |
+| --- | --- |
+| 6937 | 4.402–6.937; 13.607–15.540; 16.475–18.808 |
+| 6938 | 1.467–3.468 |
+| 6939 | 0.733–2.735 |
+| 6940 | 1.467–3.468; 4.202–6.270 |
+
+These boundaries come from smoothed angles and phase confirmation. They include latency;
+visual sequence review establishes correspondence to the observed cycles, not millisecond
+accuracy against manually annotated start/end times. Verify seeking again in the actual UI.
+
+## Repeat on Computer A
+
+The four original MOV files are in the repository root and ignored by Git. Follow
+[VIDEO_SETUP.md](VIDEO_SETUP.md) once to install optional packages and download the model.
+From the repository root, run:
+
+```bash
+cd apps/api
+source .venv/bin/activate
+python -m app.tools.analyze_video ../../IMG_6937.MOV --output artifacts/check-6937
+python -m app.tools.analyze_video ../../IMG_6938.MOV --output artifacts/check-6938
+python -m app.tools.analyze_video ../../IMG_6939.MOV --output artifacts/check-6939
+python -m app.tools.analyze_video ../../IMG_6940.MOV --output artifacts/check-6940
+```
+
+Expect counts **3, 1, 1, 2** and `complete`. Use new output folder names if those folders
+already exist; the tool refuses to overwrite a previous result. Each run writes `poses.json`
+and `analysis.json`. No API server is needed for extraction.
+
+For HTTP verification, open a second terminal at the repository root:
+
+```bash
+cd apps/api
+source .venv/bin/activate
+python -m uvicorn app.main:app --port 8000
+```
+
+Leave it running. In the first terminal, still in `apps/api`, run:
+
+```bash
+python -m app.tools.replay_live artifacts/check-6937/poses.json --expected-reps 3
+python -m app.tools.replay_live artifacts/check-6938/poses.json --expected-reps 1
+python -m app.tools.replay_live artifacts/check-6939/poses.json --expected-reps 1
+python -m app.tools.replay_live artifacts/check-6940/poses.json --expected-reps 2
+```
+
+Each report should say `count_match`. Stop the server with **Control+C** in its terminal.
+Another computer must obtain the consented clips separately; recordings are not in Git.
+
+## Local evidence and remaining limits
+
+Computer A's ignored `artifacts/recording-review/` contains metadata, visual frame sheets,
+`recording-analysis.png` (angle/timing chart), original model outputs under `baseline/`,
+and fixed-counter results plus HTTP replay reports under `reviewed/`. Cached poses were
+reused after the counter fix because pose extraction did not change. Do not commit these
+files or turn the recordings into public test fixtures.
+
+- This validates counting on these clips only. Scores remain null; body alignment, form
+  issues, symmetry, and injury-related conclusions are not implemented or validated.
+- The camera angle is not automatically classified. A selected `push-up` hint is not
+  exercise recognition. A successful count is not a judgment of correct form.
+- 6939 is a short landscape smoke test; 6937 provides three reps and pauses, while 6940
+  checks the opposite visible side. Keep 6938 as the short portrait boundary regression.
+- Processing the 4K clips took tens of seconds with other review work running. This was
+  not a controlled speed benchmark. Measure response time and coordinate the frontend's
+  request timeout/loading state before enabling synchronous HTTP uploads.
+- **Next checkpoint:** connect the validated provider/analyzer to `POST /api/v1/videos/analyze`
+  with upload limits, explicit dependency/decode errors, temporary-file cleanup, and tests.
+  It currently returns 501. Then check Computer B's playback against these same timestamps.

@@ -22,13 +22,13 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `app/api/routes` | HTTP validation, routing, status codes |
 | `app/core` | Local settings and CORS |
 | `app/domain` | Stable v1.0 JSON types and semantic validation |
-| `app/analysis` | Geometry, visibility, squat segmentation and analyzer; future scoring |
+| `app/analysis` | Geometry, visibility, push-up/squat segmentation and analyzer; future scoring |
 | `app/analysis/exercises` | Example/planned configuration profiles |
-| `app/services` | Future pose/video/OpenAI adapters; local coach fallback |
+| `app/services` | Optional MediaPipe/video adapters; local coach fallback |
 | `tests` | Route, validation, fixture, and score arithmetic checks |
 
 Pose analysis counts push-up and squat reps from supplied poses. Other hints (or no hint) return
-`not_implemented`. Upload returns 501. Coach remains local. SDK/CV integration is future work.
+`not_implemented`. Upload returns 501. Coach remains local. Local CV extraction is available; HTTP upload integration is next.
 
 ## Feature checkpoint 1: joint angles and landmark visibility
 
@@ -106,10 +106,14 @@ landmarks; no real-camera accuracy has been established yet.
 ## Feature checkpoint 3: live API integration
 
 `app/analysis/movement.py` implements `MovementAnalyzer`. The live route now selects
-`RuleBasedAnalyzer`, which measures the supplied poses and replays the squat counter.
+`RuleBasedAnalyzer`, which measures the supplied poses and replays the selected push-up or squat counter.
 No contract fields, schemas, frontend files, or dependencies changed.
 
-- Send `exerciseHint: "squat"`. No hint or another registered exercise remains unimplemented.
+The joint names and standing-phase details below describe the original squat path.
+See **Push-up priority** below for its elbow measurements and top-position equivalent.
+
+- Send `exerciseHint: "push-up"` for the demo or `"squat"` for the legacy counter.
+  No hint or another registered exercise remains unimplemented.
 - The first usable hip-knee-ankle triplet selects the side; left wins if both work in that
   frame. Keep this side throughout the set, including during tracking loss. Visibility must
   be at least 0.7 for each joint. Coordinates must be in-frame, with non-degenerate geometry.
@@ -124,7 +128,7 @@ No contract fields, schemas, frontend files, or dependencies changed.
   Final interrupted sets remain `partial`; read `limitations`, even after Stop.
 - `provenance.kind: "measured"` means the algorithm ran on supplied poses. The server cannot
   verify they came from a camera. Synthetic test inputs must still be presented as synthetic.
-- This is a tested pose-to-response path; real-camera accuracy is still unverified. Use a
+- Squat real-camera accuracy is still unverified. Use a
   side view, keep one whole leg visible, and stand still briefly before and after each set.
 
 From `apps/api`, with `.venv` active:
@@ -165,21 +169,23 @@ instead of standing. Null/confidence/tracking-loss behavior follows checkpoint 3
 
 Checkpoint 4 preparation now includes a [capture replay tool and step-by-step guide](examples/README.md).
 It tests saved poses against a running API, compares a human count, and checks cumulative
-response stability. A labeled synthetic example is included. Real captured poses and matching
-video are still needed before checking off real-camera validation.
+response stability. A labeled synthetic example is included. Four actual MOV recordings
+now match the human counts of 3, 1, 1, and 2; see [VALIDATION.md](VALIDATION.md) for
+evidence, the short-clip timing fix, repeat commands, and limits of this check.
 
 1. Completed: geometry and visibility helpers.
 2. Completed: conservative squat segmentation, smoothing, and failure-case tests.
 3. Completed: connect measured poses and completed reps to the existing live API contract.
 4. Completed: push-up elbow counting and capture replay checker, tested with synthetic inputs.
-5. Local video extraction implemented; next compare the user's push-ups with human counts.
-6. Add supported push-up metrics, explainable scoring, and recorded-video UI integration.
-7. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
+5. Completed: local video extraction and count/sequence review on four actual recordings.
+6. Next: HTTP upload integration, cleanup/error tests, and frontend playback/timeout coordination.
+7. Add supported push-up metrics and explainable scoring.
+8. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
 
 The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
 It uses optional pinned MediaPipe/OpenCV packages, writes poses and upload analysis locally,
-and leaves the HTTP upload route at 501 until actual-footage validation and route integration.
-Next within checkpoint 5: analyze the user's recording and compare counts/timestamps.
+and leaves the HTTP upload route at 501 until route integration. Actual-footage counts
+are checked; UI seeking accuracy and broader counting reliability remain to be tested.
 
 Keep each checkpoint small: implement, test, review, commit, and push `backend-cv`.
 

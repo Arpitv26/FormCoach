@@ -26,6 +26,24 @@ def test_pushup_phases_and_three_completed_cycles():
     assert segment_pushups(samples) == segment_pushups(samples)
 
 
+def test_top_dwell_starts_on_the_frame_that_confirms_ascent():
+    # A short recording ends after enough observed extension. Confirming ascent
+    # must not discard the first top observation and require an extra frame.
+    angles = STANDING + [140] * 5 + [90] * 5 + [130] * 2 + [170] * 4
+    samples = [AngleSample(index * 100, angle) for index, angle in enumerate(angles)]
+    result = segment_pushups(samples)
+    assert len(result.reps) == 1
+    assert result.reps[0].end_ms == 2000
+    assert result.current_phase == "top"
+    assert not segment_pushups(samples[:-1]).reps  # Full dwell is still required.
+
+
+def test_brief_top_spike_during_ascent_does_not_complete_a_rep():
+    angles = STANDING + [140] * 5 + [90] * 5 + [130] * 2 + [170] * 2 + [130] * 4
+    samples = [AngleSample(index * 100, angle) for index, angle in enumerate(angles)]
+    assert not segment_pushups(samples).reps
+
+
 @pytest.mark.parametrize("side", ["left", "right"])
 def test_pushup_http_measures_elbow_not_knee_and_keeps_scores_unknown(client, side):
     result = analyze(client, pushup_request(side=side, final=True))

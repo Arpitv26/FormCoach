@@ -1,7 +1,8 @@
 # Prerecorded push-up video — local backend checkpoint
 
 **Current scope:** a local command extracts poses from a video and writes measured analysis.
-The HTTP upload route still returns 501; connect it only after we validate the actual clip.
+The HTTP upload route still returns 501; connecting it is the next checkpoint after the
+four-clip count check documented in [VALIDATION.md](VALIDATION.md).
 The frontend camera is not required. No API key or cloud upload is used by this command.
 
 We use Google's pretrained [MediaPipe Pose Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/python)
@@ -113,4 +114,5 @@ live contract reports the last sampled pose timestamp. Rep timestamps share the 
 
 Sources: [MediaPipe model bundles](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/index)
 and [OpenCV timestamp/rotation properties](https://docs.opencv.org/4.13.0/d4/d15/group__videoio__flags__base.html).
-Real-footage validation remains pending until the user's recording is analyzed and reviewed.
+Four supplied MOV recordings now match human counts (3, 1, 1, 2). See [VALIDATION.md](VALIDATION.md)
+for the timing fix, replay evidence, and limits; this is not a general form-accuracy claim.
