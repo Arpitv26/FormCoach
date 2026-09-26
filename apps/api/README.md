@@ -22,7 +22,7 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `app/api/routes` | HTTP validation, routing, status codes |
 | `app/core` | Local settings and CORS |
 | `app/domain` | Stable v1.0 JSON types and semantic validation |
-| `app/analysis` | Geometry and visibility helpers; analyzer placeholder; future rep/scoring helpers |
+| `app/analysis` | Geometry, visibility, and squat segmentation; analyzer placeholder; future scoring |
 | `app/analysis/exercises` | Example/planned configuration profiles |
 | `app/services` | Future pose/video/OpenAI adapters; local coach fallback |
 | `tests` | Route, validation, fixture, and score arithmetic checks |
@@ -59,6 +59,61 @@ python -m pytest -q tests/test_geometry.py tests/test_visibility.py
 The first command activates the project's Python environment. The second prints `90.0`:
 the three points form a right angle. The tests should show **57 passed**. They cover known
 angles, image aspect ratios, missing/hidden/outside landmarks, and invalid configuration.
+
+## Feature checkpoint 2: squat rep counting
+
+`app/analysis/exercises/squat_segmentation.py` supplies `segment_squats`. It consumes a
+chronological sequence of `AngleSample(timestamp_ms, angle_deg)` values from one knee.
+Use the geometry helper's output; keep the same anatomical side throughout a set, and
+send `None` when a required joint is unusable. Do not switch knees to bridge lost tracking.
+The result contains completed rep segments, the current phase, the latest smoothed angle,
+and the number of tracking breaks. These are internal types; the public API is unchanged.
+
+The counter must observe standing before it can follow descent -> bottom -> ascent ->
+standing and count a rep. The initial policy only counts cycles reaching the configured
+bottom threshold: shallow attempts are not counted yet. This is a limitation of the
+provisional segmentation policy, not a judgment about correct squat depth.
+
+| Setting | Initial heuristic |
+| --- | --- |
+| Standing / bottom knee angles | At least 160 degrees / at most 100 degrees, from the squat profile |
+| Separate transition thresholds | Begin descent at 150 degrees or less; leave bottom at 110 or more |
+| Stable transition | Condition must hold for at least 150 ms across consecutive usable samples |
+| Smoothing | Median of the most recent 3 usable angle samples; wait for a full window after reset |
+| Completed-rep duration | At least 800 ms; unfinished attempts expire after 15000 ms |
+| Tracking gaps | More than 300 ms between samples resets readiness and any unfinished rep |
+| Missing angle | Any `None` resets immediately, even for a short dropout; completed reps are retained |
+
+These heuristics need real-camera calibration. The three-sample median depends on sampling
+rate, and smoothing/confirmation add latency. No missing poses are interpolated. Start is
+the first sample of a confirmed descent; end is the sample confirming standing. The bottom
+timestamp is the earliest lowest smoothed angle observed after descent confirmation, not
+an independently verified anatomical bottom. All times use the original sample clock.
+
+Replay the complete cumulative set on every call. Returned reps replace the prior result;
+do not add the latest count to the previous count. A final snapshot never completes an
+unfinished rep automatically. The live route is still a placeholder until checkpoint 3.
+
+Run the focused tests from `apps/api`, with `.venv` active:
+
+```bash
+python -m pytest -q tests/test_squat_segmentation.py
+```
+
+Expect **43 passed**. The tests use synthetic angle sequences and known synthetic body
+landmarks; no real-camera accuracy has been established yet.
+
+## Remaining backend plan
+
+1. Completed: geometry and visibility helpers.
+2. Completed: conservative squat segmentation, smoothing, and failure-case tests.
+3. Next: connect measured poses and completed reps to the existing live API contract.
+4. Integrate browser poses with Computer B and compare against visible repetitions in a clip.
+5. Add per-rep measurements, supported feedback, and explainable scoring.
+6. Add uploaded-video pose extraction through the same analyzer.
+7. Add evidence-only OpenAI coaching, then consider additional exercises.
+
+Keep each checkpoint small: implement, test, review, commit, and push `backend-cv`.
 
 ## Backend checks
 
