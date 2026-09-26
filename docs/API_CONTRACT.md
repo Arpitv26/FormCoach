@@ -19,7 +19,10 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 - `provenance.kind`: `measured`, `synthetic`, or `placeholder`. Always expose synthetic labels.
 - Empty issue lists do not prove good form when analysis is unavailable.
 - `limitations` explains missing scores, uncalibrated heuristics, view limits, or unavailable features.
-- No real exercise analysis is supported in bootstrap. Profiles describe planned capability.
+- Push-up and squat counting from supplied poses is implemented; four real push-up clips
+  match human counts. This is not a general accuracy benchmark.
+  Other exercise profiles describe planned capability. Push-ups support descriptive timing/range
+  comparison flags; scores and biomechanical form assessment remain unavailable.
 - Extra fields are rejected by the backend models. Coordinate shared additions deliberately.
 
 ## GET /api/v1/health
@@ -115,21 +118,90 @@ the dashboard's current analysis; do not add response rep counts together. Do no
 only the newest chunk, as that loses reps at batch boundaries. Re-sending the same snapshot
 is safe. Abort or ignore an old response after switching sessions. Keep image dimensions
 and exercise hint fixed within a session; reset if either changes. Gaps retain original
-indices/timestamps and must be handled by future analysis, never filled with invented poses.
+indices/timestamps; the analyzer resets unfinished reps across tracking gaps, without interpolation.
 
-When the user ends the set, send its final snapshot with `isFinal: true`. Future analyzers
-return `partial` while the set is open and `complete` when finalized with enough evidence.
-Only completed reps appear in `reps`; an unfinished repetition is not counted. Missing data
-may produce `insufficient_data`. Bootstrap always returns `not_implemented`, including for
-an empty batch or final snapshot. It stores no session state and computes no movement.
+When the user ends the set, send its final snapshot with `isFinal: true`. For `squat`:
 
-`source.durationMs` in the placeholder is the last sample timestamp, or null if the batch
+- `insufficient_data`: stable standing has not been established (or tracking was lost before
+  any completed rep). Count is null. This includes the empty batch and tiny two-frame example.
+- `partial`: observations establish readiness or completed reps. Count is the number of
+  observed completed cycles, including zero when ready with none completed.
+- `complete`: final snapshot ends in confirmed standing with no unavailable angles or tracking
+  breaks anywhere in the received sequence. This does not imply form scores are available.
+- Final snapshots with tracking loss or a confirmed unfinished rep remain `partial`. Read the
+  limitations; the set need not still be recording. Completed reps survive tracking loss.
+
+Only completed reps appear in `reps`; finalization never finishes a rep automatically.
+There is no server session state. No hint or another registered hint returns `not_implemented`.
+
+`source.durationMs` is the last sample timestamp, or null if the batch
 is empty. It reports received sample coverage, not measured exercise duration. For live
 analysis, playback is relative to the same zero point. Local video recording for replay is future work.
 
-HTTP 200 body is a full `AnalysisResponse`. The placeholder echoes the session and known
-hint (confidence null), and returns null scores, null totalReps, empty reps/issues/timeline,
-and a clear limitation. The sample six-rep fixture is never returned for an arbitrary request.
+HTTP 200 body is a full `AnalysisResponse`. User-selected exercise confidence, all scores,
+camera quality score/fullBodyVisible, and scoring metadata remain null. The six-rep fixture
+is never substituted for a request. Empty issues do not establish good form.
+
+**Squat measurement policy:** choose the first usable hip-knee-ankle side, preferring left
+if both work in that frame, and keep it for the entire set. Each joint needs visibility at
+least 0.7 and in-frame coordinates; undefined geometry is unavailable. Missing angles or gaps
+over 300 ms reset readiness and discard unfinished reps. Start with stable standing in a side
+view. Camera orientation is not automatically validated. See apps/api/README.md for thresholds.
+
+Per-rep `measurements` contains `durationMs` and either `minSmoothedLeftKneeAngleDeg` or
+`minSmoothedRightKneeAngleDeg`. The minimum uses a causal three-sample median after descent
+confirmation, not raw samples. Its `minimum_knee_angle` key moment has a readable label.
+The timeline includes rep start, minimum-angle moment, and rep end. Timestamps include
+smoothing/confirmation latency. No front-view knee-tracking finding is inferred from this.
+
+For this analyzer, `provenance.kind: "measured"` identifies computation from the supplied
+poses; it does not attest that the client captured them from a camera. Keep synthetic inputs
+clearly labeled in demos/tests. Counting heuristics are not a validated fitness assessment.
+
+**Push-up support:** select `exerciseHint: "push-up"`. The same status, replay, visibility,
+side-locking, timing, and finalization policies apply, using the straight-arm top position
+instead of standing. The triplet is shoulder-elbow-wrist; initial thresholds are top >=160
+and bottom <=100 degrees. Results use `minSmoothedLeftElbowAngleDeg` or
+`minSmoothedRightElbowAngleDeg`, plus `durationMs` and a `minimum_elbow_angle` key moment.
+Additional push-up `measurements` keys (the dictionary is extensible; old results may lack them):
+
+| Key | Meaning |
+| --- | --- |
+| `maxSmoothedLeftElbowAngleDeg` / `maxSmoothedRightElbowAngleDeg` | Maximum on the selected side over the same window as the existing minimum |
+| `smoothedLeftElbowExcursionDeg` / `smoothedRightElbowExcursionDeg` | That maximum minus minimum, in degrees |
+| `angleMeasurementStartMs` | Inclusive timestamp of descent confirmation; extrema cover this through `endMs` |
+| `timeToMinElbowAngleMs` | Existing minimum key-moment timestamp minus `startMs` |
+| `timeFromMinElbowAngleMs` | `endMs` minus the minimum key-moment timestamp |
+
+The two time parts sum to `durationMs`; they include pauses and confirmation delay, not
+isolated lowering/lifting durations. Extrema exclude the initial top position before descent
+confirmation and later samples after rep completion. They describe observed 2D excursion,
+not a range-of-motion score. All `metrics` score fields remain null. See
+[measurement definitions](../apps/api/MEASUREMENTS.md) and the explicitly synthetic
+`contracts/examples/pushup-analysis.json` example. Missing keys mean unavailable, never zero.
+No body-alignment, depth-quality, or injury claim is implied by these provisional cycles.
+**Push-up comparison flags:** from rep 3 onward, compare with the immediately preceding two
+completed reps. Require continuous usable angles across that entire reference/current span,
+including between reps. Duration references must differ by at most 20% of their median;
+excursion references by at most 10°. Eligible comparisons emit numeric evidence even without a flag.
+
+- `PUSHUP_REP_DURATION_CHANGED`: absolute duration change >= max(500 ms, 30% of reference median).
+- `PUSHUP_ELBOW_EXCURSION_REDUCED`: excursion reduction >= max(15°, 20% of reference median).
+
+These are uncalibrated review heuristics. Issue severity is `low`, confidence is null,
+explanations contain measured values/reference reps/thresholds, and IDs link rep/session
+issues to timeline events at the current rep start. No bad-form, fatigue, or injury inference.
+`summary.primaryFocus` becomes `rep_consistency_review` when flags exist; scores remain null.
+Earlier rep results never change when frames are appended, including later tracking loss.
+
+New optional measurement keys: `comparisonReferenceStartRep`, `comparisonReferenceEndRep`,
+`referenceMedianDurationMs`, `durationDeltaMs`, `durationDeltaPercent`, `durationChangeThresholdMs`,
+`referenceMedianElbowExcursionDeg`, `elbowExcursionDeltaDeg`, `elbowExcursionDeltaPercent`,
+`elbowExcursionReductionThresholdDeg`. Deltas are current minus reference. Missing keys mean
+unavailable (too few reps, tracking loss, unstable/missing reference metric), not zero change.
+See [comparison policy](../apps/api/COMPARISONS.md) for exact units and limitations and
+`contracts/examples/pushup-comparison-analysis.json` for a clearly synthetic flagged example.
+The user-selected push-up demo replaces the earlier squat demo priority; wire shapes are unchanged.
 
 Registered IDs: `squat`, `push-up`, `lunge`, `barbell-squat`, `bicep-curl`, `shoulder-press`,
 `deadlift`. Unknown hints return HTTP 400 `UNKNOWN_EXERCISE`. Registration is not an assertion
@@ -148,23 +220,47 @@ curl -s http://localhost:8000/api/v1/live/analyze-batch \
 Content-Type: `multipart/form-data`, with required `file` and optional text `exerciseHint`.
 Let the browser set multipart headers; the client already does this. No JSON wrapper.
 
-**Bootstrap behavior:** HTTP 501, no pose extraction, no saved video, no fabricated analysis:
+**Implemented local upload behavior:** HTTP 200 returns the existing `AnalysisResponse`,
+with `source.type: "upload"`, a server-generated session ID, and timestamps relative to the
+upright decoded clip. `durationMs` covers the last decoded frame (not necessarily the media
+container's nominal duration). Counting uses the same analyzer as live. Scores remain null.
 
-```json
-{
-  "detail": {
-    "code": "VIDEO_ANALYSIS_NOT_IMPLEMENTED",
-    "message": "Video pose extraction is not implemented in this bootstrap."
-  }
-}
-```
+Send `exerciseHint: "push-up"` for the demo. The multipart field remains optional in the wire
+shape, but real processing requires explicit selection: missing/empty returns 400
+`EXERCISE_REQUIRED`; unknown IDs return `UNKNOWN_EXERCISE`; registered but unimplemented
+IDs return `EXERCISE_NOT_SUPPORTED`. Legacy `squat` also counts. No automatic detection.
 
-The declared future HTTP 200 body is `AnalysisResponse`, with `source.type: "upload"`,
-actual clip duration, and timestamps relative to the upright decoded clip. The backend
-will generate the upload session ID. Video acceptance limits and codec handling must be
-defined before enabling real extraction; the bootstrap is a local development endpoint.
-Do not upload large recordings just to test this stub. Starlette may spool multipart data
-to a temporary file before the handler closes it; this is not persistent video storage.
+Accepted: nonempty MP4/MOV/WebM, <=250 MiB, <=120 seconds, <=4K pixels and <=4096 per axis,
+fixed upright square-pixel dimensions, valid monotonic source timestamps. HEVC MOV works
+on Computer A; H.264 MP4 is a fallback for decoder/browser compatibility. MIME headers do
+not establish validity. Processing needs the optional local packages/model in VIDEO_SETUP.md.
+
+Uploads are synchronous, run in a worker thread, and permit one native extraction per API
+process. Concurrent analysis returns 503 `VIDEO_PROCESSOR_BUSY`. Temporary copies and
+multipart files are closed/removed when processing exits; the result contains no video URL
+or pose-frame sequence. Keep the original browser file for playback. Aborting a browser
+request does not immediately cancel native processing. No queue or persisted job exists.
+
+The 180-second extraction deadline is cooperative between native calls, not a hard native
+execution timeout. Starlette spools multipart data before handler size/concurrency checks;
+these are local-demo processing limits, not a hard incoming body/disk quota. Run one worker.
+
+Application errors retain the existing `detail.code` / `detail.message` shape:
+
+| HTTP | Codes |
+| --- | --- |
+| 400 | `EXERCISE_REQUIRED`, `UNKNOWN_EXERCISE`, `EXERCISE_NOT_SUPPORTED`, `EMPTY_VIDEO`, `INVALID_VIDEO` |
+| 413 | `VIDEO_TOO_LARGE` |
+| 415 | `UNSUPPORTED_VIDEO_TYPE` |
+| 503 | `VIDEO_SETUP_REQUIRED`, `VIDEO_PROCESSOR_BUSY` |
+| 504 | `VIDEO_PROCESSING_TIMEOUT` |
+| 500 | `VIDEO_PROCESSING_FAILED` (sanitized message; details in backend terminal) |
+
+Missing/malformed multipart fields use FastAPI's existing HTTP 422 shape. Insufficient pose
+evidence returns HTTP 200 with honest `insufficient_data`/`partial` analysis, never mock data.
+See [HTTP upload guide](../apps/api/HTTP_UPLOAD.md) for exact curl commands and B's checklist.
+**Frontend behavior:** the integrated client uses a separate 240-second upload timeout.
+Health/live/coach requests retain 15 seconds.
 
 ## AnalysisResponse
 
@@ -210,19 +306,22 @@ type CoachRequest = {
 
 HTTP 200: `contractVersion`, `sessionId`, `mode`, `provider: "fallback" | "openai"`,
 `message`, `evidence` (dot paths into the analysis), and `limitations`.
-The bootstrap always uses `fallback`, makes no network call, states that data is synthetic
-when applicable, quotes the supplied score only when available, and admits that free-form
-QA is not implemented. It does not echo arbitrary issue/cue text as advice. API keys do
-not enable unfinished functionality. The future adapter must follow AI_COACH.md.
+Default `fallback` makes no network call. It summarizes supplied counts, push-up timing,
+observed elbow excursion/comparisons, or the legacy supplied score. Synthetic data stays
+labeled and unknown scores stay unknown. Local free-form QA is unsupported.
+Optional `COACH_PROVIDER=openai` plus a backend key and SDK enables bounded evidence
+selection; the backend renders reviewed wording. Provider failures fall back honestly.
+`evidence` uses zero-based array dot paths; display `limitations` alongside `message`.
+No contract fields changed. See AI_COACH.md and apps/api/COACH_SETUP.md.
 
 ## Errors and frontend behavior
 
 - HTTP 400: application error `{"detail":{"code":"...","message":"..."}}`.
 - HTTP 422: FastAPI validation shape `{"detail":[{"loc":[...],"msg":"...","type":"...",...}]}`.
   Client shows a friendly message; developers inspect the network response for field errors.
-- HTTP 501: explicit unimplemented video processing (same shape as 400).
+- Upload-specific statuses and codes are listed above; all use the application error shape.
 - Network/unexpected server errors: client throws `ApiError`; no mock substitution.
-- Client timeout is 15 seconds; future real video extraction may require a deliberate increase.
+- Client timeout is 15 seconds for short requests and 240 seconds for uploads. Never automatically retry a timed-out upload.
 - No auth or durable session storage exists. Health does not expose secrets/settings.
 
 Change procedure and regeneration commands are in `contracts/README.md` and AGENTS.md.

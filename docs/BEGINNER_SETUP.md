@@ -99,7 +99,7 @@ The download ends with `Successfully installed ...` or `Requirement already sati
 repeating it would overwrite your local settings. Leave `OPENAI_API_KEY=` empty.
 
 The backend reads **apps/api/.env**. The root `.env.example` is a reference, not a file
-the apps automatically load. No key is needed; bootstrap coaching is always local.
+the apps automatically load. No key is needed; coaching defaults to local. Optional OpenAI setup is in apps/api/COACH_SETUP.md.
 Never paste keys into Python/TypeScript files, Git commits, screenshots, or `NEXT_PUBLIC_` variables.
 
 ## 6. Start the backend
@@ -148,9 +148,11 @@ npm run dev
 ```
 
 Success shows a local URL and `Ready`. Open **http://localhost:3000**.
-You should see **FormCoach**, a clearly labeled mock session, six rep scores, and
-**Check backend health**. Clicking that button should show `formcoach-api: ok` if Terminal 1 is running.
-This page is intentionally a starting point; it does not track your camera yet.
+You should see **FormCoach** with push-up upload and camera-preview choices. Open
+**Connection tools** near the bottom, then **Check backend health**: it should show
+`formcoach-api: ok` if Terminal 1 is running. Camera preview does not track/count movement.
+For real recorded-video analysis, follow apps/api/VIDEO_SETUP.md, then open
+http://localhost:3000/upload and select a push-up clip.
 
 ## 9. Stop or restart
 
@@ -182,7 +184,8 @@ Run `deactivate` after stopping the backend to leave its virtual environment.
 | Download fails with a network error | Connect to the internet and repeat the same install command. Do not use `sudo pip`. |
 | Browser cannot reach API | Open the health URL directly; check Terminal 1 is running. |
 | Browser reports CORS or health button fails despite API health working | Check the web port and API URL match the settings below. Restart both servers after changing `.env` files. |
-| Route returns 501 or `not_implemented` | Expected for bootstrap upload/live analysis. It is not a setup failure. |
+| Upload returns 503 `VIDEO_SETUP_REQUIRED` | Follow `apps/api/VIDEO_SETUP.md` to install the optional CV packages and model, then restart the API. |
+| Live analysis returns `not_implemented` | Select `push-up` or legacy `squat`; other exercises/automatic selection are not implemented. |
 
 ### Port already in use
 

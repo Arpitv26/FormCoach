@@ -3,13 +3,18 @@
 ## Project and stopping point
 
 FormCoach is a movement/fitness coaching demo for UBC BizTech HelloHacks 2026. Two beginner
-developers have roughly a tomorrow-scale hackathon timeline. Prioritize a reliable live
-squat demo, clear evidence, and a polished presentation. Judging: functionality 35%, pitch
+developers have roughly a tomorrow-scale hackathon timeline. Prioritize a reliable
+push-up demo using prerecorded gym video, clear evidence, and a polished presentation.
+Judging: functionality 35%, pitch
 25%, technical complexity 20%, UX/design 20%.
 
 The bootstrap task ends with a verified shared foundation on main. Do not implement the
 full product during bootstrap. Feature work begins after humans create their branches.
 Future agents should implement the responsibilities in their handoff, not restart the design.
+
+**Updated user priority:** prerecorded push-ups; no squat demo. Computer B is still building
+the frontend. Do not wait on browser tracking to implement backend video pose extraction.
+Keep the legacy squat fixture for compatibility, not as the intended presentation.
 
 ## Read before coding
 
@@ -25,12 +30,13 @@ Future agents should implement the responsibilities in their handoff, not restar
 - Monorepo; independent Next.js/TypeScript frontend and FastAPI/Pydantic Python backend.
 - Browser live pose extraction and backend uploaded-video extraction both produce our
   normalized `PoseFrame` representation. Analysis never depends on MediaPipe objects.
-- Pretrained pose estimation later; no training a pose model from scratch.
+- Local video uses pretrained MediaPipe Pose Landmarker; no training a pose model from scratch.
 - `MovementAnalyzer` is the shared interface for rules and possible later lightweight ML.
 - Version `1.0` JSON contract; Python models -> checked-in schemas -> generated TS types.
 - Stateless cumulative HTTP batches first. No database or WebSocket requirement.
 - AI explains measured evidence. It cannot invent detections, diagnose, or predict injury.
-- Bootstrap fallback never calls OpenAI. Mock JSON is explicitly synthetic.
+- Coaching defaults to local. OpenAI requires explicit provider opt-in plus a backend key;
+  it selects evidence IDs and the server renders wording. Read docs/AI_COACH.md. Mock JSON is synthetic.
 
 ## Ownership
 
@@ -69,6 +75,24 @@ If a contract must change:
 
 ## Current capabilities
 
-Health works. Live route validates cumulative pose batches but returns null results with
-`status: "not_implemented"`. Upload returns 501. Coach always uses a deterministic fallback.
-Frontend renders the canonical six-rep fixture and can check API health. No CV or real scorer exists.
+Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
+counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
+hint remain `not_implemented`. Scores stay null. Upload runs the optional local CV pipeline; coach defaults to a useful local fallback with an optional OpenAI evidence selector.
+Frontend progress is tracked by remote commit in docs/INTEGRATION_STATUS.md. A local MediaPipe video adapter is available with optional dependencies; no form scorer is
+integrated. Four real MOV recordings match human counts of 3, 1, 1, and 2 after a
+phase-confirmation timing fix; see apps/api/VALIDATION.md for evidence and limitations.
+HTTP upload integration now includes cleanup/error tests and a single-extraction gate.
+Frontend PR #1 is merged into main and integrated into backend-cv without conflicts.
+Upload/playback and the separate 240-second timeout passed a real-clip browser check;
+read docs/INTEGRATION_STATUS.md. Next for B: coach panel and demo polish.
+Push-up reps now include observed elbow excursion and timing around the minimum angle;
+read apps/api/MEASUREMENTS.md. The new contracts/examples/pushup-analysis.json is synthetic.
+Push-up comparisons now flag substantial duration changes or reduced observed excursion
+against two preceding stable reps, with evidence and unknown confidence; see apps/api/COMPARISONS.md.
+Real clips retain counts 3/1/1/2 and produce no flags; positive cases are synthetic so far.
+B can integrate later. Evidence-only coaching, mocked SDK tests, and one live OpenAI QA
+request are verified (2026-09-26, synthetic timing question, 3.22 seconds; docs/AI_COACH.md).
+Next for A: real positive-case comparison validation. Recheck origin/frontend periodically and update
+docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
+Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
+Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

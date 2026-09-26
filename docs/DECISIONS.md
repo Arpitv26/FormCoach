@@ -5,6 +5,7 @@ demo problem, and record the reason here so future agents do not restart the arc
 
 | Decision | Why | Consequence |
 | --- | --- | --- |
+| Prerecorded push-up demo first | User changed the demo away from squats; browser tracking is not ready | Backend video extraction and push-up validation are next; keep old fixtures honest |
 | One monorepo with two apps | Two people can share types/docs while owning separate folders | Avoid edits outside your app without coordination |
 | FastAPI + Python + Pydantic | Python is practical for CV/math; FastAPI exposes typed HTTP routes and interactive docs | Backend owns validation and movement interpretation |
 | Next.js + TypeScript + Tailwind | Familiar React product tools, typed responses, quick responsive styling | Frontend decides the detailed product design |
@@ -20,8 +21,9 @@ demo problem, and record the reason here so future agents do not restart the arc
 | No DB/auth/queues/cloud requirements | They add setup and integration risk without improving the initial demo | No durable history in bootstrap; history is stretch |
 | Nulls plus status/provenance | Prevent fake measurements and misleading empty results | UI must distinguish unknown, synthetic, incomplete, and real results |
 | Generated schema and TS types | A frozen boundary must not drift silently across machines | Contract commits regenerate/check all representations |
-| Stub upload returns 501 | Fake video processing would mislead the demo and the frontend | UI can build error states now; implement real extraction later |
-| Bootstrap coach always local | No key or spend should be required to run the foundation | Configuring a key alone does not enable the future adapter |
+| Real synchronous uploads after clip validation | Four push-up clips establish a concrete counting checkpoint | Optional local model, worker-thread processing, one extraction per process, explicit errors, no fake fallback |
+| Coach local by default | No key or spend should be required to run the app | Paid calls need COACH_PROVIDER=openai, SDK, and key; key alone does not enable them |
+| OpenAI selects reviewed evidence statements | Structured output alone does not guarantee factual prose | Validate selected IDs, render wording server-side, preserve uncertainty; free-form generation remains deferred |
 | Per-app dependencies and env files | Beginners can run one app without installing the other | No root npm workspace; run npm commands from apps/web |
 | Node 24, Python 3.12 team defaults | Match both machines and CI with small pinned dependency sets | Create separate local environments; do not share installed dependency folders |
 | Explicit ESLint step | Current Next.js builds do not run lint automatically | CI runs lint, typecheck, tests, and build separately |
@@ -33,4 +35,4 @@ and FastAPI's [multipart](https://fastapi.tiangolo.com/tutorial/request-files/) 
 [CORS documentation](https://fastapi.tiangolo.com/tutorial/cors/). OpenAI integration guidance is linked in AI_COACH.md.
 
 No actual analysis support is implied by profile registration. The first product checkpoint is
-a reliable squat demo; additional exercises and custom lightweight ML are later decisions.
+now a reliable prerecorded push-up demo (user priority change); additional exercises and custom lightweight ML are later decisions.

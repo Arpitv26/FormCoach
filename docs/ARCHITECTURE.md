@@ -8,7 +8,7 @@ flowchart TD
   Camera[Live webcam in Next.js] --> BrowserPose[Future browser pose adapter]
   BrowserPose --> Batch[HTTP cumulative PoseFrame batch]
   Batch --> Analyzer[Python MovementAnalyzer]
-  Upload[Uploaded video] --> Video[Future frame extraction + pretrained pose adapter]
+  Upload[Uploaded video] --> Video[Frame extraction + pretrained pose adapter]
   Video --> Poses[FormCoach PoseFrames]
   Poses --> Analyzer
   Profile[Exercise profile] --> Analyzer
@@ -19,8 +19,11 @@ flowchart TD
   JSON --> Coach[Evidence-only coach]
 ```
 
-The boxes after input validation describe future work. The bootstrap supplies the contracts,
-interfaces, profile configuration, null-result analyzer, upload 501 route, and fallback coach.
+Contracts, interfaces, profiles, geometry, visibility checks, and push-up/squat rep counting through
+the live route are implemented. Local backend video pose extraction is available through an optional MediaPipe adapter.
+HTTP upload now calls that adapter. Push-up timing/range comparisons emit descriptive review
+flags with supporting evidence. Browser extraction, biomechanical form assessment, and scoring
+remain future work. Coaching uses a local fallback.
 
 ## Application boundaries
 
@@ -44,12 +47,14 @@ CORS permits browser calls from `localhost:3000` and `127.0.0.1:3000` by default
 One browser application, one Python process. No persistence, authentication, queue, Redis,
 Docker, or cloud service. The live protocol is stateless: each request contains the sampled
 frames from the beginning of the current short set, and its response replaces the current
-analysis. An identical request yields identical placeholder results. No hidden session cache
+analysis. An identical request yields identical analysis results. No hidden session cache
 or cross-worker state is needed. See the limits and finalization rules in API_CONTRACT.md.
 
-Uploads will initially be synchronous for short clips. If actual processing times require a
+Uploads are synchronous for short clips, with native processing in a worker thread and
+one extraction per API process (extra requests get 503). If actual processing times require a
 job API later, that is a coordinated contract change, not an undocumented behavior switch.
-The bootstrap multipart handler closes its temporary upload and retains no recording.
+The handler closes the multipart spool and removes its temporary copy after processing.
+Body spooling precedes the handler limits; this remains a local demo endpoint. See apps/api/HTTP_UPLOAD.md.
 
 ## Contract and code seams
 
@@ -58,9 +63,9 @@ The bootstrap multipart handler closes its temporary upload and retains no recor
 The schema checks in CI catch accidental drift. Python model validators also check relationships
 that plain JSON Schema cannot express, such as rep counts and landmark index/name pairs.
 
-`analysis/interfaces.py` defines `MovementAnalyzer`. Replace the dependency in
-`api/routes/live.py` when implementing real analysis. Future upload processing calls that same
-interface after `PoseProvider.extract` returns a `PoseSequence`. Profiles are selected through
+`analysis/interfaces.py` defines `MovementAnalyzer`. The live route injects `RuleBasedAnalyzer`
+from `analysis/movement.py`, supporting push-ups and squats. Local video processing calls that
+same interface after `PoseProvider.extract` returns a `PoseSequence`, including HTTP uploads. Profiles are selected through
 `analysis/exercises/registry.py`. Keep algorithm selection behind the interface.
 
 The frontend client lives in `apps/web/src/lib/api/client.ts`; fixture access lives in `mock.ts`.

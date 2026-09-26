@@ -9,7 +9,10 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="FormCoach API",
         version="0.1.0",
-        description="Hackathon foundation. Live analysis and video CV are not implemented yet.",
+        description=(
+            "Pose-based rep counting from live batches and uploaded videos. "
+            "Uploads require optional local CV setup; form scoring is not implemented."
+        ),
     )
     app.add_middleware(
         CORSMiddleware,

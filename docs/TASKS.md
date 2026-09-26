@@ -17,13 +17,28 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 
 ## BACKEND
 
-- [ ] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
-- [ ] [A] Phase 1: squat phase transitions and completed-rep segmentation.
-- [ ] [A] Phase 2: measured squat metrics, documented score formulas, grounded issues.
-- [ ] [A] Phase 2: tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
-- [ ] [A] Phase 3: push-up and lunge analyzers after reliable squat.
-- [ ] [A] Phase 4: bounded video decoding + pretrained pose adapter + cleanup/errors.
-- [ ] [A] Phase 5: OpenAI adapter and evidence/uncertainty guardrails.
+**Current priority: prerecorded push-ups. No squat demo.**
+
+- [x] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
+- [x] [A] Phase 1: squat phase transitions and completed-rep segmentation (synthetic tests).
+- [x] [A] Connect the internal squat counter to live API responses without changing the contract.
+- [x] [A] Compare four real clips with human counts and visual sequences; counts 3/1/1/2 and HTTP replay pass (apps/api/VALIDATION.md).
+- [ ] [SHARED] Validate exact playback alignment and rehearse the integrated demo.
+- [x] [A] Descriptive per-rep elbow excursion and timing parts; see apps/api/MEASUREMENTS.md.
+- [x] [A] Causal within-set timing/range comparisons with traceable review flags and synthetic positive cases.
+- [ ] [A] Validate a real positive comparison case; do not infer positive-case accuracy from current unflagged clips.
+- [ ] [A] Justified score formulas only after evidence/view/calibration review.
+- [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
+- [ ] [A] Extend those failure-case tests to future form metrics and scoring.
+- [x] [A] Push-up elbow cycle counter and shared segmentation mechanics (synthetic tests).
+- [x] [A] Saved-pose replay checker and labeled synthetic push-up capture.
+- [ ] [A] Lunge analyzer only after the push-up video demo works.
+- [x] [A] Optional local video decoding + MediaPipe pose adapter + bounded inputs and cleanup.
+- [x] [A] Integrate validated video processing into HTTP uploads, including cleanup/errors and busy handling.
+- [x] [B] Use separate 240-second upload timeout and connect measured results/playback (PR #1; one real-clip UI check passes).
+- [x] [A] Phase 5: Optional OpenAI evidence selector, useful local fallback, evidence/uncertainty tests.
+- [x] [A] Verify one live OpenAI request with a locally configured key (2026-09-26: synthetic rep-3 timing QA, provider openai, 3.22 seconds).
+- [ ] [SHARED] Recheck frontend branch periodically; see INTEGRATION_STATUS.md for current gaps.
 - [ ] [A] Phase 6: optional automatic exercise classification.
 - [ ] [A] Phase 7: advanced ML/reference features only if demo is stable.
 
@@ -32,7 +47,7 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [B] Landing/demo interface and responsive visual direction.
 - [ ] [B] Results dashboard entirely from canonical mock; null and error states.
 - [ ] [B] Camera permission, framing/readiness states, exercise selector.
-- [ ] [B] Upload selection/preview and honest loading/error states.
+- [x] [B] Upload selection/preview and honest loading/error states (PR #1).
 - [ ] [B] Browser pose adapter and correctly mirrored skeleton overlay.
 - [ ] [B] Cumulative live requests, session reset/finalization, response replacement.
 - [ ] [B] Per-rep cards, metric graphs, issue timeline, lowest-score highlight.
@@ -45,10 +60,11 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [SHARED] Both computers branch from the same published bootstrap main commit.
 - [ ] [SHARED] Agree on browser pose provider and first supported camera view.
 - [ ] [SHARED] Confirm identical coordinates/timestamps in browser and video adapters.
-- [ ] [SHARED] Connect real squat responses without dashboard-specific shape changes.
+- [x] [SHARED] Connect real push-up upload responses without dashboard-specific shape changes.
 - [ ] [SHARED] Test live reset, final snapshot, camera loss, backend down, and stale responses.
 - [ ] [SHARED] Ensure synthetic/placeholder results are never presented as measured.
-- [ ] [SHARED] Validate per-rep/video/issue timestamp alignment with a matching clip.
+- [x] [SHARED] Validate rep-start and minimum-angle playback on IMG_6939 (0.733 s / 1.733 s).
+- [ ] [SHARED] Validate playback of a real comparison flag when suitable footage exists.
 - [ ] [SHARED] Merge shared contract changes first; all checks pass on integrated main.
 
 ## DEMO

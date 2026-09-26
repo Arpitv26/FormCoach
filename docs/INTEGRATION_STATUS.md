@@ -1,0 +1,46 @@
+# Computer A / Computer B integration checkpoint
+
+## Reviewed and integrated — 2026-09-26
+
+Frontend PR #1, `5dd6bb4`, was reviewed and merged into `main` as `9c16f22`.
+Computer A merged that main into `backend-cv` as `75c4faa`, with no conflicts.
+The backend PR is the next step into main; keep it separate from future feature work.
+No frontend source edits were needed during this review. Neither feature branch was deleted.
+
+## Verified
+
+- Frontend: 26 tests, lint, TypeScript, contract checks, production build, and PR GitHub CI pass.
+- Backend: 295 tests pass. Test fixtures now override local coaching credentials so developer
+  `.env` settings cannot trigger paid requests during ordinary tests.
+- Actual Chrome upload from the production frontend to Computer A's running backend:
+  `IMG_6939.MOV`, HEVC 3840×2160, HTTP 200, measured provenance, **1 completed push-up**.
+- Two runs took 14.46 and 10.41 seconds. Rep-start seek reached **0.733 s** and minimum-angle
+  seek reached **1.733 s**, paused correctly with no playback error. The latter frame visibly
+  shows the lowered position. This verifies one clip's UI alignment, not all recordings.
+- Desktop 1440×1000 and mobile 390×844 layouts inspected; no horizontal mobile overflow.
+  Clearing the file also clears its results; no browser page errors occurred.
+- Video requests use a separate **240-second timeout**. Other calls retain 15 seconds.
+- Upload results show measured elbow values, unknown scores, camera limitations, and correctly
+  describe finalized `partial` results. Original video stays available for timestamp playback.
+- Gym choices remain previews with null backend hints; webcam is preview-only.
+
+The footage and screenshots are local review artifacts, not repository files. No raw video,
+real pose data, API keys, or screenshots of participants were committed.
+
+## Remaining work
+
+- B: connect the coach panel to the current analysis. Display provider, message, evidence,
+  and limitations; keep keys backend-only. A live OpenAI timing QA already passed separately.
+- A: validate a real comfortable variation that triggers comparison rules. Existing four
+  recordings count 3/1/1/2 but produce zero flags; synthetic positives do not prove accuracy.
+- Together: rehearse more clips, recovery/error states, and actual camera access if preview
+  is included. No physical webcam access was requested in this review.
+- Small B follow-ups: the older, currently unused SessionResults component still labels all
+  partial results “Set in progress”; update before reusing it for uploads. Connection-tools
+  copy says the backend is optional for the demo, but real upload analysis requires it.
+- Frontend polish and camera preview can continue, but prerecorded push-ups remain the demo.
+- Keep scores null until justified formulas and calibration exist. No claims of general
+  form assessment, fatigue detection, medical diagnosis, or universal exercise recognition.
+
+Recheck remote branch heads at later checkpoints. B owns apps/web and A owns apps/api;
+shared contract changes still need deliberate coordination.

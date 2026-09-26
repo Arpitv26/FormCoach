@@ -4,7 +4,10 @@ Read AGENTS.md, API_CONTRACT.md, ARCHITECTURE.md, and PRODUCT_SCOPE.md first. Yo
 is `frontend`; your primary ownership is **apps/web/**. Follow BEGINNER_SETUP.md to run it.
 Do not wait for backend work. No Python or OpenAI key is needed to build the mock interface.
 
-## Starting point
+## Bootstrap starting point
+
+The following describes the shared foundation. For the latest reviewed remote frontend
+progress and integration gaps, see INTEGRATION_STATUS.md. B's branch now has additional UI.
 
 The app is Next.js App Router + TypeScript + Tailwind. The homepage intentionally has only a
 FormCoach title, fixture summary, six rep scores, and a health button. You own the detailed design.
@@ -49,13 +52,38 @@ localhost or HTTPS. Stop media tracks when leaving the camera page.
 - Loading, permission denied, no camera, no pose, partially visible, and ready.
 - `not_implemented`: explain that the foundation received input but has no real results.
 - `insufficient_data`: explain which evidence is missing; do not display zero as a bad score.
-- `partial`: show only completed reps and explain that the set is still active.
+- `partial`: show completed reps and limitations. A final set can remain partial after
+  tracking loss or an unfinished rep; this status alone does not mean recording is active.
 - `complete`: final results; check provenance before calling them measured.
 - Nullable values: render “Not available”, not `0`, `NaN`, or a full progress bar.
 - Synthetic results: visible “Demo data” label. No pretend processing animation implying real CV.
-- API errors: `ApiError.status`/`code` distinguish 501 stub, validation, and connection failure.
+- API errors: `ApiError.status`/`code` distinguish invalid video, setup missing, busy, timeout,
+  validation, and connection failure; see API_CONTRACT.md.
+
+## Updated demo priority
+
+The user wants **prerecorded push-ups**, not squats. Prioritize video selection/playback and
+push-up results; browser tracking can follow. Send `exerciseHint: "push-up"`. The backend
+counts elbow cycles and returns `minSmoothedLeftElbowAngleDeg` or its right-side equivalent,
+`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Real HTTP uploads
+are now available after optional CV setup, with four clips matching counts of 3/1/1/2.
+Read **apps/api/HTTP_UPLOAD.md**: set a separate **240-second upload timeout**, show loading
+and typed errors, retain the matching local video, and test seeking. No pose frames/video
+URL are returned, so a skeleton overlay needs later coordination. The old squat mock is a legacy UI fixture, not a push-up analysis; never
+relabel its knee measurements or issue as push-up findings. Coordinate a new realistic fixture
+when actual push-up metrics exist. Existing v1.0 types need no changes.
+
+The backend replay tool and labeled synthetic elbow capture are documented in
+apps/api/examples/README.md. Actual recording evidence is in apps/api/VALIDATION.md.
 
 ## Live and playback details
+
+The backend counts push-up cycles from supplied poses, with per-rep time intervals and
+smoothed elbow-angle measurements. Use `exerciseHint: "push-up"` for this demo. Scores remain null, so there
+is no known worst rep yet. Full-body readiness and camera orientation are not evaluated;
+do not show a green full-body indicator based only on a non-null count. See API_CONTRACT.md
+for side locking and limitations. The two-frame shared request example produces
+`insufficient_data`; it is not enough movement to count a rep. The mock dashboard stays usable.
 
 The v1 live request is a cumulative sampled set, not an incremental chunk. Keep at most
 1800 frames / 120 seconds; aim for 15 fps and one POST per second. Only one request in
@@ -89,3 +117,23 @@ npm run contracts:check
 
 Commit frequently with messages such as `feat(web): add mock results dashboard`.
 Only edit shared files deliberately; announce needed contract changes to A before relying on them.
+
+## Timing and angle measurements (can integrate later)
+
+Computer A now returns per-rep observed elbow excursion and time to/from the minimum angle.
+Read `apps/api/MEASUREMENTS.md` for exact keys, units, sample window, and suggested labels.
+`contracts/examples/pushup-analysis.json` is an explicitly synthetic one-rep fixture for
+building this view without the backend. Keep its label visible and scores unavailable.
+These additions use the existing measurements dictionary; generated types are unchanged.
+Do not label the two timing parts as exact lowering/lifting phases, compare different
+camera angles as quality scores, or infer a worst rep from range alone. Older responses
+may lack the keys. Backend work can continue while B integrates on its own schedule.
+
+## Comparison flags (can also integrate later)
+
+Use `contracts/examples/pushup-comparison-analysis.json` for an explicitly synthetic
+three-rep result with duration/range changes on rep 3. Read `apps/api/COMPARISONS.md`.
+Render existing issue cards/timeline as **Changes to review**; show explanations containing
+reference reps, differences, and thresholds. Confidence and all scores remain null.
+Do not label these as bad form, fatigue, injury risk, or a worst-rep score. Missing comparison
+keys mean unavailable; one/two-rep clips cannot yet be compared. No new TypeScript schema.

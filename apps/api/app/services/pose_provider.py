@@ -15,5 +15,5 @@ class PoseSequence:
 
 class PoseProvider(Protocol):
     def extract(self, video_path: Path) -> PoseSequence:
-        """Future adapter maps a pretrained provider into FormCoach domain landmarks."""
+        """Map pretrained provider output into FormCoach domain landmarks."""
         ...
