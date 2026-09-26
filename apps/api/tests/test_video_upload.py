@@ -16,6 +16,7 @@ from app.api.routes.videos import analyze_video, get_video_processor
 from app.core.config import API_ROOT, get_settings
 from app.domain.analysis import AnalysisResponse
 from app.domain.pose import LiveBatchRequest
+from app.domain.video import VideoAnalysisResponse
 from app.services import video_processor as service
 from app.services.mediapipe_pose import (
     MediaPipePoseProvider,
@@ -229,3 +230,55 @@ def test_model_path_is_relative_to_api_root(monkeypatch):
     assert get_settings().pose_model_path == API_ROOT / "artifacts/test.task"
     monkeypatch.setenv("POSE_MODEL_PATH", "/tmp/custom.task")
     assert get_settings().pose_model_path == Path("/tmp/custom.task")
+
+
+def test_overlay_upload_extracts_once_and_matches_analysis(client, upload_service):
+    _, state = upload_service
+    response = client.post(
+        "/api/v1/videos/analyze-with-pose",
+        files={"file": ("clip.mov", b"synthetic video bytes")},
+        data={"exerciseHint": "push-up"},
+    )
+    assert response.status_code == 200
+    result = VideoAnalysisResponse.model_validate(response.json())
+    assert len(state.paths) == 1
+    assert result.pose_track.frames == state.sequence.frames
+    assert (result.pose_track.image_width, result.pose_track.image_height) == (1280, 720)
+    assert result.pose_track.duration_ms == result.analysis.source.duration_ms
+    original = AnalysisResponse.model_validate(post(client).json())
+    assert result.analysis.reps == original.reps
+    assert result.analysis.summary == original.summary
+    assert "poseTrack" not in post(client).json()
+
+
+def test_overlay_preserves_empty_frames_and_portrait_dimensions(client, upload_service):
+    _, state = upload_service
+    state.sequence = PoseSequence(
+        [frame.model_copy(update={"landmarks": []}) for frame in state.sequence.frames],
+        720,
+        1280,
+        2450,
+    )
+    response = client.post(
+        "/api/v1/videos/analyze-with-pose",
+        files={"file": ("clip.mov", b"synthetic video bytes")},
+        data={"exerciseHint": "push-up"},
+    )
+    result = VideoAnalysisResponse.model_validate(response.json())
+    assert result.pose_track.image_width == 720
+    assert result.pose_track.image_height == 1280
+    assert all(frame.landmarks == [] for frame in result.pose_track.frames)
+    assert result.analysis.summary.total_reps is None
+
+
+def test_overlay_error_closes_spool_and_releases_gate(upload_service):
+    from app.api.routes.videos import analyze_video_with_pose
+
+    processor, state = upload_service
+    state.error = VideoInputError("broken")
+    upload = UploadFile(BytesIO(b"synthetic video bytes"), filename="clip.mov")
+    with pytest.raises(HTTPException):
+        analyze_video_with_pose(upload, processor, "push-up")
+    assert upload.file.closed
+    assert processor._gate.acquire(blocking=False)
+    processor._gate.release()

@@ -264,6 +264,48 @@ Health/live/coach requests retain 15 seconds.
 
 ## AnalysisResponse
 
+### Additive video playback endpoint
+
+`POST /api/v1/videos/analyze-with-pose` accepts the same multipart fields, limits, and
+errors as `/videos/analyze`. It returns `VideoAnalysisResponse`:
+
+```typescript
+{
+  contractVersion: "1.0";
+  analysis: AnalysisResponse;
+  poseTrack: {
+    imageWidth: number;
+    imageHeight: number;
+    durationMs: number;
+    frames: PoseFrame[];
+  };
+}
+```
+
+This addition supplies the joints needed for video overlays without changing the existing
+analysis endpoint or making clients extract poses twice. One upload/extraction feeds both
+analysis and playback. The browser keeps the original selected file; no video URL or server
+storage is added. Track duration matches analysis source duration. Dimensions are the upright,
+unmirrored, square-pixel image after rotation; at most 4096 per axis and 4K total area.
+At most 1800 sampled frames / 120 seconds. Frame indices/timestamps strictly increase.
+Empty-landmark frames preserve no-pose/multiple-person gaps. All frames use the canonical
+coordinates above, including unmodified offscreen estimates. Nothing is interpolated.
+
+Render joints only with visibility >=0.7 and in-frame x/y, and connections only when both
+endpoints qualify. Fit to the **contained image rectangle**, including letterbox offsets.
+Playback uses the most recent sample at/before `video.currentTime * 1000`, hiding samples
+older than 150 ms, during seeks, or when image aspect ratios disagree. This tolerance is a
+rendering policy, not calibrated tracking accuracy. Skeletons are raw pose observations;
+rep measurements use causal smoothing and can differ slightly. Colour denotes tracking,
+not good/bad form. Native fullscreen/Picture-in-Picture shows the video without the sibling
+canvas; use inline playback for the overlay.
+
+Example: `contracts/examples/pushup-video-with-pose.json` is clearly **synthetic**, with no
+matching video. The UI must not overlay it on a user's unrelated recording. Details and
+browser setup: [POSE_OVERLAY.md](POSE_OVERLAY.md).
+
+## Analysis response fields
+
 Read the complete six-rep JSON fixture and generated schema for exact fields. Key semantics:
 
 | Field | Meaning |
