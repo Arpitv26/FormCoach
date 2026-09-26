@@ -2,10 +2,76 @@
 
 UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measured evidence.
 
-**This is the shared foundation, not a finished movement analyzer.** The Next.js homepage,
-FastAPI routes, version 1.0 contracts, synthetic six-rep squat example, checks, and team
-handoffs are ready. Real pose estimation, rep counting, and form scoring are next tasks.
+**FormCoach is in development.** The frontend/backend foundation, shared data formats,
+mock squat results, and tested joint-angle and visibility helpers are ready.
+Real pose tracking, rep counting, form scoring, and AI coaching are still being built.
 No API key, database, Docker, or GPU is needed to run this foundation.
+
+## How it works
+
+Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,
+and FormCoach will count repetitions, measure how they move, and explain their results.
+We are starting with squats. This diagram shows the planned complete workflow:
+
+```text
+       LIVE WEBCAM                      UPLOADED VIDEO
+            |                                |
+   Pose model in browser             Pose model on backend
+            |                                |
+            +----------------+---------------+
+                             |
+                             v
+              BODY LANDMARKS (shared format)
+              Joint positions + timestamps
+                             |
+                             v
+              OUR MOVEMENT ANALYSIS (Python)
+              - Check which joints are visible
+              - Calculate joint angles
+              - Track movement phases
+              - Count completed repetitions
+              - Measure and compare each rep
+                             |
+                             v
+                    STRUCTURED RESULTS
+              Measurements, scores, issues,
+                  and video timestamps
+                             |
+               +-------------+-------------+
+               |                           |
+               v                           v
+        RESULTS DASHBOARD              AI COACH
+        Graphs, rep breakdown,         Explains only the
+        and video highlights           supplied evidence
+               ^                           |
+               +---------------------------+
+```
+
+### What we use and what we build
+
+- **Existing pose model:** We plan to integrate Google's
+  [MediaPipe Pose Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker),
+  which estimates 33 body landmarks, including hips, knees, and ankles. It is already
+  trained to locate body parts; we do not need to train a pose model from scratch.
+- **Our analysis code:** We turn those joint positions into angles, repetitions, timing,
+  and explainable exercise feedback. We start with mathematical rules that we can test.
+  For example, following the hip-knee-ankle angle over time will help identify a squat's
+  downward movement and return to standing.
+- **AI coach:** We plan to use an OpenAI model to explain the measured results in simple
+  language. It must not invent form problems or fill in missing measurements. When the
+  camera cannot provide reliable evidence, FormCoach should say that the result is unavailable.
+
+The same movement-analysis code will handle live and uploaded video because both paths
+produce the same joint-position format. Our main contribution is this analysis layer and
+the interface that makes its results understandable.
+
+### How the two computers work together
+
+**Computer A (us)** builds the Python backend: movement measurements, rep counting,
+video processing, and AI coaching. **Computer B** builds the Next.js frontend: camera
+experience, skeleton overlay, dashboard, and visual polish. Shared data formats let both
+people work independently; the frontend can use clearly labeled mock results until real
+analysis is ready.
 
 ## Start here
 
@@ -68,6 +134,10 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 
 Mock results are labeled **MOCK DEMO DATA**. No exercise is analyzed yet. The squat
 profile is an example configuration; all other profiles are planned.
+
+The first backend feature adds tested 2D joint-angle calculations and checks for missing,
+outside-frame, or insufficiently visible joints. These helpers are not connected to a real
+live analyzer yet. Our next checkpoint is squat rep counting.
 
 ## Check your work
 
