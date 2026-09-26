@@ -148,7 +148,10 @@ set a separate upload timeout. See the [upload guide](apps/api/HTTP_UPLOAD.md).
 Push-up reps also expose observed elbow range and timing around the minimum angle; see
 [measurement definitions](apps/api/MEASUREMENTS.md). Scores remain unavailable.
 The frontend can integrate later using `contracts/examples/pushup-analysis.json`, an
-explicitly synthetic one-rep fixture with the new fields.
+explicitly synthetic one-rep fixture with the new fields. Causal timing/range comparisons
+also flag measured differences for review; see [comparison rules](apps/api/COMPARISONS.md).
+A separate synthetic three-rep comparison fixture demonstrates those flags without claiming
+that the user recordings contain them.
 See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work

@@ -85,6 +85,10 @@ Next: Computer B connects upload/playback and sets a separate 240-second upload 
 (the bootstrap client still uses 15 seconds). Read apps/api/HTTP_UPLOAD.md and API_CONTRACT.md.
 Push-up reps now include observed elbow excursion and timing around the minimum angle;
 read apps/api/MEASUREMENTS.md. The new contracts/examples/pushup-analysis.json is synthetic.
-B can integrate later; A can continue measurement/rule work independently.
+Push-up comparisons now flag substantial duration changes or reduced observed excursion
+against two preceding stable reps, with evidence and unknown confidence; see apps/api/COMPARISONS.md.
+Real clips retain counts 3/1/1/2 and produce no flags; positive cases are synthetic so far.
+B can integrate later. Next for A: real positive-case validation and evidence-only coaching;
+keep form scoring deferred until its measurement and calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

@@ -125,3 +125,12 @@ These additions use the existing measurements dictionary; generated types are un
 Do not label the two timing parts as exact lowering/lifting phases, compare different
 camera angles as quality scores, or infer a worst rep from range alone. Older responses
 may lack the keys. Backend work can continue while B integrates on its own schedule.
+
+## Comparison flags (can also integrate later)
+
+Use `contracts/examples/pushup-comparison-analysis.json` for an explicitly synthetic
+three-rep result with duration/range changes on rep 3. Read `apps/api/COMPARISONS.md`.
+Render existing issue cards/timeline as **Changes to review**; show explanations containing
+reference reps, differences, and thresholds. Confidence and all scores remain null.
+Do not label these as bad form, fatigue, injury risk, or a worst-rep score. Missing comparison
+keys mean unavailable; one/two-rep clips cannot yet be compared. No new TypeScript schema.

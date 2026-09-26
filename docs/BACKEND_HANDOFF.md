@@ -33,7 +33,8 @@ form scorer or OpenAI call yet. Authored fixture angles are not video measuremen
 | Completed | HTTP uploads, input limits, cleanup/error tests, real request check | Recorded demo backend |
 | Completed | Push-up observed elbow excursion and timing parts, synthetic/recorded-pose checks | Descriptive measurements |
 | B, when ready | Coordinate upload loading/timeout, measured results, and video seeking | Before demo rehearsal |
-| Next for A | Within-set comparisons, grounded rule evidence, then justified scoring | Critical to form feedback |
+| Completed | Causal timing/range comparison flags with thresholds, reference evidence, and replay tests | Changes to review, not quality scores |
+| Next for A | Real positive-case comparison validation and evidence-only coaching | Preserve uncertainty; scoring still deferred |
 | Later | Evidence-only OpenAI coach with local failure fallback | Should have |
 | Later | Browser tracking, lunge/other exercises | Only after the recorded push-up demo works |
 | Stretch | Automatic exercise detection, ghost comparison, custom ML, history | Only if demo is stable |

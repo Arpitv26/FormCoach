@@ -25,7 +25,9 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Compare four real clips with human counts and visual sequences; counts 3/1/1/2 and HTTP replay pass (apps/api/VALIDATION.md).
 - [ ] [SHARED] Validate exact playback alignment and rehearse the integrated demo.
 - [x] [A] Descriptive per-rep elbow excursion and timing parts; see apps/api/MEASUREMENTS.md.
-- [ ] [A] Within-set comparisons, grounded issues, documented score formulas after measurement review.
+- [x] [A] Causal within-set timing/range comparisons with traceable review flags and synthetic positive cases.
+- [ ] [A] Validate a real positive comparison case; do not infer positive-case accuracy from current unflagged clips.
+- [ ] [A] Justified score formulas only after evidence/view/calibration review.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.
 - [x] [A] Push-up elbow cycle counter and shared segmentation mechanics (synthetic tests).

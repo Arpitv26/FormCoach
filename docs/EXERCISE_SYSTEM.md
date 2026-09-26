@@ -67,3 +67,10 @@ them using contracts/README.md before depending on them.
 
 There is no universal exercise support. Automatic selection is a later feature; explicit
 user selection is the reliable starting point.
+
+## Implemented push-up review rules
+
+The push-up profile now configures two descriptive comparison rules and their heuristic
+thresholds. `pushup_comparisons.py` compares each completed rep with its two predecessors,
+gates tracking/reference stability, and supplies evidence in the existing measurements and
+issue fields. See `apps/api/COMPARISONS.md`. These do not establish correct form or scores.

@@ -21,8 +21,9 @@ flowchart TD
 
 Contracts, interfaces, profiles, geometry, visibility checks, and push-up/squat rep counting through
 the live route are implemented. Local backend video pose extraction is available through an optional MediaPipe adapter.
-HTTP upload now calls that adapter. Browser extraction, form scoring, and issues remain
-future work. Coaching uses a local fallback.
+HTTP upload now calls that adapter. Push-up timing/range comparisons emit descriptive review
+flags with supporting evidence. Browser extraction, biomechanical form assessment, and scoring
+remain future work. Coaching uses a local fallback.
 
 ## Application boundaries
 
