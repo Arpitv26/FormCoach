@@ -29,7 +29,8 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Push-up elbow cycle counter and shared segmentation mechanics (synthetic tests).
 - [x] [A] Saved-pose replay checker and labeled synthetic push-up capture.
 - [ ] [A] Lunge analyzer only after the push-up video demo works.
-- [ ] [A] Phase 4: bounded video decoding + pretrained pose adapter + cleanup/errors.
+- [x] [A] Optional local video decoding + MediaPipe pose adapter + bounded inputs and cleanup.
+- [ ] [A] Integrate validated video processing into the HTTP upload endpoint.
 - [ ] [A] Phase 5: OpenAI adapter and evidence/uncertainty guardrails.
 - [ ] [A] Phase 6: optional automatic exercise classification.
 - [ ] [A] Phase 7: advanced ML/reference features only if demo is stable.

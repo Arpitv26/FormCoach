@@ -15,8 +15,8 @@ is still building the frontend; Computer A owns video pose extraction and moveme
    scoring exists; an empty issue list is not proof of good form.
 7. Explain one actual measurement, and later let the AI coach summarize that evidence.
 
-The push-up counter exists for supplied poses. Backend video extraction and real-footage
-validation are the next steps. No body-alignment or form-score accuracy is claimed yet.
+The push-up counter exists for supplied poses. Local backend video extraction is available; real-footage
+validation and HTTP upload integration are the next steps. No body-alignment or form-score accuracy is claimed yet.
 The old six-rep squat fixture must not be relabeled as push-up results.
 
 ## Recording and acceptance

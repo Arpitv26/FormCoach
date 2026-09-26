@@ -20,8 +20,8 @@ flowchart TD
 ```
 
 Contracts, interfaces, profiles, geometry, visibility checks, and squat rep counting through
-the live route are implemented. Pose extraction, form metrics/scoring, and issue detection
-remain future work. Upload returns 501 and coaching uses a local fallback.
+the live route are implemented. Local backend video pose extraction is available through an optional MediaPipe adapter.
+Browser extraction, HTTP upload integration, form scoring, and issues remain future work. Upload returns 501 and coaching uses a local fallback.
 
 ## Application boundaries
 

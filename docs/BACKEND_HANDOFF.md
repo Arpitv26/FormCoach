@@ -5,8 +5,8 @@ Your branch is `backend-cv`; your primary ownership is **apps/api/**. Follow BEG
 Computer B builds the UI independently from the shared fixture. Preserve its contract.
 
 **User priority change:** prerecorded push-ups, no squat demo. The push-up elbow counter
-and replay checker now work on synthetic poses. Next implement backend video pose extraction
-and validate the user's recording; do not wait for browser tracking. The original squat mock
+and replay checker now work on synthetic poses. The local video adapter now extracts MediaPipe poses; next
+validate the user's recording and integrate the upload route; do not wait for browser tracking. The original squat mock
 remains a legacy fixture. See apps/api/examples/README.md for the replay workflow.
 
 ## What is already wired
@@ -20,10 +20,9 @@ remains a legacy fixture. See apps/api/examples/README.md for the replay workflo
 - Tests for routes, invalid requests, fixture semantics, and deterministic score arithmetic.
 
 Since bootstrap, geometry/visibility helpers and the squat rep counter with median smoothing
-have been connected to the live API and tested with synthetic HTTP requests. Next: extract poses from prerecorded push-ups
-and validate against real footage. See apps/api/README.md for thresholds,
-limitations, and the remaining checkpoint plan. There is no integrated CV model, real form
-scorer, or OpenAI call yet. Authored fixture angles are not measurements from a video.
+have been connected to the live API and tested with synthetic HTTP requests. The local video adapter is implemented; next validate the recorded push-ups and integrate uploads. See apps/api/README.md for thresholds,
+limitations, and the remaining checkpoint plan. The optional local CV adapter is available (apps/api/VIDEO_SETUP.md); there is no form
+scorer, HTTP upload processing, or OpenAI call yet. Authored fixture angles are not measurements from a video.
 
 ## Work order after bootstrap
 

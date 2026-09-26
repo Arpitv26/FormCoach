@@ -61,8 +61,8 @@ localhost or HTTPS. Stop media tracks when leaving the camera page.
 The user wants **prerecorded push-ups**, not squats. Prioritize video selection/playback and
 push-up results; browser tracking can follow. Send `exerciseHint: "push-up"`. The backend
 counts elbow cycles and returns `minSmoothedLeftElbowAngleDeg` or its right-side equivalent,
-`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Video extraction is
-next on Computer A. The old squat mock is a legacy UI fixture, not a push-up analysis; never
+`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Local video extraction is available on Computer A; real-clip validation and HTTP upload
+integration are next. See apps/api/VIDEO_SETUP.md. The old squat mock is a legacy UI fixture, not a push-up analysis; never
 relabel its knee measurements or issue as push-up findings. Coordinate a new realistic fixture
 when actual push-up metrics exist. Existing v1.0 types need no changes.
 

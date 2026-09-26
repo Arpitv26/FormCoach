@@ -4,7 +4,8 @@ UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measure
 
 **FormCoach is in development.** The frontend/backend foundation, shared data formats,
 legacy mock squat results, and tested push-up counting from supplied poses are ready.
-Live camera pose extraction, form scoring, and AI coaching are still being built.
+Local video pose extraction is available with optional setup; browser pose tracking, form scoring,
+and AI coaching are still being built. See [video setup](apps/api/VIDEO_SETUP.md).
 No API key, database, Docker, or GPU is needed to run this foundation.
 
 ## How it works
@@ -135,12 +136,12 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 
 Mock results are labeled **MOCK DEMO DATA**. Select `push-up` for the intended demo exercise.
 The earlier squat counter still works; other profiles remain unimplemented. The original squat
-mock is a legacy UI fixture, not the demo plan. No camera pose model is integrated yet.
+mock is a legacy UI fixture, not the demo plan. A local MediaPipe video adapter is available; browser tracking is not integrated yet.
 
 Backend helpers now measure 2D joint angles, check visibility, and count completed exercise
 cycles through the live API. Synthetic tests cover partial reps, jitter, tracking loss,
 and repeatable live-batch replay; real-camera accuracy is still unverified. Our next checkpoint
-is backend video extraction and comparison against visible push-ups in a real clip.
+is comparison against visible push-ups in the user's real clip, then HTTP upload integration.
 See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work

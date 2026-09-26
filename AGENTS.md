@@ -76,6 +76,7 @@ If a contract must change:
 Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
 hint remain `not_implemented`. Scores stay null. Upload returns 501; coach uses a local fallback.
-Frontend foundation renders the six-rep fixture and can check health. No pose model or real
-scorer is integrated. Next: backend pose extraction and validation with the user's prerecorded push-up video.
+Frontend foundation renders the six-rep fixture and can check health. A local MediaPipe video adapter is available with optional dependencies; no form scorer is
+integrated. Next: validate the user's recording and connect the HTTP upload route.
+See apps/api/VIDEO_SETUP.md; the upload endpoint remains 501 until that next integration.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.
