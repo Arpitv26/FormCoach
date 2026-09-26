@@ -9,6 +9,13 @@ from app.main import create_app
 ROOT = Path(__file__).resolve().parents[3]
 
 
+@pytest.fixture(autouse=True)
+def isolate_coach_credentials(monkeypatch):
+    """Local .env credentials must never turn ordinary tests into paid API calls."""
+    monkeypatch.setenv("COACH_PROVIDER", "fallback")
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+
+
 @pytest.fixture
 def client():
     with TestClient(create_app()) as test_client:
