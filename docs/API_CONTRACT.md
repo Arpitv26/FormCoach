@@ -19,7 +19,8 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 - `provenance.kind`: `measured`, `synthetic`, or `placeholder`. Always expose synthetic labels.
 - Empty issue lists do not prove good form when analysis is unavailable.
 - `limitations` explains missing scores, uncalibrated heuristics, view limits, or unavailable features.
-- No real exercise analysis is supported in bootstrap. Profiles describe planned capability.
+- Squat counting from supplied poses is implemented; real-camera accuracy is unverified.
+  Other exercise profiles describe planned capability. Scores and form issues remain unavailable.
 - Extra fields are rejected by the backend models. Coordinate shared additions deliberately.
 
 ## GET /api/v1/health
@@ -115,21 +116,45 @@ the dashboard's current analysis; do not add response rep counts together. Do no
 only the newest chunk, as that loses reps at batch boundaries. Re-sending the same snapshot
 is safe. Abort or ignore an old response after switching sessions. Keep image dimensions
 and exercise hint fixed within a session; reset if either changes. Gaps retain original
-indices/timestamps and must be handled by future analysis, never filled with invented poses.
+indices/timestamps; the analyzer resets unfinished reps across tracking gaps, without interpolation.
 
-When the user ends the set, send its final snapshot with `isFinal: true`. Future analyzers
-return `partial` while the set is open and `complete` when finalized with enough evidence.
-Only completed reps appear in `reps`; an unfinished repetition is not counted. Missing data
-may produce `insufficient_data`. Bootstrap always returns `not_implemented`, including for
-an empty batch or final snapshot. It stores no session state and computes no movement.
+When the user ends the set, send its final snapshot with `isFinal: true`. For `squat`:
 
-`source.durationMs` in the placeholder is the last sample timestamp, or null if the batch
+- `insufficient_data`: stable standing has not been established (or tracking was lost before
+  any completed rep). Count is null. This includes the empty batch and tiny two-frame example.
+- `partial`: observations establish readiness or completed reps. Count is the number of
+  observed completed cycles, including zero when ready with none completed.
+- `complete`: final snapshot ends in confirmed standing with no unavailable angles or tracking
+  breaks anywhere in the received sequence. This does not imply form scores are available.
+- Final snapshots with tracking loss or a confirmed unfinished rep remain `partial`. Read the
+  limitations; the set need not still be recording. Completed reps survive tracking loss.
+
+Only completed reps appear in `reps`; finalization never finishes a rep automatically.
+There is no server session state. No hint or another registered hint returns `not_implemented`.
+
+`source.durationMs` is the last sample timestamp, or null if the batch
 is empty. It reports received sample coverage, not measured exercise duration. For live
 analysis, playback is relative to the same zero point. Local video recording for replay is future work.
 
-HTTP 200 body is a full `AnalysisResponse`. The placeholder echoes the session and known
-hint (confidence null), and returns null scores, null totalReps, empty reps/issues/timeline,
-and a clear limitation. The sample six-rep fixture is never returned for an arbitrary request.
+HTTP 200 body is a full `AnalysisResponse`. User-selected exercise confidence, all scores,
+camera quality score/fullBodyVisible, and scoring metadata remain null. The six-rep fixture
+is never substituted for a request. Empty issues do not establish good form.
+
+**Squat measurement policy:** choose the first usable hip-knee-ankle side, preferring left
+if both work in that frame, and keep it for the entire set. Each joint needs visibility at
+least 0.7 and in-frame coordinates; undefined geometry is unavailable. Missing angles or gaps
+over 300 ms reset readiness and discard unfinished reps. Start with stable standing in a side
+view. Camera orientation is not automatically validated. See apps/api/README.md for thresholds.
+
+Per-rep `measurements` contains `durationMs` and either `minSmoothedLeftKneeAngleDeg` or
+`minSmoothedRightKneeAngleDeg`. The minimum uses a causal three-sample median after descent
+confirmation, not raw samples. Its `minimum_knee_angle` key moment has a readable label.
+The timeline includes rep start, minimum-angle moment, and rep end. Timestamps include
+smoothing/confirmation latency. No front-view knee-tracking finding is inferred from this.
+
+For this analyzer, `provenance.kind: "measured"` identifies computation from the supplied
+poses; it does not attest that the client captured them from a camera. Keep synthetic inputs
+clearly labeled in demos/tests. Counting heuristics are not a validated fitness assessment.
 
 Registered IDs: `squat`, `push-up`, `lunge`, `barbell-squat`, `bicep-curl`, `shoulder-press`,
 `deadlift`. Unknown hints return HTTP 400 `UNKNOWN_EXERCISE`. Registration is not an assertion

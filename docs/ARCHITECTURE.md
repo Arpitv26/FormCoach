@@ -19,8 +19,9 @@ flowchart TD
   JSON --> Coach[Evidence-only coach]
 ```
 
-The boxes after input validation describe future work. The bootstrap supplies the contracts,
-interfaces, profile configuration, null-result analyzer, upload 501 route, and fallback coach.
+Contracts, interfaces, profiles, geometry, visibility checks, and squat rep counting through
+the live route are implemented. Pose extraction, form metrics/scoring, and issue detection
+remain future work. Upload returns 501 and coaching uses a local fallback.
 
 ## Application boundaries
 
@@ -44,7 +45,7 @@ CORS permits browser calls from `localhost:3000` and `127.0.0.1:3000` by default
 One browser application, one Python process. No persistence, authentication, queue, Redis,
 Docker, or cloud service. The live protocol is stateless: each request contains the sampled
 frames from the beginning of the current short set, and its response replaces the current
-analysis. An identical request yields identical placeholder results. No hidden session cache
+analysis. An identical request yields identical analysis results. No hidden session cache
 or cross-worker state is needed. See the limits and finalization rules in API_CONTRACT.md.
 
 Uploads will initially be synchronous for short clips. If actual processing times require a
@@ -58,8 +59,8 @@ The bootstrap multipart handler closes its temporary upload and retains no recor
 The schema checks in CI catch accidental drift. Python model validators also check relationships
 that plain JSON Schema cannot express, such as rep counts and landmark index/name pairs.
 
-`analysis/interfaces.py` defines `MovementAnalyzer`. Replace the dependency in
-`api/routes/live.py` when implementing real analysis. Future upload processing calls that same
+`analysis/interfaces.py` defines `MovementAnalyzer`. The live route injects `RuleBasedAnalyzer`
+from `analysis/movement.py`, currently supporting squat only. Future upload processing calls that same
 interface after `PoseProvider.extract` returns a `PoseSequence`. Profiles are selected through
 `analysis/exercises/registry.py`. Keep algorithm selection behind the interface.
 

@@ -11,12 +11,12 @@ Computer B builds the UI independently from the shared fixture. Preserve its con
 - `MovementAnalyzer` protocol, injected into the live route through `get_analyzer()`.
 - `PoseProvider` and `PoseSequence` video adapter boundary.
 - Example squat profile; planned push-up, lunge, and gym exercise entries.
-- Explicit placeholder analysis, upload 501 response, local coach fallback.
+- Squat pose-to-response analyzer; placeholders for other exercises, upload 501, local coach.
 - Tests for routes, invalid requests, fixture semantics, and deterministic score arithmetic.
 
-Since bootstrap, geometry/visibility helpers and an internal squat rep counter with median
-smoothing have been implemented and tested on synthetic inputs. Next: connect them to the
-live API, then validate against real footage. See apps/api/README.md for current thresholds,
+Since bootstrap, geometry/visibility helpers and the squat rep counter with median smoothing
+have been connected to the live API and tested with synthetic HTTP requests. Next: integrate
+browser poses with Computer B and validate against real footage. See apps/api/README.md for thresholds,
 limitations, and the remaining checkpoint plan. There is no integrated CV model, real form
 scorer, or OpenAI call yet. Authored fixture angles are not measurements from a video.
 

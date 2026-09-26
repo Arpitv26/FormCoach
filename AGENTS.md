@@ -69,6 +69,9 @@ If a contract must change:
 
 ## Current capabilities
 
-Health works. Live route validates cumulative pose batches but returns null results with
-`status: "not_implemented"`. Upload returns 501. Coach always uses a deterministic fallback.
-Frontend renders the canonical six-rep fixture and can check API health. No CV or real scorer exists.
+Health works. Live squat analysis derives completed reps, timestamps, and smoothed 2D knee
+angles from cumulative poses; insufficient observations return null counts. Other hints or no
+hint remain `not_implemented`. Scores stay null. Upload returns 501; coach uses a local fallback.
+Frontend foundation renders the six-rep fixture and can check health. No pose model or real
+scorer is integrated. Next: browser pose integration and real-camera validation with Computer B.
+Read apps/api/README.md checkpoint 3 for side selection, tracking loss, and finalization limits.

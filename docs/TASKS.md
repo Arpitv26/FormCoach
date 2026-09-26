@@ -19,10 +19,11 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 
 - [x] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
 - [x] [A] Phase 1: squat phase transitions and completed-rep segmentation (synthetic tests).
-- [ ] [A] Connect the internal squat counter to live API responses without changing the contract.
+- [x] [A] Connect the internal squat counter to live API responses without changing the contract.
 - [ ] [SHARED] Validate counts and timestamps against real camera footage before claiming demo readiness.
 - [ ] [A] Phase 2: measured squat metrics, documented score formulas, grounded issues.
-- [ ] [A] Phase 2: tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
+- [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
+- [ ] [A] Extend those failure-case tests to future form metrics and scoring.
 - [ ] [A] Phase 3: push-up and lunge analyzers after reliable squat.
 - [ ] [A] Phase 4: bounded video decoding + pretrained pose adapter + cleanup/errors.
 - [ ] [A] Phase 5: OpenAI adapter and evidence/uncertainty guardrails.

@@ -49,13 +49,21 @@ localhost or HTTPS. Stop media tracks when leaving the camera page.
 - Loading, permission denied, no camera, no pose, partially visible, and ready.
 - `not_implemented`: explain that the foundation received input but has no real results.
 - `insufficient_data`: explain which evidence is missing; do not display zero as a bad score.
-- `partial`: show only completed reps and explain that the set is still active.
+- `partial`: show completed reps and limitations. A final set can remain partial after
+  tracking loss or an unfinished rep; this status alone does not mean recording is active.
 - `complete`: final results; check provenance before calling them measured.
 - Nullable values: render “Not available”, not `0`, `NaN`, or a full progress bar.
 - Synthetic results: visible “Demo data” label. No pretend processing animation implying real CV.
 - API errors: `ApiError.status`/`code` distinguish 501 stub, validation, and connection failure.
 
 ## Live and playback details
+
+The backend now counts squat cycles from supplied poses, with per-rep time intervals and
+smoothed knee-angle measurements. Use `exerciseHint: "squat"`. Scores remain null, so there
+is no known worst rep yet. Full-body readiness and camera orientation are not evaluated;
+do not show a green full-body indicator based only on a non-null count. See API_CONTRACT.md
+for side locking and limitations. The two-frame shared request example produces
+`insufficient_data`; it is not enough movement to count a rep. The mock dashboard stays usable.
 
 The v1 live request is a cumulative sampled set, not an incremental chunk. Keep at most
 1800 frames / 120 seconds; aim for 15 fps and one POST per second. Only one request in

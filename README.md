@@ -3,8 +3,8 @@
 UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measured evidence.
 
 **FormCoach is in development.** The frontend/backend foundation, shared data formats,
-mock squat results, tested joint-angle/visibility helpers, and an internal squat rep counter are ready.
-Live pose tracking, analyzer API integration, form scoring, and AI coaching are still being built.
+mock squat results, and a tested live API for squat counting from supplied poses are ready.
+Live camera pose extraction, form scoring, and AI coaching are still being built.
 No API key, database, Docker, or GPU is needed to run this foundation.
 
 ## How it works
@@ -125,21 +125,21 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 
 ## What works today
 
-| Endpoint | Foundation behavior |
+| Endpoint | Current behavior |
 | --- | --- |
 | `GET /api/v1/health` | Returns `{"status":"ok","service":"formcoach-api"}` |
-| `POST /api/v1/live/analyze-batch` | Validates poses; returns `not_implemented`, null scores, no invented reps |
+| `POST /api/v1/live/analyze-batch` | Counts squat cycles from supplied poses; returns per-rep times and 2D knee angles; scores remain null |
 | `POST /api/v1/videos/analyze` | Accepts the multipart shape; returns HTTP 501 with an explicit placeholder error |
 | `POST /api/v1/coach` | Deterministic local fallback; no OpenAI calls, even if a key is set |
 
-Mock results are labeled **MOCK DEMO DATA**. No exercise is analyzed yet. The squat
-profile is an example configuration; all other profiles are planned.
+Mock results are labeled **MOCK DEMO DATA**. Select `squat` for pose-based counting.
+Other profiles remain unimplemented. No camera pose model is integrated yet.
 
 Backend helpers now measure 2D joint angles, check visibility, and count completed squat
-cycles from angle sequences. The counter has synthetic tests for partial reps, jitter,
-tracking loss, and repeatable live-batch replay; real-camera accuracy is still unverified.
-These helpers are not connected to the live route yet. Our next checkpoint is analyzer API
-integration. See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
+cycles through the live API. Synthetic tests cover partial reps, jitter, tracking loss,
+and repeatable live-batch replay; real-camera accuracy is still unverified. Our next checkpoint
+is browser-pose integration and comparison against visible reps in a real clip.
+See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work
 
