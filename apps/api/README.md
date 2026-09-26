@@ -24,7 +24,7 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `app/domain` | Stable v1.0 JSON types and semantic validation |
 | `app/analysis` | Geometry, visibility, push-up/squat segmentation and analyzer; future scoring |
 | `app/analysis/exercises` | Example/planned configuration profiles |
-| `app/services` | Optional MediaPipe/video adapters; local coach fallback |
+| `app/services` | Optional MediaPipe/video adapters; evidence coach with optional OpenAI selection |
 | `tests` | Route, validation, fixture, and score arithmetic checks |
 
 Pose analysis counts push-up and squat reps from supplied poses. Other hints (or no hint) return
@@ -181,7 +181,8 @@ evidence, the short-clip timing fix, repeat commands, and limits of this check.
 5. Completed: local video extraction and count/sequence review on four actual recordings.
 6. Completed: HTTP upload integration, cleanup/error tests. Next: frontend playback/timeout coordination.
 7. Descriptive measurements and causal comparison flags implemented; see [MEASUREMENTS.md](MEASUREMENTS.md) and [COMPARISONS.md](COMPARISONS.md). Validate real positive cases before scoring.
-8. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
+8. Completed: useful local coaching and optional OpenAI evidence selection with mocked SDK tests.
+   See COACH_SETUP.md for the pending live-key check. Browser tracking follows when B is ready.
 
 The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
 It uses optional pinned MediaPipe/OpenCV packages, writes poses and upload analysis locally,

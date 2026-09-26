@@ -225,5 +225,5 @@ def test_coach_accepts_real_rep_results_without_inventing_a_score(client):
     )
     assert response.status_code == 200
     assert response.json()["provider"] == "fallback"
-    assert response.json()["evidence"] == []
+    assert response.json()["evidence"] == ["summary.totalReps"]
     assert "does not contain an overall score" in response.json()["message"]
