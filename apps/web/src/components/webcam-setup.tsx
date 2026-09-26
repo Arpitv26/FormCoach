@@ -113,7 +113,8 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
         <section className={`${styles.nextStep} panel`} aria-labelledby="next-heading">
           <p className="eyebrow">One step at a time</p>
           <h2 id="next-heading">Preview comes first.</h2>
-          <p>{exercise.group === "live" ? "Push-up tracking is the next live demo feature. It is not connected yet." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} Camera access alone does not check your framing, count reps, or produce scores.</p>
+          <p>{exercise.group === "live" ? "For push-up analysis, upload a recorded video. Live tracking is not connected yet." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} Camera access alone does not check your framing, count reps, or produce scores.</p>
+          {exercise.group === "live" && <Link href="/upload">Analyze a push-up video →</Link>}
           <Link href="/" className={styles.demoLink}>Choose another exercise <span aria-hidden="true">↗</span></Link>
         </section>
       </aside>
