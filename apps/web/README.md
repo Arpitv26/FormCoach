@@ -11,9 +11,30 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000. Success is a FormCoach page with six clearly labeled mock reps.
+Open http://localhost:3000. Success is an exercise selection page with push-ups as the
+live demo focus, plus incline dumbbell bench press, cable lateral raises, lat pulldowns,
+and triceps pushdowns for gym sessions. Squats are out of the current demo scope.
 Control+C stops the server. Copy settings once; later runs only need `npm run dev`.
-The backend is optional until integration. No API key or Python is needed for mock UI work.
+The backend is optional until integration. No API key or Python is needed for camera preview.
+
+## Camera and exercise setup
+
+Choose **Set up push-ups**, or **Preview framing** on a gym exercise. `/camera` defaults
+to push-ups; `/camera?exercise=lat-pulldown` is an example of a specific selection.
+Click **Enable camera** and allow access. The mirrored preview uses no microphone,
+recording, or upload. **Stop camera**, leaving the page, and changing exercises release
+the camera tracks. Permission granted after cancellation is immediately released too.
+Open the app on localhost or HTTPS for browser camera access.
+
+This is preview-only: there is no pose readiness detection, rep counting, or scoring yet.
+Push-ups use the existing `push-up` backend hint. The four gym slugs in
+`src/lib/exercises.ts` are frontend routing identifiers and have `backendHint: null`.
+Do not send them to the API until Computer A registers their agreed exercise IDs and
+coordinates supported views and response examples. Push-ups replace squats as the
+first live integration target; gym views still require validation.
+
+The existing results component is retained for integration. The canonical synthetic squat
+fixture is still used by contract tests; it is not displayed or relabeled as another exercise.
 
 Start with `src/app/page.tsx`. Fetch methods are in `src/lib/api/client.ts`; use
 `getMockAnalysis()` in `src/lib/api/mock.ts` to access the canonical shared example.

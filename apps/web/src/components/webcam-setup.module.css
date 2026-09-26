@@ -1,0 +1,55 @@
+.intro { margin: 10px 0 30px; }
+.intro h1 { margin: 12px 0; font-size: clamp(2rem, 4vw, 2.8rem); }
+.intro > p:last-child { font-size: 0.875rem; }
+.layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.cameraPanel { border: 1px solid var(--line); border-radius: 18px; background: #0e1622; overflow: hidden; }
+.panelHeader { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 24px; }
+.panelHeader h2 { font-size: 1rem; }
+.viewport { position: relative; aspect-ratio: 4 / 3; background: radial-gradient(ellipse at center, #19355477, #080e17); border-block: 1px solid var(--line); }
+.video { width: 100%; height: 100%; display: block; object-fit: contain; transform: scaleX(-1); }
+.hiddenVideo { opacity: 0; }
+.placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; gap: 12px; }
+.placeholder svg { width: 60px; height: 60px; stroke: #9bbcff; stroke-width: 1.5; margin-bottom: 6px; }
+.placeholder p { color: var(--muted); font-size: 0.8125rem; max-width: 270px; }
+.previewLabel { position: absolute; top: 14px; left: 14px; padding: 6px 10px; background: #080d14e6; color: #dde7f5; font-size: 0.6875rem; border: 1px solid var(--line); border-radius: 6px; }
+.controls { padding: 24px; }
+.status { min-height: 90px; }
+.status p:last-child { color: var(--muted); font-size: 0.8125rem; margin-top: 6px; }
+.statusTitle { font-size: 0.875rem; font-weight: 600; }
+.errorTitle { color: #ffc89e; font-size: 0.875rem; font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.actions button { margin-top: 0; min-height: 44px; border: 0; }
+.actions button:disabled { transform: none; }
+.secondaryButton { background: #1c2c42; color: #e5edfa; padding: 12px 18px; border-radius: 9px; font-size: 0.8rem; }
+.secondaryButton:hover { background: #2a3d57; }
+.privacyNote { margin-top: 18px; color: var(--muted); font-size: 0.6875rem; }
+.guidance { display: grid; gap: 18px; }
+.guidance h2 { margin-top: 10px; }
+.selection h2 { margin-top: 0; }
+.selection label { display: block; color: var(--muted); font-size: 0.75rem; margin: 18px 0 8px; }
+.selection select { width: 100%; min-height: 44px; border: 1px solid #425777; background: #142238; color: #edf3ff; border-radius: 8px; padding: 10px; font: inherit; font-size: 0.8125rem; }
+.selection select:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+.selection p { color: var(--muted); font-size: 0.6875rem; margin-top: 12px; }
+.tips { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 25px; }
+.tips li { display: flex; gap: 14px; }
+.tips li > span { color: var(--blue); font-size: 0.65rem; padding-top: 4px; }
+.tips h3 { font-size: 0.8125rem; }
+.tips p { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+.nextStep { background: linear-gradient(145deg, #152333, #0e1622); }
+.nextStep > p:not(:first-child) { font-size: 0.75rem; color: var(--muted); margin-top: 12px; }
+.demoLink { display: flex; justify-content: space-between; gap: 12px; color: var(--lime); font-size: 0.8125rem; margin-top: 22px; padding-block: 5px; }
+.nextStep > .demoNote { font-size: 0.6875rem !important; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .guidance { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 580px) {
+  .guidance { grid-template-columns: minmax(0, 1fr); }
+  .intro { margin-top: 0; }
+  .panelHeader, .controls { padding: 20px; }
+  .viewport { aspect-ratio: 1; }
+  .placeholder { padding: 18px; }
+  .actions button { flex: 1; justify-content: center; }
+}

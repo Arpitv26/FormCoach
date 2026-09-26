@@ -37,6 +37,9 @@ p { line-height: 1.65; }
 .site-header nav { display: flex; gap: 32px; font-size: 0.8125rem; color: #bcc6d5; }
 .site-header nav a:hover { color: var(--lime); }
 .header-caption { color: var(--muted); font-size: 0.6rem; letter-spacing: 0.16em; }
+.camera-entry { display: inline-flex; align-items: center; gap: 14px; padding: 10px 14px; min-height: 44px; border: 1px solid #b6e46444; border-radius: 8px; color: var(--lime); font-size: 0.8125rem; }
+.camera-entry:hover { background: #b6e4640d; }
+.site-header nav a[aria-current="page"] { color: var(--lime); }
 main { max-width: 1240px; margin: auto; padding: 30px 40px; }
 .page-heading { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 22px; color: var(--muted); font-size: 0.65rem; letter-spacing: 0.12em; }
 .page-heading > span { letter-spacing: 0; font-size: 0.75rem; }
