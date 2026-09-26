@@ -1,0 +1,4 @@
+# Optional local video tools; keep these out of basic API setup.
+-r requirements.in
+mediapipe==0.10.35
+opencv-contrib-python==4.13.0.92

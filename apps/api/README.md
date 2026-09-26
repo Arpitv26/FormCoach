@@ -172,9 +172,14 @@ video are still needed before checking off real-camera validation.
 2. Completed: conservative squat segmentation, smoothing, and failure-case tests.
 3. Completed: connect measured poses and completed reps to the existing live API contract.
 4. Completed: push-up elbow counting and capture replay checker, tested with synthetic inputs.
-5. Next: backend pose extraction from prerecorded push-ups, then comparison with human counts.
+5. Local video extraction implemented; next compare the user's push-ups with human counts.
 6. Add supported push-up metrics, explainable scoring, and recorded-video UI integration.
 7. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
+
+The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
+It uses optional pinned MediaPipe/OpenCV packages, writes poses and upload analysis locally,
+and leaves the HTTP upload route at 501 until actual-footage validation and route integration.
+Next within checkpoint 5: analyze the user's recording and compare counts/timestamps.
 
 Keep each checkpoint small: implement, test, review, commit, and push `backend-cv`.
 

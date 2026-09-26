@@ -51,8 +51,8 @@ and limitations. Scores remain null. There is no camera access or OpenAI call.
 
 ## 3. Real video first; browser captures later
 
-The demo priority is now a prerecorded push-up video. Keep that clip locally while Computer A
-adds backend pose extraction; this replay tool consumes pose JSON, not video files. Computer B
+The demo priority is now a prerecorded push-up video. Use [VIDEO_SETUP.md](../VIDEO_SETUP.md)
+to extract poses locally; this replay tool consumes pose JSON, not video files. Computer B
 is still building the frontend. Browser captures can use the same checker later. When ready,
 give their agent this request:
 

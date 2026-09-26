@@ -10,7 +10,8 @@ def create_app() -> FastAPI:
         title="FormCoach API",
         version="0.1.0",
         description=(
-            "Push-up and squat counting from supplied poses. Form scoring and video CV are pending."
+            "Pose-based rep counting. Local video extraction is available; HTTP uploads and scoring "
+            "are not implemented yet."
         ),
     )
     app.add_middleware(
