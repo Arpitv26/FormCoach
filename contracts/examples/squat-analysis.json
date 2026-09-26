@@ -1,0 +1,368 @@
+{
+  "contractVersion": "1.0",
+  "sessionId": "demo-squat-001",
+  "status": "complete",
+  "provenance": {
+    "kind": "synthetic",
+    "label": "MOCK DEMO DATA \u2014 synthetic, not measured from video"
+  },
+  "source": {
+    "type": "upload",
+    "durationMs": 16000
+  },
+  "exercise": {
+    "id": "squat",
+    "name": "Squat",
+    "confidence": null
+  },
+  "cameraQuality": {
+    "score": 0.91,
+    "fullBodyVisible": true,
+    "issues": []
+  },
+  "summary": {
+    "overallScore": 81.0,
+    "totalReps": 6,
+    "primaryFocus": "knee_tracking",
+    "headline": "Demo: scores decline through rep 5, then recover on rep 6."
+  },
+  "metrics": {
+    "rangeOfMotion": 83.7,
+    "symmetry": 80.7,
+    "tempo": 80.0,
+    "stability": 87.0,
+    "consistency": 68.9
+  },
+  "reps": [
+    {
+      "repNumber": 1,
+      "startMs": 1000,
+      "endMs": 3400,
+      "score": 93.3,
+      "metrics": {
+        "rangeOfMotion": 94,
+        "symmetry": 92,
+        "tempo": 90,
+        "stability": 96
+      },
+      "measurements": {
+        "minLeftKneeAngleDeg": 78.4,
+        "minRightKneeAngleDeg": 80.1
+      },
+      "issues": [],
+      "keyMoments": [
+        {
+          "timestampMs": 2200,
+          "type": "bottom_position",
+          "label": "Bottom position"
+        }
+      ]
+    },
+    {
+      "repNumber": 2,
+      "startMs": 3400,
+      "endMs": 5800,
+      "score": 91.3,
+      "metrics": {
+        "rangeOfMotion": 92,
+        "symmetry": 90,
+        "tempo": 88,
+        "stability": 94
+      },
+      "measurements": {
+        "minLeftKneeAngleDeg": 80.2,
+        "minRightKneeAngleDeg": 81.0
+      },
+      "issues": [],
+      "keyMoments": [
+        {
+          "timestampMs": 4600,
+          "type": "bottom_position",
+          "label": "Bottom position"
+        }
+      ]
+    },
+    {
+      "repNumber": 3,
+      "startMs": 5800,
+      "endMs": 8200,
+      "score": 87.3,
+      "metrics": {
+        "rangeOfMotion": 88,
+        "symmetry": 86,
+        "tempo": 84,
+        "stability": 90
+      },
+      "measurements": {
+        "minLeftKneeAngleDeg": 84.3,
+        "minRightKneeAngleDeg": 85.8
+      },
+      "issues": [],
+      "keyMoments": [
+        {
+          "timestampMs": 7000,
+          "type": "bottom_position",
+          "label": "Bottom position"
+        }
+      ]
+    },
+    {
+      "repNumber": 4,
+      "startMs": 8200,
+      "endMs": 10600,
+      "score": 79.5,
+      "metrics": {
+        "rangeOfMotion": 78,
+        "symmetry": 78,
+        "tempo": 76,
+        "stability": 86
+      },
+      "measurements": {
+        "minLeftKneeAngleDeg": 89.4,
+        "minRightKneeAngleDeg": 93.2
+      },
+      "issues": [],
+      "keyMoments": [
+        {
+          "timestampMs": 9400,
+          "type": "bottom_position",
+          "label": "Bottom position"
+        }
+      ]
+    },
+    {
+      "repNumber": 5,
+      "startMs": 10600,
+      "endMs": 13000,
+      "score": 62.2,
+      "metrics": {
+        "rangeOfMotion": 64,
+        "symmetry": 54,
+        "tempo": 62,
+        "stability": 68
+      },
+      "measurements": {
+        "minLeftKneeAngleDeg": 103.2,
+        "minRightKneeAngleDeg": 110.1
+      },
+      "issues": [
+        {
+          "id": "issue-rep-5-left-knee",
+          "code": "LEFT_KNEE_TRACKING",
+          "severity": "medium",
+          "confidence": 0.87,
+          "title": "Left knee tracking",
+          "shortCue": "Keep your knee tracking over your toes.",
+          "explanation": "In this synthetic example, the left knee shifts inward relative to the ankle during the fifth ascent. A real detector must validate the camera view before reporting this.",
+          "startMs": 11900,
+          "endMs": 12600,
+          "involvedJoints": [
+            "left_knee",
+            "left_ankle",
+            "left_hip"
+          ]
+        }
+      ],
+      "keyMoments": [
+        {
+          "timestampMs": 11800,
+          "type": "bottom_position",
+          "label": "Bottom position"
+        }
+      ]
+    },
+    {
+      "repNumber": 6,
+      "startMs": 13000,
+      "endMs": 15400,
+      "score": 84.9,
+      "metrics": {
+        "rangeOfMotion": 86,
+        "symmetry": 84,
+        "tempo": 80,
+        "stability": 88
+      },
+      "measurements": {
+        "minLeftKneeAngleDeg": 85.8,
+        "minRightKneeAngleDeg": 87.2
+      },
+      "issues": [],
+      "keyMoments": [
+        {
+          "timestampMs": 14200,
+          "type": "bottom_position",
+          "label": "Bottom position"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "issue-rep-5-left-knee",
+      "code": "LEFT_KNEE_TRACKING",
+      "severity": "medium",
+      "confidence": 0.87,
+      "title": "Left knee tracking",
+      "shortCue": "Keep your knee tracking over your toes.",
+      "explanation": "In this synthetic example, the left knee shifts inward relative to the ankle during the fifth ascent. A real detector must validate the camera view before reporting this.",
+      "startMs": 11900,
+      "endMs": 12600,
+      "involvedJoints": [
+        "left_knee",
+        "left_ankle",
+        "left_hip"
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "timestampMs": 1000,
+      "type": "rep_start",
+      "repNumber": 1,
+      "issueId": null,
+      "label": "Rep 1 starts"
+    },
+    {
+      "timestampMs": 2200,
+      "type": "key_moment",
+      "repNumber": 1,
+      "issueId": null,
+      "label": "Bottom position"
+    },
+    {
+      "timestampMs": 3400,
+      "type": "rep_end",
+      "repNumber": 1,
+      "issueId": null,
+      "label": "Rep 1 ends"
+    },
+    {
+      "timestampMs": 3400,
+      "type": "rep_start",
+      "repNumber": 2,
+      "issueId": null,
+      "label": "Rep 2 starts"
+    },
+    {
+      "timestampMs": 4600,
+      "type": "key_moment",
+      "repNumber": 2,
+      "issueId": null,
+      "label": "Bottom position"
+    },
+    {
+      "timestampMs": 5800,
+      "type": "rep_end",
+      "repNumber": 2,
+      "issueId": null,
+      "label": "Rep 2 ends"
+    },
+    {
+      "timestampMs": 5800,
+      "type": "rep_start",
+      "repNumber": 3,
+      "issueId": null,
+      "label": "Rep 3 starts"
+    },
+    {
+      "timestampMs": 7000,
+      "type": "key_moment",
+      "repNumber": 3,
+      "issueId": null,
+      "label": "Bottom position"
+    },
+    {
+      "timestampMs": 8200,
+      "type": "rep_end",
+      "repNumber": 3,
+      "issueId": null,
+      "label": "Rep 3 ends"
+    },
+    {
+      "timestampMs": 8200,
+      "type": "rep_start",
+      "repNumber": 4,
+      "issueId": null,
+      "label": "Rep 4 starts"
+    },
+    {
+      "timestampMs": 9400,
+      "type": "key_moment",
+      "repNumber": 4,
+      "issueId": null,
+      "label": "Bottom position"
+    },
+    {
+      "timestampMs": 10600,
+      "type": "rep_end",
+      "repNumber": 4,
+      "issueId": null,
+      "label": "Rep 4 ends"
+    },
+    {
+      "timestampMs": 10600,
+      "type": "rep_start",
+      "repNumber": 5,
+      "issueId": null,
+      "label": "Rep 5 starts"
+    },
+    {
+      "timestampMs": 11800,
+      "type": "key_moment",
+      "repNumber": 5,
+      "issueId": null,
+      "label": "Bottom position"
+    },
+    {
+      "timestampMs": 11900,
+      "type": "issue",
+      "repNumber": 5,
+      "issueId": "issue-rep-5-left-knee",
+      "label": "Left knee tracking"
+    },
+    {
+      "timestampMs": 13000,
+      "type": "rep_end",
+      "repNumber": 5,
+      "issueId": null,
+      "label": "Rep 5 ends"
+    },
+    {
+      "timestampMs": 13000,
+      "type": "rep_start",
+      "repNumber": 6,
+      "issueId": null,
+      "label": "Rep 6 starts"
+    },
+    {
+      "timestampMs": 14200,
+      "type": "key_moment",
+      "repNumber": 6,
+      "issueId": null,
+      "label": "Bottom position"
+    },
+    {
+      "timestampMs": 15400,
+      "type": "rep_end",
+      "repNumber": 6,
+      "issueId": null,
+      "label": "Rep 6 ends"
+    }
+  ],
+  "limitations": [
+    "Every value is synthetic demo data; no video was analyzed.",
+    "Metric inputs and example joint angles are authored for UI development, not biomechanical calibration.",
+    "A real camera view may not support both side-view depth and front-view knee tracking."
+  ],
+  "scoring": {
+    "version": "demo-heuristic-1",
+    "method": "Weighted metric mean; see docs/SCORING.md for fixture arithmetic and missing-data policy.",
+    "weights": {
+      "rangeOfMotion": 0.3,
+      "symmetry": 0.2,
+      "tempo": 0.15,
+      "stability": 0.2,
+      "consistency": 0.15
+    }
+  }
+}

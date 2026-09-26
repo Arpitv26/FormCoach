@@ -1,0 +1,702 @@
+{
+  "$defs": {
+    "CameraQuality": {
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        },
+        "fullBodyVisible": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fullbodyvisible"
+        },
+        "issues": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Issues",
+          "type": "array"
+        }
+      },
+      "required": [
+        "score",
+        "fullBodyVisible",
+        "issues"
+      ],
+      "title": "CameraQuality",
+      "type": "object"
+    },
+    "Exercise": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Confidence"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "confidence"
+      ],
+      "title": "Exercise",
+      "type": "object"
+    },
+    "Issue": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Confidence"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "shortCue": {
+          "title": "Shortcue",
+          "type": "string"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "startMs": {
+          "minimum": 0,
+          "title": "Startms",
+          "type": "integer"
+        },
+        "endMs": {
+          "minimum": 0,
+          "title": "Endms",
+          "type": "integer"
+        },
+        "involvedJoints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Involvedjoints",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "severity",
+        "confidence",
+        "title",
+        "shortCue",
+        "explanation",
+        "startMs",
+        "endMs",
+        "involvedJoints"
+      ],
+      "title": "Issue",
+      "type": "object"
+    },
+    "KeyMoment": {
+      "additionalProperties": false,
+      "properties": {
+        "timestampMs": {
+          "minimum": 0,
+          "title": "Timestampms",
+          "type": "integer"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestampMs",
+        "type",
+        "label"
+      ],
+      "title": "KeyMoment",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "measured",
+            "synthetic",
+            "placeholder"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "label"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "RepAnalysis": {
+      "additionalProperties": false,
+      "properties": {
+        "repNumber": {
+          "minimum": 1,
+          "title": "Repnumber",
+          "type": "integer"
+        },
+        "startMs": {
+          "minimum": 0,
+          "title": "Startms",
+          "type": "integer"
+        },
+        "endMs": {
+          "minimum": 0,
+          "title": "Endms",
+          "type": "integer"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        },
+        "metrics": {
+          "$ref": "#/$defs/RepMetrics"
+        },
+        "measurements": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Measurements",
+          "type": "object"
+        },
+        "issues": {
+          "items": {
+            "$ref": "#/$defs/Issue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "keyMoments": {
+          "items": {
+            "$ref": "#/$defs/KeyMoment"
+          },
+          "title": "Keymoments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "repNumber",
+        "startMs",
+        "endMs",
+        "score",
+        "metrics",
+        "measurements",
+        "issues",
+        "keyMoments"
+      ],
+      "title": "RepAnalysis",
+      "type": "object"
+    },
+    "RepMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "rangeOfMotion": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rangeofmotion"
+        },
+        "symmetry": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Symmetry"
+        },
+        "tempo": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tempo"
+        },
+        "stability": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Stability"
+        }
+      },
+      "required": [
+        "rangeOfMotion",
+        "symmetry",
+        "tempo",
+        "stability"
+      ],
+      "title": "RepMetrics",
+      "type": "object"
+    },
+    "ScoringInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "weights": {
+          "additionalProperties": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Weights",
+          "type": "object"
+        }
+      },
+      "required": [
+        "version",
+        "method",
+        "weights"
+      ],
+      "title": "ScoringInfo",
+      "type": "object"
+    },
+    "SessionMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "rangeOfMotion": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rangeofmotion"
+        },
+        "symmetry": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Symmetry"
+        },
+        "tempo": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tempo"
+        },
+        "stability": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Stability"
+        },
+        "consistency": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Consistency"
+        }
+      },
+      "required": [
+        "rangeOfMotion",
+        "symmetry",
+        "tempo",
+        "stability",
+        "consistency"
+      ],
+      "title": "SessionMetrics",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "live",
+            "upload"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "durationMs": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Durationms"
+        }
+      },
+      "required": [
+        "type",
+        "durationMs"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Summary": {
+      "additionalProperties": false,
+      "properties": {
+        "overallScore": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Overallscore"
+        },
+        "totalReps": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Totalreps"
+        },
+        "primaryFocus": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Primaryfocus"
+        },
+        "headline": {
+          "title": "Headline",
+          "type": "string"
+        }
+      },
+      "required": [
+        "overallScore",
+        "totalReps",
+        "primaryFocus",
+        "headline"
+      ],
+      "title": "Summary",
+      "type": "object"
+    },
+    "TimelineEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "timestampMs": {
+          "minimum": 0,
+          "title": "Timestampms",
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "rep_start",
+            "rep_end",
+            "key_moment",
+            "issue"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "repNumber": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Repnumber"
+        },
+        "issueId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Issueid"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestampMs",
+        "type",
+        "repNumber",
+        "issueId",
+        "label"
+      ],
+      "title": "TimelineEvent",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": {
+      "const": "1.0",
+      "title": "Contractversion",
+      "type": "string"
+    },
+    "sessionId": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Sessionid",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "partial",
+        "insufficient_data",
+        "not_implemented"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "exercise": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Exercise"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "cameraQuality": {
+      "$ref": "#/$defs/CameraQuality"
+    },
+    "summary": {
+      "$ref": "#/$defs/Summary"
+    },
+    "metrics": {
+      "$ref": "#/$defs/SessionMetrics"
+    },
+    "reps": {
+      "items": {
+        "$ref": "#/$defs/RepAnalysis"
+      },
+      "title": "Reps",
+      "type": "array"
+    },
+    "issues": {
+      "items": {
+        "$ref": "#/$defs/Issue"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "timeline": {
+      "items": {
+        "$ref": "#/$defs/TimelineEvent"
+      },
+      "title": "Timeline",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "scoring": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ScoringInfo"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "contractVersion",
+    "sessionId",
+    "status",
+    "provenance",
+    "source",
+    "exercise",
+    "cameraQuality",
+    "summary",
+    "metrics",
+    "reps",
+    "issues",
+    "timeline",
+    "limitations",
+    "scoring"
+  ],
+  "title": "AnalysisResponse",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

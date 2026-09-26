@@ -1,0 +1,70 @@
+{
+  "contractVersion": "1.0",
+  "sessionId": "demo-live-001",
+  "exerciseHint": "squat",
+  "imageWidth": 1280,
+  "imageHeight": 720,
+  "isFinal": false,
+  "frames": [
+    {
+      "frameIndex": 0,
+      "timestampMs": 0,
+      "landmarks": [
+        {
+          "index": 23,
+          "name": "left_hip",
+          "x": 0.45,
+          "y": 0.45,
+          "z": null,
+          "visibility": 0.95
+        },
+        {
+          "index": 25,
+          "name": "left_knee",
+          "x": 0.46,
+          "y": 0.66,
+          "z": null,
+          "visibility": 0.93
+        },
+        {
+          "index": 27,
+          "name": "left_ankle",
+          "x": 0.46,
+          "y": 0.85,
+          "z": null,
+          "visibility": 0.94
+        }
+      ]
+    },
+    {
+      "frameIndex": 1,
+      "timestampMs": 100,
+      "landmarks": [
+        {
+          "index": 23,
+          "name": "left_hip",
+          "x": 0.45,
+          "y": 0.45,
+          "z": null,
+          "visibility": 0.95
+        },
+        {
+          "index": 25,
+          "name": "left_knee",
+          "x": 0.46,
+          "y": 0.66,
+          "z": null,
+          "visibility": 0.93
+        },
+        {
+          "index": 27,
+          "name": "left_ankle",
+          "x": 0.46,
+          "y": 0.85,
+          "z": null,
+          "visibility": 0.94
+        }
+      ]
+    }
+  ]
+}
