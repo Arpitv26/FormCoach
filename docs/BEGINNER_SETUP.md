@@ -182,7 +182,8 @@ Run `deactivate` after stopping the backend to leave its virtual environment.
 | Download fails with a network error | Connect to the internet and repeat the same install command. Do not use `sudo pip`. |
 | Browser cannot reach API | Open the health URL directly; check Terminal 1 is running. |
 | Browser reports CORS or health button fails despite API health working | Check the web port and API URL match the settings below. Restart both servers after changing `.env` files. |
-| Route returns 501 or `not_implemented` | Expected for bootstrap upload/live analysis. It is not a setup failure. |
+| Upload returns 503 `VIDEO_SETUP_REQUIRED` | Follow `apps/api/VIDEO_SETUP.md` to install the optional CV packages and model, then restart the API. |
+| Live analysis returns `not_implemented` | Select `push-up` or legacy `squat`; other exercises/automatic selection are not implemented. |
 
 ### Port already in use
 

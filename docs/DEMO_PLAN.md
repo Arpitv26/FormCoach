@@ -16,8 +16,8 @@ is still building the frontend; Computer A owns video pose extraction and moveme
 7. Explain one actual measurement, and later let the AI coach summarize that evidence.
 
 Local backend video extraction and push-up counting match human counts across four supplied
-recordings (3, 1, 1, 2); see apps/api/VALIDATION.md. HTTP upload integration and UI playback
-validation are next. No body-alignment or form-score accuracy is claimed yet.
+recordings (3, 1, 1, 2); see apps/api/VALIDATION.md. HTTP uploads are wired; UI playback
+validation and timeout integration are next (apps/api/HTTP_UPLOAD.md). No body-alignment or form-score accuracy is claimed yet.
 The old six-rep squat fixture must not be relabeled as push-up results.
 
 ## Recording and acceptance

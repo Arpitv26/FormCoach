@@ -13,7 +13,7 @@ No API key, database, Docker, or GPU is needed to run this foundation.
 Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,
 and FormCoach will count repetitions, measure how they move, and explain their results.
 Our demo priority is **push-ups in prerecorded gym video**. Backend video pose extraction
-works locally; HTTP upload and browser tracking are later integrations. This diagram shows the complete vision:
+works locally and through HTTP upload; browser tracking is a later integration. This diagram shows the complete vision:
 
 ```text
        LIVE WEBCAM                      UPLOADED VIDEO
@@ -131,7 +131,7 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 | --- | --- |
 | `GET /api/v1/health` | Returns `{"status":"ok","service":"formcoach-api"}` |
 | `POST /api/v1/live/analyze-batch` | Counts selected push-up/squat cycles from supplied poses; per-rep times and joint angles; scores remain null |
-| `POST /api/v1/videos/analyze` | Accepts the multipart shape; returns HTTP 501 with an explicit placeholder error |
+| `POST /api/v1/videos/analyze` | Analyzes selected push-up/squat video through optional local CV; returns measured analysis |
 | `POST /api/v1/coach` | Deterministic local fallback; no OpenAI calls, even if a key is set |
 
 Mock results are labeled **MOCK DEMO DATA**. Select `push-up` for the intended demo exercise.
@@ -143,7 +143,8 @@ cycles through the live API. Synthetic tests cover partial reps, jitter, trackin
 and repeatable live-batch replay. Four actual MOV recordings now match human counts of
 **3, 1, 1, and 2 push-ups**, after fixing a phase-confirmation timing bug. This checks those
 clips, not general form accuracy. See the [recording validation report](apps/api/VALIDATION.md).
-Our next checkpoint is HTTP upload integration and matching playback in the frontend.
+HTTP upload is now wired. Next is matching playback in the frontend; Computer B must also
+set a separate upload timeout. See the [upload guide](apps/api/HTTP_UPLOAD.md).
 See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work

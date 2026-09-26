@@ -54,25 +54,29 @@ localhost or HTTPS. Stop media tracks when leaving the camera page.
 - `complete`: final results; check provenance before calling them measured.
 - Nullable values: render “Not available”, not `0`, `NaN`, or a full progress bar.
 - Synthetic results: visible “Demo data” label. No pretend processing animation implying real CV.
-- API errors: `ApiError.status`/`code` distinguish 501 stub, validation, and connection failure.
+- API errors: `ApiError.status`/`code` distinguish invalid video, setup missing, busy, timeout,
+  validation, and connection failure; see API_CONTRACT.md.
 
 ## Updated demo priority
 
 The user wants **prerecorded push-ups**, not squats. Prioritize video selection/playback and
 push-up results; browser tracking can follow. Send `exerciseHint: "push-up"`. The backend
 counts elbow cycles and returns `minSmoothedLeftElbowAngleDeg` or its right-side equivalent,
-`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Local video extraction is available on Computer A; real-clip validation and HTTP upload
-integration are next. See apps/api/VIDEO_SETUP.md. The old squat mock is a legacy UI fixture, not a push-up analysis; never
+`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Real HTTP uploads
+are now available after optional CV setup, with four clips matching counts of 3/1/1/2.
+Read **apps/api/HTTP_UPLOAD.md**: set a separate **240-second upload timeout**, show loading
+and typed errors, retain the matching local video, and test seeking. No pose frames/video
+URL are returned, so a skeleton overlay needs later coordination. The old squat mock is a legacy UI fixture, not a push-up analysis; never
 relabel its knee measurements or issue as push-up findings. Coordinate a new realistic fixture
 when actual push-up metrics exist. Existing v1.0 types need no changes.
 
 The backend replay tool and labeled synthetic elbow capture are documented in
-apps/api/examples/README.md. Captured-video validation is still pending.
+apps/api/examples/README.md. Actual recording evidence is in apps/api/VALIDATION.md.
 
 ## Live and playback details
 
-The backend now counts squat cycles from supplied poses, with per-rep time intervals and
-smoothed knee-angle measurements. Use `exerciseHint: "squat"`. Scores remain null, so there
+The backend counts push-up cycles from supplied poses, with per-rep time intervals and
+smoothed elbow-angle measurements. Use `exerciseHint: "push-up"` for this demo. Scores remain null, so there
 is no known worst rep yet. Full-body readiness and camera orientation are not evaluated;
 do not show a green full-body indicator based only on a non-null count. See API_CONTRACT.md
 for side locking and limitations. The two-frame shared request example produces

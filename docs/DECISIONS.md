@@ -21,7 +21,7 @@ demo problem, and record the reason here so future agents do not restart the arc
 | No DB/auth/queues/cloud requirements | They add setup and integration risk without improving the initial demo | No durable history in bootstrap; history is stretch |
 | Nulls plus status/provenance | Prevent fake measurements and misleading empty results | UI must distinguish unknown, synthetic, incomplete, and real results |
 | Generated schema and TS types | A frozen boundary must not drift silently across machines | Contract commits regenerate/check all representations |
-| Stub upload returns 501 | Fake video processing would mislead the demo and the frontend | UI can build error states now; implement real extraction later |
+| Real synchronous uploads after clip validation | Four push-up clips establish a concrete counting checkpoint | Optional local model, worker-thread processing, one extraction per process, explicit errors, no fake fallback |
 | Bootstrap coach always local | No key or spend should be required to run the foundation | Configuring a key alone does not enable the future adapter |
 | Per-app dependencies and env files | Beginners can run one app without installing the other | No root npm workspace; run npm commands from apps/web |
 | Node 24, Python 3.12 team defaults | Match both machines and CI with small pinned dependency sets | Create separate local environments; do not share installed dependency folders |

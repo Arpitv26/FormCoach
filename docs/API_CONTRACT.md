@@ -19,7 +19,8 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 - `provenance.kind`: `measured`, `synthetic`, or `placeholder`. Always expose synthetic labels.
 - Empty issue lists do not prove good form when analysis is unavailable.
 - `limitations` explains missing scores, uncalibrated heuristics, view limits, or unavailable features.
-- Push-up and squat counting from supplied poses is implemented; real-camera accuracy is unverified.
+- Push-up and squat counting from supplied poses is implemented; four real push-up clips
+  match human counts. This is not a general accuracy benchmark.
   Other exercise profiles describe planned capability. Scores and form issues remain unavailable.
 - Extra fields are rejected by the backend models. Coordinate shared additions deliberately.
 
@@ -181,23 +182,47 @@ curl -s http://localhost:8000/api/v1/live/analyze-batch \
 Content-Type: `multipart/form-data`, with required `file` and optional text `exerciseHint`.
 Let the browser set multipart headers; the client already does this. No JSON wrapper.
 
-**Bootstrap behavior:** HTTP 501, no pose extraction, no saved video, no fabricated analysis:
+**Implemented local upload behavior:** HTTP 200 returns the existing `AnalysisResponse`,
+with `source.type: "upload"`, a server-generated session ID, and timestamps relative to the
+upright decoded clip. `durationMs` covers the last decoded frame (not necessarily the media
+container's nominal duration). Counting uses the same analyzer as live. Scores remain null.
 
-```json
-{
-  "detail": {
-    "code": "VIDEO_ANALYSIS_NOT_IMPLEMENTED",
-    "message": "Video pose extraction is not implemented in this bootstrap."
-  }
-}
-```
+Send `exerciseHint: "push-up"` for the demo. The multipart field remains optional in the wire
+shape, but real processing requires explicit selection: missing/empty returns 400
+`EXERCISE_REQUIRED`; unknown IDs return `UNKNOWN_EXERCISE`; registered but unimplemented
+IDs return `EXERCISE_NOT_SUPPORTED`. Legacy `squat` also counts. No automatic detection.
 
-The declared future HTTP 200 body is `AnalysisResponse`, with `source.type: "upload"`,
-actual clip duration, and timestamps relative to the upright decoded clip. The backend
-will generate the upload session ID. Video acceptance limits and codec handling must be
-defined before enabling real extraction; the bootstrap is a local development endpoint.
-Do not upload large recordings just to test this stub. Starlette may spool multipart data
-to a temporary file before the handler closes it; this is not persistent video storage.
+Accepted: nonempty MP4/MOV/WebM, <=250 MiB, <=120 seconds, <=4K pixels and <=4096 per axis,
+fixed upright square-pixel dimensions, valid monotonic source timestamps. HEVC MOV works
+on Computer A; H.264 MP4 is a fallback for decoder/browser compatibility. MIME headers do
+not establish validity. Processing needs the optional local packages/model in VIDEO_SETUP.md.
+
+Uploads are synchronous, run in a worker thread, and permit one native extraction per API
+process. Concurrent analysis returns 503 `VIDEO_PROCESSOR_BUSY`. Temporary copies and
+multipart files are closed/removed when processing exits; the result contains no video URL
+or pose-frame sequence. Keep the original browser file for playback. Aborting a browser
+request does not immediately cancel native processing. No queue or persisted job exists.
+
+The 180-second extraction deadline is cooperative between native calls, not a hard native
+execution timeout. Starlette spools multipart data before handler size/concurrency checks;
+these are local-demo processing limits, not a hard incoming body/disk quota. Run one worker.
+
+Application errors retain the existing `detail.code` / `detail.message` shape:
+
+| HTTP | Codes |
+| --- | --- |
+| 400 | `EXERCISE_REQUIRED`, `UNKNOWN_EXERCISE`, `EXERCISE_NOT_SUPPORTED`, `EMPTY_VIDEO`, `INVALID_VIDEO` |
+| 413 | `VIDEO_TOO_LARGE` |
+| 415 | `UNSUPPORTED_VIDEO_TYPE` |
+| 503 | `VIDEO_SETUP_REQUIRED`, `VIDEO_PROCESSOR_BUSY` |
+| 504 | `VIDEO_PROCESSING_TIMEOUT` |
+| 500 | `VIDEO_PROCESSING_FAILED` (sanitized message; details in backend terminal) |
+
+Missing/malformed multipart fields use FastAPI's existing HTTP 422 shape. Insufficient pose
+evidence returns HTTP 200 with honest `insufficient_data`/`partial` analysis, never mock data.
+See [HTTP upload guide](../apps/api/HTTP_UPLOAD.md) for exact curl commands and B's checklist.
+**Frontend action:** use a separate 240-second upload timeout; the bootstrap client still
+uses 15 seconds until Computer B makes that change. Keep health/live timeouts short.
 
 ## AnalysisResponse
 
@@ -253,9 +278,10 @@ not enable unfinished functionality. The future adapter must follow AI_COACH.md.
 - HTTP 400: application error `{"detail":{"code":"...","message":"..."}}`.
 - HTTP 422: FastAPI validation shape `{"detail":[{"loc":[...],"msg":"...","type":"...",...}]}`.
   Client shows a friendly message; developers inspect the network response for field errors.
-- HTTP 501: explicit unimplemented video processing (same shape as 400).
+- Upload-specific statuses and codes are listed above; all use the application error shape.
 - Network/unexpected server errors: client throws `ApiError`; no mock substitution.
-- Client timeout is 15 seconds; future real video extraction may require a deliberate increase.
+- Bootstrap client timeout is 15 seconds; Computer B must give uploads a separate 240-second
+  timeout as described above. Never automatically retry a timed-out upload.
 - No auth or durable session storage exists. Health does not expose secrets/settings.
 
 Change procedure and regeneration commands are in `contracts/README.md` and AGENTS.md.

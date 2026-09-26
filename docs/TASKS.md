@@ -31,7 +31,8 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Saved-pose replay checker and labeled synthetic push-up capture.
 - [ ] [A] Lunge analyzer only after the push-up video demo works.
 - [x] [A] Optional local video decoding + MediaPipe pose adapter + bounded inputs and cleanup.
-- [ ] [A] Integrate validated video processing into the HTTP upload endpoint.
+- [x] [A] Integrate validated video processing into HTTP uploads, including cleanup/errors and busy handling.
+- [ ] [B] Use separate 240-second upload timeout and connect measured results/playback (apps/api/HTTP_UPLOAD.md).
 - [ ] [A] Phase 5: OpenAI adapter and evidence/uncertainty guardrails.
 - [ ] [A] Phase 6: optional automatic exercise classification.
 - [ ] [A] Phase 7: advanced ML/reference features only if demo is stable.

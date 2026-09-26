@@ -76,11 +76,12 @@ If a contract must change:
 
 Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
-hint remain `not_implemented`. Scores stay null. Upload returns 501; coach uses a local fallback.
+hint remain `not_implemented`. Scores stay null. Upload runs the optional local CV pipeline; coach uses a local fallback.
 Frontend foundation renders the six-rep fixture and can check health. A local MediaPipe video adapter is available with optional dependencies; no form scorer is
 integrated. Four real MOV recordings match human counts of 3, 1, 1, and 2 after a
 phase-confirmation timing fix; see apps/api/VALIDATION.md for evidence and limitations.
-Next: connect the HTTP upload route, test cleanup/errors, and coordinate playback/loading
-with B. Keep scores null until grounded scoring exists. See apps/api/VIDEO_SETUP.md;
-the upload endpoint remains 501 until that next integration.
+HTTP upload integration now includes cleanup/error tests and a single-extraction gate.
+Next: Computer B connects upload/playback and sets a separate 240-second upload timeout
+(the bootstrap client still uses 15 seconds). Read apps/api/HTTP_UPLOAD.md and API_CONTRACT.md.
+Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.
