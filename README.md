@@ -146,11 +146,11 @@ cycles through the live API. Synthetic tests cover partial reps, jitter, trackin
 and repeatable live-batch replay. Four actual MOV recordings now match human counts of
 **3, 1, 1, and 2 push-ups**, after fixing a phase-confirmation timing bug. This checks those
 clips, not general form accuracy. See the [recording validation report](apps/api/VALIDATION.md).
-HTTP upload is now wired. Next is matching playback in the frontend; Computer B must also
-set a separate upload timeout. See the [upload guide](apps/api/HTTP_UPLOAD.md).
+HTTP upload and matching frontend playback passed a real-clip integration check.
+The frontend now uses a separate 240-second upload timeout. See the [upload guide](apps/api/HTTP_UPLOAD.md).
 Push-up reps also expose observed elbow range and timing around the minimum angle; see
 [measurement definitions](apps/api/MEASUREMENTS.md). Scores remain unavailable.
-The frontend can integrate later using `contracts/examples/pushup-analysis.json`, an
+For offline UI work, use `contracts/examples/pushup-analysis.json`, an
 explicitly synthetic one-rep fixture with the new fields. Causal timing/range comparisons
 also flag measured differences for review; see [comparison rules](apps/api/COMPARISONS.md).
 A separate synthetic three-rep comparison fixture demonstrates those flags without claiming

@@ -35,7 +35,7 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [A] Lunge analyzer only after the push-up video demo works.
 - [x] [A] Optional local video decoding + MediaPipe pose adapter + bounded inputs and cleanup.
 - [x] [A] Integrate validated video processing into HTTP uploads, including cleanup/errors and busy handling.
-- [ ] [B] Use separate 240-second upload timeout and connect measured results/playback (apps/api/HTTP_UPLOAD.md).
+- [x] [B] Use separate 240-second upload timeout and connect measured results/playback (PR #1; one real-clip UI check passes).
 - [x] [A] Phase 5: Optional OpenAI evidence selector, useful local fallback, evidence/uncertainty tests.
 - [x] [A] Verify one live OpenAI request with a locally configured key (2026-09-26: synthetic rep-3 timing QA, provider openai, 3.22 seconds).
 - [ ] [SHARED] Recheck frontend branch periodically; see INTEGRATION_STATUS.md for current gaps.
@@ -47,7 +47,7 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [B] Landing/demo interface and responsive visual direction.
 - [ ] [B] Results dashboard entirely from canonical mock; null and error states.
 - [ ] [B] Camera permission, framing/readiness states, exercise selector.
-- [ ] [B] Upload selection/preview and honest loading/error states.
+- [x] [B] Upload selection/preview and honest loading/error states (PR #1).
 - [ ] [B] Browser pose adapter and correctly mirrored skeleton overlay.
 - [ ] [B] Cumulative live requests, session reset/finalization, response replacement.
 - [ ] [B] Per-rep cards, metric graphs, issue timeline, lowest-score highlight.
@@ -60,10 +60,11 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [SHARED] Both computers branch from the same published bootstrap main commit.
 - [ ] [SHARED] Agree on browser pose provider and first supported camera view.
 - [ ] [SHARED] Confirm identical coordinates/timestamps in browser and video adapters.
-- [ ] [SHARED] Connect real push-up upload responses without dashboard-specific shape changes.
+- [x] [SHARED] Connect real push-up upload responses without dashboard-specific shape changes.
 - [ ] [SHARED] Test live reset, final snapshot, camera loss, backend down, and stale responses.
 - [ ] [SHARED] Ensure synthetic/placeholder results are never presented as measured.
-- [ ] [SHARED] Validate per-rep/video/issue timestamp alignment with a matching clip.
+- [x] [SHARED] Validate rep-start and minimum-angle playback on IMG_6939 (0.733 s / 1.733 s).
+- [ ] [SHARED] Validate playback of a real comparison flag when suitable footage exists.
 - [ ] [SHARED] Merge shared contract changes first; all checks pass on integrated main.
 
 ## DEMO

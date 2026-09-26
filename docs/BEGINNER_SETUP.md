@@ -148,9 +148,11 @@ npm run dev
 ```
 
 Success shows a local URL and `Ready`. Open **http://localhost:3000**.
-You should see **FormCoach**, a clearly labeled mock session, six rep scores, and
-**Check backend health**. Clicking that button should show `formcoach-api: ok` if Terminal 1 is running.
-This page is intentionally a starting point; it does not track your camera yet.
+You should see **FormCoach** with push-up upload and camera-preview choices. Open
+**Connection tools** near the bottom, then **Check backend health**: it should show
+`formcoach-api: ok` if Terminal 1 is running. Camera preview does not track/count movement.
+For real recorded-video analysis, follow apps/api/VIDEO_SETUP.md, then open
+http://localhost:3000/upload and select a push-up clip.
 
 ## 9. Stop or restart
 

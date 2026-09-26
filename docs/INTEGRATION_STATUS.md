@@ -1,39 +1,46 @@
 # Computer A / Computer B integration checkpoint
 
-Checked 2026-09-26 by fetching and reading **origin/frontend at bc6821d**.
-This is a code review snapshot, not a claim that the latest UI was launched or demo-tested.
-No frontend files were edited or merged into `backend-cv`. Recheck before the next integration
-checkpoint; branch heads can advance independently.
+## Reviewed and integrated — 2026-09-26
 
-## What Computer B has
+Frontend PR #1, `5dd6bb4`, was reviewed and merged into `main` as `9c16f22`.
+Computer A merged that main into `backend-cv` as `75c4faa`, with no conflicts.
+The backend PR is the next step into main; keep it separate from future feature work.
+No frontend source edits were needed during this review. Neither feature branch was deleted.
 
-- Dark fitness UI/results foundation (`59029d7`) and webcam setup/exercise selection (`bc6821d`).
-- Push-up uses the correct backend ID `push-up`.
-- Gym selection slugs have `backendHint: null`; they are not implemented analyzers.
-- Camera is preview/setup only; no recording, pose extraction, or upload request yet.
-- Results preserve demo labels and unknown scores. An API client exists for all routes.
+## Verified
 
-## Coordination items — B can do these later
+- Frontend: 26 tests, lint, TypeScript, contract checks, production build, and PR GitHub CI pass.
+- Backend: 295 tests pass. Test fixtures now override local coaching credentials so developer
+  `.env` settings cannot trigger paid requests during ordinary tests.
+- Actual Chrome upload from the production frontend to Computer A's running backend:
+  `IMG_6939.MOV`, HEVC 3840×2160, HTTP 200, measured provenance, **1 completed push-up**.
+- Two runs took 14.46 and 10.41 seconds. Rep-start seek reached **0.733 s** and minimum-angle
+  seek reached **1.733 s**, paused correctly with no playback error. The latter frame visibly
+  shows the lowered position. This verifies one clip's UI alignment, not all recordings.
+- Desktop 1440×1000 and mobile 390×844 layouts inspected; no horizontal mobile overflow.
+  Clearing the file also clears its results; no browser page errors occurred.
+- Video requests use a separate **240-second timeout**. Other calls retain 15 seconds.
+- Upload results show measured elbow values, unknown scores, camera limitations, and correctly
+  describe finalized `partial` results. Original video stays available for timestamp playback.
+- Gym choices remain previews with null backend hints; webcam is preview-only.
 
-| Item | Backend readiness / frontend action |
-| --- | --- |
-| Prerecorded push-ups first | User's intended demo remains recorded gym push-ups. Webcam polish is useful but does not replace upload/playback integration. |
-| Upload client timeout | Current remote client still uses 15 seconds. Use a separate 240-second timeout for video; keep short calls separate. See apps/api/HTTP_UPLOAD.md. |
-| Measured results | Render measurements from MEASUREMENTS.md and COMPARISONS.md; all quality scores still null. Do not require a score to show a completed analysis. |
-| Finalized partial results | `partial` can mean a finished upload with incomplete observations, not just a live set in progress. Current results status copy says “Set in progress”; distinguish using source/UI state. |
-| Coach | Existing client and v1.0 types work unchanged. Send the actual current analysis, show message + limitations + provider, and allow repeat only on user action. No frontend key. |
-| Recorded playback | Keep the local uploaded file for playback and use timestampMs / 1000 for video currentTime. Verify alignment with the exact uploaded recording. |
-| Unsupported gym exercises | Keep null backend hints unavailable for real analysis; never relabel a gym exercise as push-up to bypass validation. |
+The footage and screenshots are local review artifacts, not repository files. No raw video,
+real pose data, API keys, or screenshots of participants were committed.
 
-A keeps implementing backend checkpoints independently. B owns apps/web. Neither side needs
-to rewrite the other's algorithms. Contract fields and schemas are unchanged in the coaching
-checkpoint; coordinate semantics through API_CONTRACT.md and this note.
+## Remaining work
 
-## What remains before the demo
+- B: connect the coach panel to the current analysis. Display provider, message, evidence,
+  and limitations; keep keys backend-only. A live OpenAI timing QA already passed separately.
+- A: validate a real comfortable variation that triggers comparison rules. Existing four
+  recordings count 3/1/1/2 but produce zero flags; synthetic positives do not prove accuracy.
+- Together: rehearse more clips, recovery/error states, and actual camera access if preview
+  is included. No physical webcam access was requested in this review.
+- Small B follow-ups: the older, currently unused SessionResults component still labels all
+  partial results “Set in progress”; update before reusing it for uploads. Connection-tools
+  copy says the backend is optional for the demo, but real upload analysis requires it.
+- Frontend polish and camera preview can continue, but prerecorded push-ups remain the demo.
+- Keep scores null until justified formulas and calibration exist. No claims of general
+  form assessment, fatigue detection, medical diagnosis, or universal exercise recognition.
 
-- A completed one live OpenAI timing-question check on 2026-09-26 (3.22 seconds). Integrated frontend coaching still needs rehearsal.
-- A: obtain/validate a real comfortable variation that triggers the comparison rules. Existing
-  clips match 3/1/1/2 reps but produce zero review flags. Synthetic positive cases are not proof
-  of real-video detection accuracy.
-- B: connect upload → measured dashboard → matching playback → coach panel.
-- Together: rehearse end to end, including failed uploads, backend down, and fallback coach.
+Recheck remote branch heads at later checkpoints. B owns apps/web and A owns apps/api;
+shared contract changes still need deliberate coordination.

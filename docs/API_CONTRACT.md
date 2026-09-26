@@ -259,8 +259,8 @@ Application errors retain the existing `detail.code` / `detail.message` shape:
 Missing/malformed multipart fields use FastAPI's existing HTTP 422 shape. Insufficient pose
 evidence returns HTTP 200 with honest `insufficient_data`/`partial` analysis, never mock data.
 See [HTTP upload guide](../apps/api/HTTP_UPLOAD.md) for exact curl commands and B's checklist.
-**Frontend action:** use a separate 240-second upload timeout; the bootstrap client still
-uses 15 seconds until Computer B makes that change. Keep health/live timeouts short.
+**Frontend behavior:** the integrated client uses a separate 240-second upload timeout.
+Health/live/coach requests retain 15 seconds.
 
 ## AnalysisResponse
 
@@ -321,8 +321,7 @@ No contract fields changed. See AI_COACH.md and apps/api/COACH_SETUP.md.
   Client shows a friendly message; developers inspect the network response for field errors.
 - Upload-specific statuses and codes are listed above; all use the application error shape.
 - Network/unexpected server errors: client throws `ApiError`; no mock substitution.
-- Bootstrap client timeout is 15 seconds; Computer B must give uploads a separate 240-second
-  timeout as described above. Never automatically retry a timed-out upload.
+- Client timeout is 15 seconds for short requests and 240 seconds for uploads. Never automatically retry a timed-out upload.
 - No auth or durable session storage exists. Health does not expose secrets/settings.
 
 Change procedure and regeneration commands are in `contracts/README.md` and AGENTS.md.

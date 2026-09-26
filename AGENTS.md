@@ -82,8 +82,9 @@ Frontend progress is tracked by remote commit in docs/INTEGRATION_STATUS.md. A l
 integrated. Four real MOV recordings match human counts of 3, 1, 1, and 2 after a
 phase-confirmation timing fix; see apps/api/VALIDATION.md for evidence and limitations.
 HTTP upload integration now includes cleanup/error tests and a single-extraction gate.
-Next: Computer B connects upload/playback and sets a separate 240-second upload timeout
-(the bootstrap client still uses 15 seconds). Read apps/api/HTTP_UPLOAD.md and API_CONTRACT.md.
+Frontend PR #1 is merged into main and integrated into backend-cv without conflicts.
+Upload/playback and the separate 240-second timeout passed a real-clip browser check;
+read docs/INTEGRATION_STATUS.md. Next for B: coach panel and demo polish.
 Push-up reps now include observed elbow excursion and timing around the minimum angle;
 read apps/api/MEASUREMENTS.md. The new contracts/examples/pushup-analysis.json is synthetic.
 Push-up comparisons now flag substantial duration changes or reduced observed excursion

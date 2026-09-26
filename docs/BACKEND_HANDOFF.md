@@ -33,7 +33,7 @@ see apps/api/COACH_SETUP.md and docs/AI_COACH.md. Authored fixture angles are no
 | Completed | Optional video extraction, push-up counts and cumulative HTTP replay on four real clips | Recorded demo evidence |
 | Completed | HTTP uploads, input limits, cleanup/error tests, real request check | Recorded demo backend |
 | Completed | Push-up observed elbow excursion and timing parts, synthetic/recorded-pose checks | Descriptive measurements |
-| B, when ready | Coordinate upload loading/timeout, measured results, and video seeking | Before demo rehearsal |
+| Completed | Frontend PR #1 merged; actual upload, measured results, and timestamp seeks checked | One real clip; see INTEGRATION_STATUS.md |
 | Completed | Causal timing/range comparison flags with thresholds, reference evidence, and replay tests | Changes to review, not quality scores |
 | Completed | Evidence-only local coach and optional OpenAI selector with simulated HTTP tests | Stable v1.0 shape |
 | Next for A | Real positive-case comparison validation | Requires suitable footage; scoring still deferred |
