@@ -24,7 +24,8 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Connect the internal squat counter to live API responses without changing the contract.
 - [x] [A] Compare four real clips with human counts and visual sequences; counts 3/1/1/2 and HTTP replay pass (apps/api/VALIDATION.md).
 - [ ] [SHARED] Validate exact playback alignment and rehearse the integrated demo.
-- [ ] [A] Measured push-up metrics, documented score formulas, grounded issues.
+- [x] [A] Descriptive per-rep elbow excursion and timing parts; see apps/api/MEASUREMENTS.md.
+- [ ] [A] Within-set comparisons, grounded issues, documented score formulas after measurement review.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.
 - [x] [A] Push-up elbow cycle counter and shared segmentation mechanics (synthetic tests).

@@ -145,6 +145,10 @@ and repeatable live-batch replay. Four actual MOV recordings now match human cou
 clips, not general form accuracy. See the [recording validation report](apps/api/VALIDATION.md).
 HTTP upload is now wired. Next is matching playback in the frontend; Computer B must also
 set a separate upload timeout. See the [upload guide](apps/api/HTTP_UPLOAD.md).
+Push-up reps also expose observed elbow range and timing around the minimum angle; see
+[measurement definitions](apps/api/MEASUREMENTS.md). Scores remain unavailable.
+The frontend can integrate later using `contracts/examples/pushup-analysis.json`, an
+explicitly synthetic one-rep fixture with the new fields.
 See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work

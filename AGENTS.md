@@ -83,5 +83,8 @@ phase-confirmation timing fix; see apps/api/VALIDATION.md for evidence and limit
 HTTP upload integration now includes cleanup/error tests and a single-extraction gate.
 Next: Computer B connects upload/playback and sets a separate 240-second upload timeout
 (the bootstrap client still uses 15 seconds). Read apps/api/HTTP_UPLOAD.md and API_CONTRACT.md.
+Push-up reps now include observed elbow excursion and timing around the minimum angle;
+read apps/api/MEASUREMENTS.md. The new contracts/examples/pushup-analysis.json is synthetic.
+B can integrate later; A can continue measurement/rule work independently.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

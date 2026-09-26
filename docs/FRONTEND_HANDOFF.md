@@ -114,3 +114,14 @@ npm run contracts:check
 
 Commit frequently with messages such as `feat(web): add mock results dashboard`.
 Only edit shared files deliberately; announce needed contract changes to A before relying on them.
+
+## Timing and angle measurements (can integrate later)
+
+Computer A now returns per-rep observed elbow excursion and time to/from the minimum angle.
+Read `apps/api/MEASUREMENTS.md` for exact keys, units, sample window, and suggested labels.
+`contracts/examples/pushup-analysis.json` is an explicitly synthetic one-rep fixture for
+building this view without the backend. Keep its label visible and scores unavailable.
+These additions use the existing measurements dictionary; generated types are unchanged.
+Do not label the two timing parts as exact lowering/lifting phases, compare different
+camera angles as quality scores, or infer a worst rep from range alone. Older responses
+may lack the keys. Backend work can continue while B integrates on its own schedule.

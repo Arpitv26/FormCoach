@@ -180,7 +180,7 @@ evidence, the short-clip timing fix, repeat commands, and limits of this check.
 4. Completed: push-up elbow counting and capture replay checker, tested with synthetic inputs.
 5. Completed: local video extraction and count/sequence review on four actual recordings.
 6. Completed: HTTP upload integration, cleanup/error tests. Next: frontend playback/timeout coordination.
-7. Add supported push-up metrics and explainable scoring.
+7. Descriptive elbow excursion/timing implemented ([MEASUREMENTS.md](MEASUREMENTS.md)); next compare reps and establish grounded rules before scoring.
 8. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
 
 The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
