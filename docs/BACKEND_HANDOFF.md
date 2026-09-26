@@ -5,8 +5,9 @@ Your branch is `backend-cv`; your primary ownership is **apps/api/**. Follow BEG
 Computer B builds the UI independently from the shared fixture. Preserve its contract.
 
 **User priority change:** prerecorded push-ups, no squat demo. The push-up elbow counter
-and replay checker now work on synthetic poses. The local video adapter now extracts MediaPipe poses; next
-validate the user's recording and integrate the upload route; do not wait for browser tracking. The original squat mock
+and local MediaPipe video adapter now match human counts on four real recordings (3, 1, 1, 2).
+Read apps/api/VALIDATION.md for the timing fix and limits. Next integrate the upload route;
+do not wait for browser tracking. The original squat mock
 remains a legacy fixture. See apps/api/examples/README.md for the replay workflow.
 
 ## What is already wired
@@ -15,32 +16,33 @@ remains a legacy fixture. See apps/api/examples/README.md for the replay workflo
 - Pydantic contract validation, JSON schemas, and generated frontend types.
 - `MovementAnalyzer` protocol, injected into the live route through `get_analyzer()`.
 - `PoseProvider` and `PoseSequence` video adapter boundary.
-- Example squat profile; planned push-up, lunge, and gym exercise entries.
-- Squat pose-to-response analyzer; placeholders for other exercises, upload 501, local coach.
+- Push-up and squat profiles/counters; planned lunge and gym exercise entries.
+- Push-up/squat pose-to-response analyzer; upload 501, local coach.
 - Tests for routes, invalid requests, fixture semantics, and deterministic score arithmetic.
 
-Since bootstrap, geometry/visibility helpers and the squat rep counter with median smoothing
-have been connected to the live API and tested with synthetic HTTP requests. The local video adapter is implemented; next validate the recorded push-ups and integrate uploads. See apps/api/README.md for thresholds,
-limitations, and the remaining checkpoint plan. The optional local CV adapter is available (apps/api/VIDEO_SETUP.md); there is no form
-scorer, HTTP upload processing, or OpenAI call yet. Authored fixture angles are not measurements from a video.
+Geometry/visibility, median smoothing, and both counters are connected to the live API.
+The optional local CV adapter is available (apps/api/VIDEO_SETUP.md). There is no form scorer,
+HTTP upload processing, or OpenAI call yet. Authored fixture angles are not video measurements.
 
-## Work order after bootstrap
+## Current work order
 
-| Phase | Work | Priority |
+| Checkpoint | Work | Priority |
 | --- | --- | --- |
-| 1 | Geometry, aspect-ratio-correct angles, smoothing, visibility gates, squat phase/rep segmentation | Critical |
-| 2 | Squat per-rep measurements, documented metrics/weights, grounded issues, summary, tests | Critical |
-| 3 | Push-up and lunge rules using the same interfaces | Should have; after the push-up video demo works |
-| 4 | Uploaded-video extraction with OpenCV and a pretrained pose model | Critical to recorded fallback, now the main demo priority |
-| 5 | Evidence-only OpenAI coach with local failure fallback | Should have; use AI_COACH.md |
-| 6 | Automatic exercise classification from landmark sequences | Stretch |
-| 7 | Ghost comparison, custom lightweight ML, degradation/history/other advanced features | Stretch |
+| Completed | Geometry, visibility, shared phase/rep segmentation, live API | Foundation |
+| Completed | Optional video extraction, push-up counts and cumulative HTTP replay on four real clips | Recorded demo evidence |
+| Next | HTTP upload integration, input limits, cleanup/error tests, processing-time check | Critical |
+| Then | Coordinate upload loading/timeout, measured results, and video seeking with B | Critical |
+| Then | Supported push-up measurements, documented scoring, grounded issues, tests | Critical to form feedback |
+| Later | Evidence-only OpenAI coach with local failure fallback | Should have |
+| Later | Browser tracking, lunge/other exercises | Only after the recorded push-up demo works |
+| Stretch | Automatic exercise detection, ghost comparison, custom ML, history | Only if demo is stable |
 
-Phases 3–5 can be reprioritized based on the demo; do not delay a reliable squat path to
-finish more exercises. The user now prioritizes prerecorded push-ups. Computer B owns browser camera extraction; agree early on a pose provider
-and give them a known-valid cumulative sample. Computer A owns all movement interpretation.
+Computer B owns browser camera extraction and playback. Computer A owns movement
+interpretation. Preserve existing squat support, but do not expand it for this demo.
+Real 4K processing takes tens of seconds on this Mac; coordinate request timeouts before
+connecting B's upload UI. A successful count does not imply that form has been evaluated.
 
-## Phase 1 and 2 acceptance criteria
+## Measurement acceptance criteria
 
 Implement small geometry helpers and deterministic tests for ordinary angles, degenerate
 points, missing/low-confidence landmarks, and aspect ratios. Unknown visibility is not high

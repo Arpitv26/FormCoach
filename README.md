@@ -13,7 +13,7 @@ No API key, database, Docker, or GPU is needed to run this foundation.
 Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,
 and FormCoach will count repetitions, measure how they move, and explain their results.
 Our demo priority is **push-ups in prerecorded gym video**. Backend video pose extraction
-comes next; browser tracking is a later integration. This diagram shows the complete vision:
+works locally; HTTP upload and browser tracking are later integrations. This diagram shows the complete vision:
 
 ```text
        LIVE WEBCAM                      UPLOADED VIDEO
@@ -51,7 +51,7 @@ comes next; browser tracking is a later integration. This diagram shows the comp
 
 ### What we use and what we build
 
-- **Existing pose model:** We plan to integrate Google's
+- **Existing pose model:** Our local video adapter uses Google's
   [MediaPipe Pose Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker),
   which estimates 33 body landmarks, including hips, knees, and ankles. It is already
   trained to locate body parts; we do not need to train a pose model from scratch.
@@ -140,8 +140,10 @@ mock is a legacy UI fixture, not the demo plan. A local MediaPipe video adapter 
 
 Backend helpers now measure 2D joint angles, check visibility, and count completed exercise
 cycles through the live API. Synthetic tests cover partial reps, jitter, tracking loss,
-and repeatable live-batch replay; real-camera accuracy is still unverified. Our next checkpoint
-is comparison against visible push-ups in the user's real clip, then HTTP upload integration.
+and repeatable live-batch replay. Four actual MOV recordings now match human counts of
+**3, 1, 1, and 2 push-ups**, after fixing a phase-confirmation timing bug. This checks those
+clips, not general form accuracy. See the [recording validation report](apps/api/VALIDATION.md).
+Our next checkpoint is HTTP upload integration and matching playback in the frontend.
 See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work

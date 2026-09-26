@@ -28,7 +28,8 @@ algorithm so a rule-based analyzer and a future lightweight ML implementation ca
 `squat.py` configures standing → descent → bottom → ascent phases. It includes hips,
 knees, ankles, shoulders, and foot landmarks. Candidate knee angle thresholds are 160°
 for standing and 100° for bottom. **These are example engineering heuristics, not a universal
-definition of a correct squat, a clinical threshold, or a finished state machine.**
+definition of a correct squat or a clinical threshold.** The separate segmentation engine
+now uses these thresholds for counting; that does not turn them into form-quality criteria.
 
 The visibility threshold 0.7 is also a starting heuristic. Unknown visibility is unavailable,
 not a passing value. View support must be evaluated per rule. Side-view flexion can inform
@@ -52,13 +53,13 @@ not currently executed against them.
 No route rewrite should be necessary. If genuinely new contract fields are needed, coordinate
 them using contracts/README.md before depending on them.
 
-## Planned exercises
+## Exercise status
 
-| ID | Bootstrap state | Eventual role |
+| ID | Current state | Role |
 | --- | --- | --- |
-| `squat` | Example profile; no analysis | First live demo |
-| `push-up` | Planned profile | Second live exercise |
-| `lunge` | Planned profile | Third live exercise |
+| `squat` | Knee-angle rep counter; no form scorer | Legacy support, not the demo |
+| `push-up` | Elbow-angle rep counter; four real clips checked; no form scorer | Prerecorded demo priority |
+| `lunge` | Planned profile | After the push-up demo works |
 | `barbell-squat` | Registry placeholder | Possible recorded gym demo |
 | `bicep-curl` | Registry placeholder | Possible recorded gym demo |
 | `shoulder-press` | Registry placeholder | Possible recorded gym demo |

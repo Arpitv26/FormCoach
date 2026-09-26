@@ -8,7 +8,7 @@ flowchart TD
   Camera[Live webcam in Next.js] --> BrowserPose[Future browser pose adapter]
   BrowserPose --> Batch[HTTP cumulative PoseFrame batch]
   Batch --> Analyzer[Python MovementAnalyzer]
-  Upload[Uploaded video] --> Video[Future frame extraction + pretrained pose adapter]
+  Upload[Uploaded video] --> Video[Local frame extraction + pretrained pose adapter; HTTP wiring next]
   Video --> Poses[FormCoach PoseFrames]
   Poses --> Analyzer
   Profile[Exercise profile] --> Analyzer
@@ -19,7 +19,7 @@ flowchart TD
   JSON --> Coach[Evidence-only coach]
 ```
 
-Contracts, interfaces, profiles, geometry, visibility checks, and squat rep counting through
+Contracts, interfaces, profiles, geometry, visibility checks, and push-up/squat rep counting through
 the live route are implemented. Local backend video pose extraction is available through an optional MediaPipe adapter.
 Browser extraction, HTTP upload integration, form scoring, and issues remain future work. Upload returns 501 and coaching uses a local fallback.
 
@@ -60,8 +60,8 @@ The schema checks in CI catch accidental drift. Python model validators also che
 that plain JSON Schema cannot express, such as rep counts and landmark index/name pairs.
 
 `analysis/interfaces.py` defines `MovementAnalyzer`. The live route injects `RuleBasedAnalyzer`
-from `analysis/movement.py`, currently supporting squat only. Future upload processing calls that same
-interface after `PoseProvider.extract` returns a `PoseSequence`. Profiles are selected through
+from `analysis/movement.py`, supporting push-ups and squats. Local video processing calls that
+same interface after `PoseProvider.extract` returns a `PoseSequence`; HTTP upload wiring is next. Profiles are selected through
 `analysis/exercises/registry.py`. Keep algorithm selection behind the interface.
 
 The frontend client lives in `apps/web/src/lib/api/client.ts`; fixture access lives in `mock.ts`.

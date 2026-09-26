@@ -3,8 +3,9 @@
 ## Project and stopping point
 
 FormCoach is a movement/fitness coaching demo for UBC BizTech HelloHacks 2026. Two beginner
-developers have roughly a tomorrow-scale hackathon timeline. Prioritize a reliable live
-push-up demo using prerecorded gym video, clear evidence, and a polished presentation. Judging: functionality 35%, pitch
+developers have roughly a tomorrow-scale hackathon timeline. Prioritize a reliable
+push-up demo using prerecorded gym video, clear evidence, and a polished presentation.
+Judging: functionality 35%, pitch
 25%, technical complexity 20%, UX/design 20%.
 
 The bootstrap task ends with a verified shared foundation on main. Do not implement the
@@ -29,7 +30,7 @@ Keep the legacy squat fixture for compatibility, not as the intended presentatio
 - Monorepo; independent Next.js/TypeScript frontend and FastAPI/Pydantic Python backend.
 - Browser live pose extraction and backend uploaded-video extraction both produce our
   normalized `PoseFrame` representation. Analysis never depends on MediaPipe objects.
-- Pretrained pose estimation later; no training a pose model from scratch.
+- Local video uses pretrained MediaPipe Pose Landmarker; no training a pose model from scratch.
 - `MovementAnalyzer` is the shared interface for rules and possible later lightweight ML.
 - Version `1.0` JSON contract; Python models -> checked-in schemas -> generated TS types.
 - Stateless cumulative HTTP batches first. No database or WebSocket requirement.
@@ -77,6 +78,9 @@ Health works. Pose analysis counts push-ups using elbow angles and retains the e
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
 hint remain `not_implemented`. Scores stay null. Upload returns 501; coach uses a local fallback.
 Frontend foundation renders the six-rep fixture and can check health. A local MediaPipe video adapter is available with optional dependencies; no form scorer is
-integrated. Next: validate the user's recording and connect the HTTP upload route.
-See apps/api/VIDEO_SETUP.md; the upload endpoint remains 501 until that next integration.
+integrated. Four real MOV recordings match human counts of 3, 1, 1, and 2 after a
+phase-confirmation timing fix; see apps/api/VALIDATION.md for evidence and limitations.
+Next: connect the HTTP upload route, test cleanup/errors, and coordinate playback/loading
+with B. Keep scores null until grounded scoring exists. See apps/api/VIDEO_SETUP.md;
+the upload endpoint remains 501 until that next integration.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.

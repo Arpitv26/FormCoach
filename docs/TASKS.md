@@ -22,8 +22,9 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
 - [x] [A] Phase 1: squat phase transitions and completed-rep segmentation (synthetic tests).
 - [x] [A] Connect the internal squat counter to live API responses without changing the contract.
-- [ ] [SHARED] Validate push-up counts and timestamps against the user's prerecorded video before claiming demo readiness.
-- [ ] [A] Phase 2: measured squat metrics, documented score formulas, grounded issues.
+- [x] [A] Compare four real clips with human counts and visual sequences; counts 3/1/1/2 and HTTP replay pass (apps/api/VALIDATION.md).
+- [ ] [SHARED] Validate exact playback alignment and rehearse the integrated demo.
+- [ ] [A] Measured push-up metrics, documented score formulas, grounded issues.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.
 - [x] [A] Push-up elbow cycle counter and shared segmentation mechanics (synthetic tests).
@@ -53,7 +54,7 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [ ] [SHARED] Both computers branch from the same published bootstrap main commit.
 - [ ] [SHARED] Agree on browser pose provider and first supported camera view.
 - [ ] [SHARED] Confirm identical coordinates/timestamps in browser and video adapters.
-- [ ] [SHARED] Connect real squat responses without dashboard-specific shape changes.
+- [ ] [SHARED] Connect real push-up upload responses without dashboard-specific shape changes.
 - [ ] [SHARED] Test live reset, final snapshot, camera loss, backend down, and stale responses.
 - [ ] [SHARED] Ensure synthetic/placeholder results are never presented as measured.
 - [ ] [SHARED] Validate per-rep/video/issue timestamp alignment with a matching clip.
