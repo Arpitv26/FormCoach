@@ -1,12 +1,14 @@
 """Stateless movement analysis from caller-supplied poses, independent of a pose SDK."""
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.pushup_segmentation import segment_pushups
 from app.analysis.exercises.squat_segmentation import segment_squats
 from app.analysis.geometry import AngleMeasurement, measure_joint_angle
 from app.analysis.placeholder import PlaceholderAnalyzer
-from app.analysis.rep_segmentation import AngleSample, RepSegment
+from app.analysis.rep_segmentation import AngleSample, RepSegment, SegmentationResult
 from app.domain.analysis import (
     AnalysisResponse,
     CameraQuality,
@@ -23,8 +25,28 @@ from app.domain.analysis import (
 from app.domain.pose import PoseFrame
 
 
-def _knee_measurements(
-    frames: Sequence[PoseFrame], profile: ExerciseProfile, width: int, height: int
+@dataclass(frozen=True)
+class MovementSpec:
+    joints: tuple[str, str, str]
+    ready_phase: str
+    ready_cue: str
+    segment: Callable[[Sequence[AngleSample]], SegmentationResult]
+
+
+MOVEMENTS = {
+    "squat": MovementSpec(("hip", "knee", "ankle"), "standing", "standing", segment_squats),
+    "push-up": MovementSpec(
+        ("shoulder", "elbow", "wrist"), "top", "the straight-arm top position", segment_pushups
+    ),
+}
+
+
+def _joint_measurements(
+    frames: Sequence[PoseFrame],
+    profile: ExerciseProfile,
+    width: int,
+    height: int,
+    joints: tuple[str, str, str],
 ) -> tuple[str | None, list[AngleMeasurement]]:
     """Lock to the first usable side; left wins a tie. Appending frames cannot switch it."""
     side = None
@@ -34,7 +56,7 @@ def _knee_measurements(
         for candidate in (side,) if side else ("left", "right"):
             measurement = measure_joint_angle(
                 frame,
-                (f"{candidate}_hip", f"{candidate}_knee", f"{candidate}_ankle"),
+                tuple(f"{candidate}_{joint}" for joint in joints),
                 image_width=width,
                 image_height=height,
                 minimum_visibility=profile.minimum_visibility,
@@ -46,7 +68,7 @@ def _knee_measurements(
     return side, measurements
 
 
-def _rep_result(segment: RepSegment, number: int, side: str) -> RepAnalysis:
+def _rep_result(segment: RepSegment, number: int, side: str, joint: str) -> RepAnalysis:
     return RepAnalysis(
         rep_number=number,
         start_ms=segment.start_ms,
@@ -54,15 +76,15 @@ def _rep_result(segment: RepSegment, number: int, side: str) -> RepAnalysis:
         score=None,
         metrics=RepMetrics(range_of_motion=None, symmetry=None, tempo=None, stability=None),
         measurements={
-            f"minSmoothed{side.title()}KneeAngleDeg": segment.min_angle_deg,
+            f"minSmoothed{side.title()}{joint.title()}AngleDeg": segment.min_angle_deg,
             "durationMs": segment.end_ms - segment.start_ms,
         },
         issues=[],
         key_moments=[
             KeyMoment(
                 timestamp_ms=segment.bottom_ms,
-                type="minimum_knee_angle",
-                label=f"Lowest smoothed {side} knee angle (2D)",
+                type=f"minimum_{joint}_angle",
+                label=f"Lowest smoothed {side} {joint} angle (2D)",
             )
         ],
     )
@@ -102,7 +124,7 @@ class RuleBasedAnalyzer:
         profile: ExerciseProfile | None,
         is_final: bool,
     ) -> AnalysisResponse:
-        if profile is None or profile.id != "squat":
+        if profile is None or profile.id not in MOVEMENTS:
             response = PlaceholderAnalyzer().analyze(
                 frames,
                 session_id=session_id,
@@ -112,63 +134,73 @@ class RuleBasedAnalyzer:
                 profile=profile,
                 is_final=is_final,
             )
-            response.limitations.append("Select squat to use the current knee-angle rep counter.")
+            response.limitations.append(
+                "Select push-up or squat to use an implemented rep counter."
+            )
             return response
 
-        side, measurements = _knee_measurements(frames, profile, image_width, image_height)
-        result = segment_squats(
+        movement = MOVEMENTS[profile.id]
+        joint = movement.joints[1]
+        side, measurements = _joint_measurements(
+            frames, profile, image_width, image_height, movement.joints
+        )
+        result = movement.segment(
             [
                 AngleSample(frame.timestamp_ms, measurement.angle_deg)
                 for frame, measurement in zip(frames, measurements, strict=True)
             ]
         )
-        reps = [_rep_result(rep, index, side) for index, rep in enumerate(result.reps, 1)]
+        reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
         limitations = [
-            "2D knee angles use supplied landmarks; their camera origin cannot be verified.",
+            f"2D {joint} angles use supplied landmarks; their camera origin cannot be verified.",
             "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
-            "Uncalibrated squat heuristics count only observed standing-bottom-standing cycles. "
+            f"Uncalibrated {profile.id} rules count observed extension-flexion-extension cycles. "
             "Shallow, fast, or interrupted attempts may not count; this is not a form judgment.",
             "Scores, form issues, and automatic exercise recognition are not implemented. "
             "The exercise is a user selection. Empty issues do not establish good form.",
         ]
         if side:
             limitations.append(
-                f"Uses the {side} knee throughout this set (first usable side; left wins ties). "
+                f"Uses the {side} {joint} throughout this set (first usable side; left wins ties). "
                 "Three-sample median smoothing and phase confirmation delay event timestamps."
             )
         else:
-            camera_issues.append("No usable hip-knee-ankle triplet. Keep one leg visible.")
+            camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable:
             camera_issues.append(
-                f"Knee angle unavailable in {unavailable} of {len(frames)} frames: "
+                f"{joint.title()} angle unavailable in {unavailable} of {len(frames)} frames: "
                 "missing, outside-frame, low/unknown visibility, or coincident landmarks."
             )
         if unavailable or result.tracking_breaks:
             limitations.append(
                 f"Incomplete tracking: {unavailable} unavailable frames and "
                 f"{result.tracking_breaks} tracking breaks. Completed reps are retained; "
-                "the count may omit movement during gaps. Resume from standing."
+                f"the count may omit movement during gaps. Resume from {movement.ready_cue}."
             )
 
         has_evidence = bool(reps) or result.current_phase != "unknown"
         if not has_evidence:
             status = "insufficient_data"
-            headline = "Waiting for a visible hip, knee, and ankle and stable standing."
+            headline = (
+                f"Waiting for visible {', '.join(movement.joints)} joints and {movement.ready_cue}."
+            )
             limitations.append(
-                "Not enough continuous standing observations to establish readiness."
+                f"Need continuous observations of {movement.ready_cue} to establish readiness."
             )
         else:
             status = "partial"
             if (
                 is_final
-                and result.current_phase == "standing"
+                and result.current_phase == movement.ready_phase
                 and not unavailable
                 and not result.tracking_breaks
             ):
                 status = "complete"
-            headline = f"{len(reps)} completed squat reps observed. Scores are not available yet."
+            headline = (
+                f"{len(reps)} completed {profile.id} reps observed. Scores are not available yet."
+            )
         if is_final and result.current_phase in {"descent", "bottom", "ascent"}:
             limitations.append("The set ended during an unfinished repetition; it was not counted.")
 

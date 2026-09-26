@@ -27,7 +27,7 @@ No API key is required. The health response is `{"status":"ok","service":"formco
 | `app/services` | Future pose/video/OpenAI adapters; local coach fallback |
 | `tests` | Route, validation, fixture, and score arithmetic checks |
 
-Live analysis counts squat reps from supplied poses. Other exercise hints (or no hint) return
+Pose analysis counts push-up and squat reps from supplied poses. Other hints (or no hint) return
 `not_implemented`. Upload returns 501. Coach remains local. SDK/CV integration is future work.
 
 ## Feature checkpoint 1: joint angles and landmark visibility
@@ -143,15 +143,38 @@ open http://localhost:8000/docs, expand **POST /api/v1/live/analyze-batch**, and
 **Execute**. Expect HTTP 200 with `status: "insufficient_data"` and `totalReps: null`: that tiny
 two-frame example deliberately has too little data to count a rep. It never returns demo reps.
 
+## Push-up priority
+
+The user changed the demo to **prerecorded push-ups**, with no squat demo. Select
+`exerciseHint: "push-up"`. The earlier squat implementation is retained for compatibility.
+`pushup_segmentation.py` uses the shared `angle_segmentation.py` engine. The original squat
+tests protect that extraction from regressions.
+
+The push-up counter measures shoulder-elbow-wrist angle on one locked side. It first requires
+the straight-arm top position (at least 160 degrees), confirmed descent, flexion at most
+100 degrees, ascent, and return to the top. Other smoothing/timing/gap settings match the
+checkpoint 2 table. These are provisional counting thresholds, not a correct-depth standard.
+Shallow attempts do not count yet. Body alignment, camera orientation, and actual exercise
+identity are not inferred; a selected exercise is not automatic recognition.
+
+Results use `minSmoothedLeftElbowAngleDeg` or `minSmoothedRightElbowAngleDeg`, `durationMs`,
+and a `minimum_elbow_angle` key moment. Scores remain null. Finalization uses the top position
+instead of standing. Null/confidence/tracking-loss behavior follows checkpoint 3.
+
 ## Remaining backend plan
+
+Checkpoint 4 preparation now includes a [capture replay tool and step-by-step guide](examples/README.md).
+It tests saved poses against a running API, compares a human count, and checks cumulative
+response stability. A labeled synthetic example is included. Real captured poses and matching
+video are still needed before checking off real-camera validation.
 
 1. Completed: geometry and visibility helpers.
 2. Completed: conservative squat segmentation, smoothing, and failure-case tests.
 3. Completed: connect measured poses and completed reps to the existing live API contract.
-4. Next: integrate browser poses with Computer B and compare against visible reps in a clip.
-5. Add per-rep measurements, supported feedback, and explainable scoring.
-6. Add uploaded-video pose extraction through the same analyzer.
-7. Add evidence-only OpenAI coaching, then consider additional exercises.
+4. Completed: push-up elbow counting and capture replay checker, tested with synthetic inputs.
+5. Next: backend pose extraction from prerecorded push-ups, then comparison with human counts.
+6. Add supported push-up metrics, explainable scoring, and recorded-video UI integration.
+7. Add evidence-only coaching. Browser tracking follows when Computer B is ready.
 
 Keep each checkpoint small: implement, test, review, commit, and push `backend-cv`.
 

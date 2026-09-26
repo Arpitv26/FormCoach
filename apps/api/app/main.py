@@ -9,7 +9,9 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="FormCoach API",
         version="0.1.0",
-        description="Hackathon foundation. Live analysis and video CV are not implemented yet.",
+        description=(
+            "Push-up and squat counting from supplied poses. Form scoring and video CV are pending."
+        ),
     )
     app.add_middleware(
         CORSMiddleware,

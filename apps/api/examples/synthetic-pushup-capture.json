@@ -1,0 +1,685 @@
+{
+  "contractVersion": "1.0",
+  "sessionId": "synthetic-one-pushup-not-camera-data",
+  "exerciseHint": "push-up",
+  "imageWidth": 1280,
+  "imageHeight": 720,
+  "isFinal": true,
+  "frames": [
+    {
+      "frameIndex": 0,
+      "timestampMs": 0,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 1,
+      "timestampMs": 100,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 2,
+      "timestampMs": 200,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 3,
+      "timestampMs": 300,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 4,
+      "timestampMs": 400,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 5,
+      "timestampMs": 500,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4910605640135218,
+          "y": 0.7683456786441606,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 6,
+      "timestampMs": 600,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4910605640135218,
+          "y": 0.7683456786441606,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 7,
+      "timestampMs": 700,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4910605640135218,
+          "y": 0.7683456786441606,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 8,
+      "timestampMs": 800,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4910605640135218,
+          "y": 0.7683456786441606,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 9,
+      "timestampMs": 900,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4910605640135218,
+          "y": 0.7683456786441606,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 10,
+      "timestampMs": 1000,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.546875,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 11,
+      "timestampMs": 1100,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.546875,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 12,
+      "timestampMs": 1200,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.546875,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 13,
+      "timestampMs": 1300,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.546875,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 14,
+      "timestampMs": 1400,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.546875,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 15,
+      "timestampMs": 1500,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.5103194442373403,
+          "y": 0.7341076693573722,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 16,
+      "timestampMs": 1600,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.5103194442373403,
+          "y": 0.7341076693573722,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 17,
+      "timestampMs": 1700,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.5103194442373403,
+          "y": 0.7341076693573722,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 18,
+      "timestampMs": 1800,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.5103194442373403,
+          "y": 0.7341076693573722,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 19,
+      "timestampMs": 1900,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.5103194442373403,
+          "y": 0.7341076693573722,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 20,
+      "timestampMs": 2000,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 21,
+      "timestampMs": 2100,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 22,
+      "timestampMs": 2200,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 23,
+      "timestampMs": 2300,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    },
+    {
+      "frameIndex": 24,
+      "timestampMs": 2400,
+      "landmarks": [
+        {
+          "index": 11,
+          "name": "left_shoulder",
+          "x": 0.390625,
+          "y": 0.2777777777777778,
+          "visibility": 0.9
+        },
+        {
+          "index": 13,
+          "name": "left_elbow",
+          "x": 0.390625,
+          "y": 0.5555555555555556,
+          "visibility": 0.9
+        },
+        {
+          "index": 15,
+          "name": "left_wrist",
+          "x": 0.4177575277604578,
+          "y": 0.8291132647256133,
+          "visibility": 0.9
+        }
+      ]
+    }
+  ]
+}

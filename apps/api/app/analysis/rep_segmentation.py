@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from math import isfinite
 from typing import Literal
 
-type MovementPhase = Literal["unknown", "standing", "descent", "bottom", "ascent"]
+type MovementPhase = Literal[
+    "unknown", "extended", "standing", "top", "descent", "bottom", "ascent"
+]
 
 
 @dataclass(frozen=True)

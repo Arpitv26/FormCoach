@@ -206,7 +206,7 @@ def test_first_usable_side_stays_locked_as_more_frames_arrive(client):
 
 
 @pytest.mark.parametrize(
-    "hint", [None, "push-up", "lunge", "barbell-squat", "bicep-curl", "shoulder-press", "deadlift"]
+    "hint", [None, "lunge", "barbell-squat", "bicep-curl", "shoulder-press", "deadlift"]
 )
 def test_unimplemented_exercises_never_get_squat_results(client, hint):
     request = {**squat_request(), "exerciseHint": hint}
