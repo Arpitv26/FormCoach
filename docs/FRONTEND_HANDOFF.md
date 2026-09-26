@@ -56,6 +56,19 @@ localhost or HTTPS. Stop media tracks when leaving the camera page.
 - Synthetic results: visible “Demo data” label. No pretend processing animation implying real CV.
 - API errors: `ApiError.status`/`code` distinguish 501 stub, validation, and connection failure.
 
+## Updated demo priority
+
+The user wants **prerecorded push-ups**, not squats. Prioritize video selection/playback and
+push-up results; browser tracking can follow. Send `exerciseHint: "push-up"`. The backend
+counts elbow cycles and returns `minSmoothedLeftElbowAngleDeg` or its right-side equivalent,
+`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Video extraction is
+next on Computer A. The old squat mock is a legacy UI fixture, not a push-up analysis; never
+relabel its knee measurements or issue as push-up findings. Coordinate a new realistic fixture
+when actual push-up metrics exist. Existing v1.0 types need no changes.
+
+The backend replay tool and labeled synthetic elbow capture are documented in
+apps/api/examples/README.md. Captured-video validation is still pending.
+
 ## Live and playback details
 
 The backend now counts squat cycles from supplied poses, with per-rep time intervals and

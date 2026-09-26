@@ -17,14 +17,18 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 
 ## BACKEND
 
+**Current priority: prerecorded push-ups. No squat demo.**
+
 - [x] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
 - [x] [A] Phase 1: squat phase transitions and completed-rep segmentation (synthetic tests).
 - [x] [A] Connect the internal squat counter to live API responses without changing the contract.
-- [ ] [SHARED] Validate counts and timestamps against real camera footage before claiming demo readiness.
+- [ ] [SHARED] Validate push-up counts and timestamps against the user's prerecorded video before claiming demo readiness.
 - [ ] [A] Phase 2: measured squat metrics, documented score formulas, grounded issues.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.
-- [ ] [A] Phase 3: push-up and lunge analyzers after reliable squat.
+- [x] [A] Push-up elbow cycle counter and shared segmentation mechanics (synthetic tests).
+- [x] [A] Saved-pose replay checker and labeled synthetic push-up capture.
+- [ ] [A] Lunge analyzer only after the push-up video demo works.
 - [ ] [A] Phase 4: bounded video decoding + pretrained pose adapter + cleanup/errors.
 - [ ] [A] Phase 5: OpenAI adapter and evidence/uncertainty guardrails.
 - [ ] [A] Phase 6: optional automatic exercise classification.

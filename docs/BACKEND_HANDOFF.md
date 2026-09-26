@@ -4,6 +4,11 @@ Read AGENTS.md, ARCHITECTURE.md, API_CONTRACT.md, EXERCISE_SYSTEM.md, SCORING.md
 Your branch is `backend-cv`; your primary ownership is **apps/api/**. Follow BEGINNER_SETUP.md.
 Computer B builds the UI independently from the shared fixture. Preserve its contract.
 
+**User priority change:** prerecorded push-ups, no squat demo. The push-up elbow counter
+and replay checker now work on synthetic poses. Next implement backend video pose extraction
+and validate the user's recording; do not wait for browser tracking. The original squat mock
+remains a legacy fixture. See apps/api/examples/README.md for the replay workflow.
+
 ## What is already wired
 
 - FastAPI health/live/upload/coach routes and CORS.
@@ -15,8 +20,8 @@ Computer B builds the UI independently from the shared fixture. Preserve its con
 - Tests for routes, invalid requests, fixture semantics, and deterministic score arithmetic.
 
 Since bootstrap, geometry/visibility helpers and the squat rep counter with median smoothing
-have been connected to the live API and tested with synthetic HTTP requests. Next: integrate
-browser poses with Computer B and validate against real footage. See apps/api/README.md for thresholds,
+have been connected to the live API and tested with synthetic HTTP requests. Next: extract poses from prerecorded push-ups
+and validate against real footage. See apps/api/README.md for thresholds,
 limitations, and the remaining checkpoint plan. There is no integrated CV model, real form
 scorer, or OpenAI call yet. Authored fixture angles are not measurements from a video.
 
@@ -26,14 +31,14 @@ scorer, or OpenAI call yet. Authored fixture angles are not measurements from a 
 | --- | --- | --- |
 | 1 | Geometry, aspect-ratio-correct angles, smoothing, visibility gates, squat phase/rep segmentation | Critical |
 | 2 | Squat per-rep measurements, documented metrics/weights, grounded issues, summary, tests | Critical |
-| 3 | Push-up and lunge rules using the same interfaces | Should have; only after squat works |
-| 4 | Uploaded-video extraction with OpenCV and a pretrained pose model | Critical to recorded fallback, after live squat |
+| 3 | Push-up and lunge rules using the same interfaces | Should have; after the push-up video demo works |
+| 4 | Uploaded-video extraction with OpenCV and a pretrained pose model | Critical to recorded fallback, now the main demo priority |
 | 5 | Evidence-only OpenAI coach with local failure fallback | Should have; use AI_COACH.md |
 | 6 | Automatic exercise classification from landmark sequences | Stretch |
 | 7 | Ghost comparison, custom lightweight ML, degradation/history/other advanced features | Stretch |
 
 Phases 3–5 can be reprioritized based on the demo; do not delay a reliable squat path to
-finish more exercises. Computer B owns browser camera extraction; agree early on a pose provider
+finish more exercises. The user now prioritizes prerecorded push-ups. Computer B owns browser camera extraction; agree early on a pose provider
 and give them a known-valid cumulative sample. Computer A owns all movement interpretation.
 
 ## Phase 1 and 2 acceptance criteria

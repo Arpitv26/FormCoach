@@ -3,7 +3,7 @@
 UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measured evidence.
 
 **FormCoach is in development.** The frontend/backend foundation, shared data formats,
-mock squat results, and a tested live API for squat counting from supplied poses are ready.
+legacy mock squat results, and tested push-up counting from supplied poses are ready.
 Live camera pose extraction, form scoring, and AI coaching are still being built.
 No API key, database, Docker, or GPU is needed to run this foundation.
 
@@ -11,7 +11,8 @@ No API key, database, Docker, or GPU is needed to run this foundation.
 
 Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,
 and FormCoach will count repetitions, measure how they move, and explain their results.
-We are starting with squats. This diagram shows the planned complete workflow:
+Our demo priority is **push-ups in prerecorded gym video**. Backend video pose extraction
+comes next; browser tracking is a later integration. This diagram shows the complete vision:
 
 ```text
        LIVE WEBCAM                      UPLOADED VIDEO
@@ -55,8 +56,8 @@ We are starting with squats. This diagram shows the planned complete workflow:
   trained to locate body parts; we do not need to train a pose model from scratch.
 - **Our analysis code:** We turn those joint positions into angles, repetitions, timing,
   and explainable exercise feedback. We start with mathematical rules that we can test.
-  For example, following the hip-knee-ankle angle over time will help identify a squat's
-  downward movement and return to standing.
+  For example, following the shoulder-elbow-wrist angle helps identify a push-up's
+  downward movement and return to the straight-arm top position.
 - **AI coach:** We plan to use an OpenAI model to explain the measured results in simple
   language. It must not invent form problems or fill in missing measurements. When the
   camera cannot provide reliable evidence, FormCoach should say that the result is unavailable.
@@ -128,17 +129,18 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 | Endpoint | Current behavior |
 | --- | --- |
 | `GET /api/v1/health` | Returns `{"status":"ok","service":"formcoach-api"}` |
-| `POST /api/v1/live/analyze-batch` | Counts squat cycles from supplied poses; returns per-rep times and 2D knee angles; scores remain null |
+| `POST /api/v1/live/analyze-batch` | Counts selected push-up/squat cycles from supplied poses; per-rep times and joint angles; scores remain null |
 | `POST /api/v1/videos/analyze` | Accepts the multipart shape; returns HTTP 501 with an explicit placeholder error |
 | `POST /api/v1/coach` | Deterministic local fallback; no OpenAI calls, even if a key is set |
 
-Mock results are labeled **MOCK DEMO DATA**. Select `squat` for pose-based counting.
-Other profiles remain unimplemented. No camera pose model is integrated yet.
+Mock results are labeled **MOCK DEMO DATA**. Select `push-up` for the intended demo exercise.
+The earlier squat counter still works; other profiles remain unimplemented. The original squat
+mock is a legacy UI fixture, not the demo plan. No camera pose model is integrated yet.
 
-Backend helpers now measure 2D joint angles, check visibility, and count completed squat
+Backend helpers now measure 2D joint angles, check visibility, and count completed exercise
 cycles through the live API. Synthetic tests cover partial reps, jitter, tracking loss,
 and repeatable live-batch replay; real-camera accuracy is still unverified. Our next checkpoint
-is browser-pose integration and comparison against visible reps in a real clip.
+is backend video extraction and comparison against visible push-ups in a real clip.
 See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work

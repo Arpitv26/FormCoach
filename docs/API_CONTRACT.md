@@ -19,7 +19,7 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 - `provenance.kind`: `measured`, `synthetic`, or `placeholder`. Always expose synthetic labels.
 - Empty issue lists do not prove good form when analysis is unavailable.
 - `limitations` explains missing scores, uncalibrated heuristics, view limits, or unavailable features.
-- Squat counting from supplied poses is implemented; real-camera accuracy is unverified.
+- Push-up and squat counting from supplied poses is implemented; real-camera accuracy is unverified.
   Other exercise profiles describe planned capability. Scores and form issues remain unavailable.
 - Extra fields are rejected by the backend models. Coordinate shared additions deliberately.
 
@@ -155,6 +155,14 @@ smoothing/confirmation latency. No front-view knee-tracking finding is inferred 
 For this analyzer, `provenance.kind: "measured"` identifies computation from the supplied
 poses; it does not attest that the client captured them from a camera. Keep synthetic inputs
 clearly labeled in demos/tests. Counting heuristics are not a validated fitness assessment.
+
+**Push-up support:** select `exerciseHint: "push-up"`. The same status, replay, visibility,
+side-locking, timing, and finalization policies apply, using the straight-arm top position
+instead of standing. The triplet is shoulder-elbow-wrist; initial thresholds are top >=160
+and bottom <=100 degrees. Results use `minSmoothedLeftElbowAngleDeg` or
+`minSmoothedRightElbowAngleDeg`, plus `durationMs` and a `minimum_elbow_angle` key moment.
+No body-alignment, depth-quality, or injury claim is implied by these provisional cycles.
+The user-selected push-up demo replaces the earlier squat demo priority; wire shapes are unchanged.
 
 Registered IDs: `squat`, `push-up`, `lunge`, `barbell-squat`, `bicep-curl`, `shoulder-press`,
 `deadlift`. Unknown hints return HTTP 400 `UNKNOWN_EXERCISE`. Registration is not an assertion

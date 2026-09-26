@@ -1,46 +1,43 @@
 # Demo plan
 
-**Live reliability matters more than implementing 20 exercises.** This describes the intended
-demo after feature work; the bootstrap alone does not perform movement analysis.
+**Updated user direction: prerecorded push-ups, no squat demo.** Reliability on the actual
+gym clip matters more than live camera tracking or implementing many exercises. Computer B
+is still building the frontend; Computer A owns video pose extraction and movement analysis.
 
-## Live sequence
+## Main sequence — prerecorded gym video
 
-1. Open the camera experience and let the participant get into frame.
-2. Show honest camera readiness: needed joints visible and a usable view.
-3. Select squat. Say “detected” only if automatic recognition was actually implemented.
-4. Perform several comfortable good reps; show the skeleton and live completed-rep count.
-5. Perform one comfortable, visibly inconsistent rep (for example a tempo or range change).
-   Choose a variation supported by the real implemented rules and camera view.
-6. Show the measured cue with its confidence/visibility context.
-7. Finish the set. The dashboard shows overall score, available metrics, rep scores,
-   lowest-scoring rep, and issue timeline.
-8. Explain one concrete measurement and how it produced a rule/score.
-9. Ask the coach for a concise explanation grounded in that structured evidence.
-10. If synchronized video exists, jump to the worst rep or issue moment.
+1. Select a consented short side-view push-up clip and explicitly select `push-up`.
+2. Extract poses using a pretrained model; show the skeleton once that UI is implemented.
+3. Run the same movement analyzer used for live pose batches.
+4. Show completed-rep counts, elbow-angle measurements, and rep intervals.
+5. Seek to corresponding moments in that same clip. Compare against a human count.
+6. Add only genuinely implemented metrics/issues. Scores remain unavailable until grounded
+   scoring exists; an empty issue list is not proof of good form.
+7. Explain one actual measurement, and later let the AI coach summarize that evidence.
 
-The synthetic fixture includes a knee-tracking issue around rep 5 for UI work. Do not assume
-the first real side-view squat analyzer can measure that same issue. Rehearse a truthful
-demonstration of the implemented detector rather than forcing the footage to match the fixture.
+The push-up counter exists for supplied poses. Backend video extraction and real-footage
+validation are the next steps. No body-alignment or form-score accuracy is claimed yet.
+The old six-rep squat fixture must not be relabeled as push-up results.
 
-## Recorded gym path
+## Recording and acceptance
 
-Use consented videos filmed at Anytime Fitness, subject to gym recording rules. Keep
-bystanders out of frame. Select the exercise and view that the implemented backend supports.
-Equipment exercise options include barbell squat, curl, shoulder press, and deadlift, but
-none are working in bootstrap. Use a short clip and annotated playback with synchronized
-rep boundaries, pose overlay, and issue highlights after that feature is implemented.
+Film at Anytime Fitness only with permission under its rules; avoid bystanders. Keep the
+camera fixed and side-on with shoulder, elbow, wrist, hip, and ankle visible. Start and end
+with a brief straight-arm top pause. Use 3–5 comfortable repetitions for the first clip.
+Keep the recording in an ignored local `artifacts/` folder, not Git.
 
-## Rehearsal and fallback order
+Record human count, observed count, missed/extra reps, timing differences, and visibility
+problems. A matching total alone does not prove that each rep was identified correctly.
+See apps/api/examples/README.md for the pose replay tool. Confirm actual clip results before
+adding variation demonstrations or making accuracy claims.
 
-- Confirm the correct branches are integrated, dependencies installed, battery charged,
-  camera permission granted, lens unobstructed, and both servers running.
-- Pick the camera orientation and distance supported by the chosen rule. Test venue lighting.
-- Rehearse start → good reps → supported variation → finish → results at least twice.
-- Keep one consented short recording and its genuinely computed result for a measured fallback.
-- If live or recorded analysis fails, openly switch to the labeled synthetic UI walkthrough.
-  Do not pretend it is a result from the current participant.
-- The local coach fallback keeps the UI usable without network/API credits. Label its provider.
-- Avoid dependency upgrades or last-minute contract changes before presenting.
+## Later live option and fallback
+
+Browser tracking is later work on Computer B. It will send the same pose contract; it should
+not block the recorded demo. Rehearse the recorded flow twice on the presentation machine.
+Keep a successfully analyzed local clip and its matching measured results. If processing
+fails, label any synthetic walkthrough explicitly. The local coach fallback does not need a key.
+Freeze working dependencies/contracts before the pitch.
 
 ## Pitch and judging
 

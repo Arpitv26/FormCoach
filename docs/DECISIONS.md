@@ -5,6 +5,7 @@ demo problem, and record the reason here so future agents do not restart the arc
 
 | Decision | Why | Consequence |
 | --- | --- | --- |
+| Prerecorded push-up demo first | User changed the demo away from squats; browser tracking is not ready | Backend video extraction and push-up validation are next; keep old fixtures honest |
 | One monorepo with two apps | Two people can share types/docs while owning separate folders | Avoid edits outside your app without coordination |
 | FastAPI + Python + Pydantic | Python is practical for CV/math; FastAPI exposes typed HTTP routes and interactive docs | Backend owns validation and movement interpretation |
 | Next.js + TypeScript + Tailwind | Familiar React product tools, typed responses, quick responsive styling | Frontend decides the detailed product design |
@@ -33,4 +34,4 @@ and FastAPI's [multipart](https://fastapi.tiangolo.com/tutorial/request-files/) 
 [CORS documentation](https://fastapi.tiangolo.com/tutorial/cors/). OpenAI integration guidance is linked in AI_COACH.md.
 
 No actual analysis support is implied by profile registration. The first product checkpoint is
-a reliable squat demo; additional exercises and custom lightweight ML are later decisions.
+now a reliable prerecorded push-up demo (user priority change); additional exercises and custom lightweight ML are later decisions.

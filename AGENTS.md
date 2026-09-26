@@ -4,12 +4,16 @@
 
 FormCoach is a movement/fitness coaching demo for UBC BizTech HelloHacks 2026. Two beginner
 developers have roughly a tomorrow-scale hackathon timeline. Prioritize a reliable live
-squat demo, clear evidence, and a polished presentation. Judging: functionality 35%, pitch
+push-up demo using prerecorded gym video, clear evidence, and a polished presentation. Judging: functionality 35%, pitch
 25%, technical complexity 20%, UX/design 20%.
 
 The bootstrap task ends with a verified shared foundation on main. Do not implement the
 full product during bootstrap. Feature work begins after humans create their branches.
 Future agents should implement the responsibilities in their handoff, not restart the design.
+
+**Updated user priority:** prerecorded push-ups; no squat demo. Computer B is still building
+the frontend. Do not wait on browser tracking to implement backend video pose extraction.
+Keep the legacy squat fixture for compatibility, not as the intended presentation.
 
 ## Read before coding
 
@@ -69,9 +73,9 @@ If a contract must change:
 
 ## Current capabilities
 
-Health works. Live squat analysis derives completed reps, timestamps, and smoothed 2D knee
-angles from cumulative poses; insufficient observations return null counts. Other hints or no
+Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
+counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
 hint remain `not_implemented`. Scores stay null. Upload returns 501; coach uses a local fallback.
 Frontend foundation renders the six-rep fixture and can check health. No pose model or real
-scorer is integrated. Next: browser pose integration and real-camera validation with Computer B.
-Read apps/api/README.md checkpoint 3 for side selection, tracking loss, and finalization limits.
+scorer is integrated. Next: backend pose extraction and validation with the user's prerecorded push-up video.
+Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.
