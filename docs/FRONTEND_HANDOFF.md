@@ -1,150 +1,180 @@
-# Frontend / product / UX handoff — Computer B
+# Frontend handoff — Computer B
 
-Read AGENTS.md, API_CONTRACT.md, ARCHITECTURE.md, and PRODUCT_SCOPE.md first. Your branch
-is `frontend`; your primary ownership is **apps/web/**. Follow BEGINNER_SETUP.md to run it.
-Do not wait for backend work. No Python or OpenAI key is needed to build the mock interface.
+**Current checkpoint: 2026-09-26, including the camera logging/smoothing fix `dde10e2`.**
+Read this file and AGENTS.md before continuing. This replaces the old bootstrap handoff.
+The demo is **prerecorded push-ups**. Squat JSON is a legacy fixture, not the demo.
 
-## Bootstrap starting point
+## Get all the work, in order
 
-The following describes the shared foundation. For the latest reviewed remote frontend
-progress and integration gaps, see INTEGRATION_STATUS.md. B's branch now has additional UI.
+1. Frontend PR #1 is already merged into main.
+2. Merge [backend PR #2](https://github.com/Arpitv26/helloHacks/pull/2) into main.
+3. Merge the **`pose-overlay` → `main` PR** after its checks pass. It includes the upload
+   skeleton, live skeleton, UI cleanup, startup-log fix, display smoothing, and this handoff.
+4. Only after both feature PRs are merged, update Computer B using the commands below.
 
-The app is Next.js App Router + TypeScript + Tailwind. The homepage intentionally has only a
-FormCoach title, fixture summary, six rep scores, and a health button. You own the detailed design.
+**PR #2 alone does not include the overlays.** `pose-overlay` contains all backend commits
+plus the later overlay commits. Before #2 merges, the overlay PR also lists the backend
+changes; after a normal merge of #2, its diff narrows to the overlay/handoff work.
+Do not cherry-pick the individual fixes or overwrite the frontend directory with an old copy.
 
-| File | Purpose |
-| --- | --- |
-| `src/app/page.tsx` | Replaceable starting page; currently reads the fixture |
-| `src/app/layout.tsx`, `globals.css` | Page frame, metadata, simple styling |
-| `src/lib/api/types.ts` | Generated wire types; do not hand-edit |
-| `src/lib/api/client.ts` | Central health/live/upload/coach fetch methods and `ApiError` |
-| `src/lib/api/mock.ts` | `getMockAnalysis()` returns a fresh copy of the canonical fixture |
-| `src/components/backend-status.tsx` | Small client component showing connection/error handling |
-| `tests/` | Fixture and API boundary tests; use `npm test` |
-
-Use `contracts/examples/squat-analysis.json` through `getMockAnalysis()`. Build results
-components that take an `AnalysisResponse` prop. Later, pass the result of
-`api.analyzeLiveBatch(...)` or `api.analyzeVideo(...)` into the same components. Mock mode
-must be explicit and labeled; a failed real request must never silently switch to mock data.
-The live pose fixture is only a request-shape example, not an animation or squat dataset.
-
-## Responsibilities after bootstrap
-
-1. Create a beautiful, clear landing/demo interface and a responsive layout.
-2. Build webcam setup, permission/denied/error states, framing guidance, and exercise selection.
-3. Build upload selection, preview, loading, unsupported/unimplemented, and retry states.
-4. Build the results dashboard: overall score, five metrics, confidence and unknown states.
-5. Add per-rep cards/table, score comparison, issue cards, and timeline markers.
-6. Derive worst rep from the lowest available score; add playback jump when matching video exists.
-7. Add charts showing scores/metrics across reps; describe changes as form consistency,
-   not diagnosed fatigue. Rep 5 is the fixture's low point and rep 6 recovers.
-8. Add the coach panel with fallback/provider labeling, concise messages, and limitations.
-9. Integrate a browser pose adapter and skeleton overlay once the chosen provider is coordinated.
-10. Polish transitions, empty/error states, keyboard access, readable labels, and demo pacing.
-
-Computer A owns rep segmentation, metrics, scoring, and issue detection. Do not duplicate
-those algorithms in React. Browser pose extraction is frontend work; agree on provider and
-coordinate normalization with A before integrating it. Ordinary camera access requires
-localhost or HTTPS. Stop media tracks when leaving the camera page.
-
-## Essential UI states
-
-- Loading, permission denied, no camera, no pose, partially visible, and ready.
-- `not_implemented`: explain that the foundation received input but has no real results.
-- `insufficient_data`: explain which evidence is missing; do not display zero as a bad score.
-- `partial`: show completed reps and limitations. A final set can remain partial after
-  tracking loss or an unfinished rep; this status alone does not mean recording is active.
-- `complete`: final results; check provenance before calling them measured.
-- Nullable values: render “Not available”, not `0`, `NaN`, or a full progress bar.
-- Synthetic results: visible “Demo data” label. No pretend processing animation implying real CV.
-- API errors: `ApiError.status`/`code` distinguish invalid video, setup missing, busy, timeout,
-  validation, and connection failure; see API_CONTRACT.md.
-
-## Updated demo priority
-
-The user wants **prerecorded push-ups**, not squats. Prioritize video selection/playback and
-push-up results; browser tracking can follow. Send `exerciseHint: "push-up"`. The backend
-counts elbow cycles and returns `minSmoothedLeftElbowAngleDeg` or its right-side equivalent,
-`durationMs`, and `minimum_elbow_angle` moments, with scores still null. Real HTTP uploads
-are now available after optional CV setup, with four clips matching counts of 3/1/1/2.
-Read **apps/api/HTTP_UPLOAD.md**: set a separate **240-second upload timeout**, show loading
-and typed errors, retain the matching local video, and test seeking. The original endpoint returns no pose frames/video URL. The additive
-`/videos/analyze-with-pose` endpoint returns analysis and poses from one extraction; the current
-upload client uses it. Read POSE_OVERLAY.md before changing camera or playback rendering. The old squat mock is a legacy UI fixture, not a push-up analysis; never
-relabel its knee measurements or issue as push-up findings. Coordinate a new realistic fixture
-when actual push-up metrics exist. The analysis shape is unchanged; new VideoAnalysisResponse/PoseTrack types are generated.
-
-The backend replay tool and labeled synthetic elbow capture are documented in
-apps/api/examples/README.md. Actual recording evidence is in apps/api/VALIDATION.md.
-
-## Live and playback details
-
-The backend counts push-up cycles from supplied poses, with per-rep time intervals and
-smoothed elbow-angle measurements. Use `exerciseHint: "push-up"` for this demo. Scores remain null, so there
-is no known worst rep yet. Full-body readiness and camera orientation are not evaluated;
-do not show a green full-body indicator based only on a non-null count. See API_CONTRACT.md
-for side locking and limitations. The two-frame shared request example produces
-`insufficient_data`; it is not enough movement to count a rep. The mock dashboard stays usable.
-
-The v1 live request is a cumulative sampled set, not an incremental chunk. Keep at most
-1800 frames / 120 seconds; aim for 15 fps and one POST per second. Only one request in
-flight; replace results with each response. Create a new session ID per set; discard old
-responses after reset. Send `isFinal: true` at the end. See API_CONTRACT.md before implementing.
-
-Send unmirrored coordinates with image dimensions; mirror the visual overlay and preview
-together. Preserve anatomical left/right. Confidence/visibility issues should guide the user
-to reposition instead of inventing form feedback.
-
-Playback uses seconds, contract timestamps use milliseconds: divide by 1000. Seek to
-`rep.startMs` for the worst-rep jump; later use key moments for precise highlights. The
-fixture has no matching video, so mock timeline actions must not imply real synchronized footage.
-Live replay requires local recording and a matching time origin; coordinate that feature.
-
-## First useful work package
-
-Build a results screen from the six-rep fixture, including null/error states, before connecting
-CV. Then add camera/upload flows. Use one place to select demo data vs real API so integration
-does not spread conditional fetch logic throughout the UI.
-
-Run from `apps/web` before committing:
+From your repository folder (the one containing `apps`), first run:
 
 ```bash
+git status
+```
+
+If you have unfinished edits, save and commit your own work before merging. Do not discard
+it. If Git already says `working tree clean`, continue. On Computer B's existing frontend branch:
+
+```bash
+git checkout frontend
+git fetch origin
+git merge origin/main
+```
+
+`fetch` downloads the published history. `merge` brings the integrated main into your frontend
+branch while retaining your own commits. Success says `Already up to date`, `Fast-forward`, or
+`Merge made`. If it reports `CONFLICT`, give the output to your coding agent to resolve; do not
+choose all of one side. Then install the updated browser library/model and start the frontend:
+
+```bash
+cd apps/web
+npm ci
+npm run pose:setup
+npm run dev
+```
+
+Successful setup prints `Browser pose assets ready`. Open http://localhost:3000.
+If a frontend is already running, stop that terminal with **Control+C** before restarting.
+The model downloads once; no OpenAI key or Python is needed for the live skeleton.
+`npm run dev`/`build` recopy the runtime and apply the logging fix. After updating an already
+open camera page, stop the camera, press **Command+Shift+R**, and enable it again.
+
+## What already works — extend it, do not rebuild it
+
+| Area | Current behavior |
+| --- | --- |
+| `/` | Exercise selection/landing interface; gym choices are planned analysis, not supported counters |
+| `/upload` | File validation, local preview, real backend upload, cancellation/stale-response handling |
+| Uploaded results | Rep count, per-rep elbow min/max/excursion, timing parts, review cues, timestamp jumps |
+| Uploaded skeleton | Exact pose track from the same extraction, aligned with landscape/portrait playback; toggle on/off |
+| `/camera?exercise=push-up` | Permission/error/stop states, local browser pose extraction and mirrored live skeleton |
+| Display smoothing | Light live x/y smoothing only; raw analysis poses remain unchanged; lost/uncertain joints disappear |
+| Startup logging | Known successful XNNPACK notice is informational; real errors are preserved |
+| Backend coach | Local evidence summary plus optional OpenAI evidence selection; UI panel still needs integration |
+| Unknowns | Scores remain null; no prominent empty score card; unmeasured elbow columns hidden; detailed limits expandable |
+
+**Still unfinished:** live rep counting UI, coach panel, real positive comparison-case validation,
+form scoring, automatic exercise recognition, other gym exercise analyzers, recording/history.
+The human reports physical-camera tracking works with some flicker; the latest smoothing needs
+another physical-camera comparison. Do not claim general tracking/form accuracy from this demo.
+
+## Files you will use
+
+All paths below are relative to `apps/web` unless specified.
+
+| File | Responsibility |
+| --- | --- |
+| `src/app/page.tsx`, `src/lib/exercises.ts` | Exercise entry points and supported/planned labels |
+| `src/components/video-upload.tsx` | Upload controls, player, overlay toggle, seeking |
+| `src/lib/video/upload-session.ts` | File/result/pose pairing, aborts, object URL cleanup |
+| `src/components/uploaded-results.tsx` | Actual upload result presentation |
+| `src/components/playback-overlay.tsx` | Synchronize pose samples with the selected video |
+| `src/components/webcam-setup.tsx`, `src/lib/camera/preview.ts` | Camera permissions and stream lifecycle |
+| `src/components/live-overlay.tsx`, `src/lib/pose/live.ts` | Local model loading/inference and camera overlay lifecycle |
+| `src/lib/pose/drawing.ts`, `display-filter.ts`, `names.ts` | Geometry for display, visual smoothing, canonical landmark mapping |
+| `scripts/setup-pose.mjs`, `pose-runtime-logging.mjs` | Local model/runtime setup and exact startup-notice routing |
+| `src/lib/api/client.ts` | Centralized URL, error handling, timeout and typed API methods |
+| `src/lib/api/types.ts` | Generated contract types; never hand-edit |
+| `src/lib/api/mock.ts` | Legacy squat fixture helper; not the push-up demo source |
+| `tests/` | Camera, upload, client, contract, rendering and logging tests |
+
+The older `SessionResults` component is not the current upload view. Its `partial` label says
+“Set in progress”; fix that before reusing it, because final uploads can also be partial.
+
+## API and rendering boundary
+
+Read [API_CONTRACT.md](API_CONTRACT.md) and [POSE_OVERLAY.md](POSE_OVERLAY.md).
+Contract version is still **1.0**; `AnalysisResponse` is unchanged.
+
+- Upload UI calls `api.analyzeVideoWithPose(file, "push-up", signal)` and receives
+  `{ contractVersion, analysis, poseTrack }`. Render `analysis`; keep `poseTrack` paired with
+  the exact original file. The old `api.analyzeVideo` remains analysis-only for compatibility.
+- Upload timeout is **240 seconds**; health/live/coach retain **15 seconds**. Do not retry
+  automatically after timeout; backend processing may still be running.
+- MP4/MOV/WebM, at most 250 MiB, 120 seconds and 4K. Setup/malformed/busy errors remain explicit.
+- Coordinates refer to the upright **unmirrored** image. Mirror camera video/canvas together,
+  never the data. Apply letterbox offsets. Anatomical left/right never swap in the contract.
+- Playback uses milliseconds divided by 1000; hide missing/stale poses and do not interpolate
+  across lost tracking. Native fullscreen/Picture-in-Picture omits the sibling canvas;
+  use inline playback to demonstrate the overlay.
+- Display filtering is visual only. Feed **raw mapped poses** to future movement analysis,
+  never `DisplayPoseFilter` output. A visible skeleton is not a form score or readiness guarantee.
+- Never overlay synthetic poses on a user's recording, invent scores, or replace failed real
+  requests with mock data. `null` is unknown; zero is an actual measurement.
+- Finalized `partial` means incomplete evidence, not necessarily an ongoing set. Empty issues
+  do not establish good form. Full-body visibility/camera orientation are not verified.
+
+Browser-only tracking works on Computer B without a backend. Real upload/coach requests need
+an API. The default `http://localhost:8000` means **Computer B's own computer**, not Computer A.
+For same-machine backend setup, follow [BEGINNER_SETUP.md](BEGINNER_SETUP.md) and
+[VIDEO_SETUP.md](../apps/api/VIDEO_SETUP.md). Coordinate networking separately if using A's API;
+do not put A's key in a frontend env variable. Preserve existing `.env.local` settings.
+
+## Mock data for independent UI work
+
+Use these repository-root files directly when the backend is unavailable, with visible
+synthetic labels. None has a matching recording.
+
+- `contracts/examples/pushup-analysis.json`: one synthetic measured-geometry rep, null scores.
+- `contracts/examples/pushup-comparison-analysis.json`: three synthetic reps with review flags.
+- `contracts/examples/pushup-video-with-pose.json`: synthetic analysis + pose envelope shape.
+- `contracts/examples/live-pose-batch.json`: tiny request-shape example, not enough to count reps.
+- `contracts/examples/squat-analysis.json`: legacy scored UI fixture only; do not rename its
+  knee measurements as push-up findings.
+
+## Next frontend work, in small tested commits
+
+1. **Coach panel:** call `api.coach({ analysis, mode: "summary" })` using the current result.
+   Modes are `summary`, `next_set`, `qa` (QA requires a nonblank question). Display `message`,
+   `provider`, `evidence` paths and `limitations`; discard responses for replaced uploads.
+   No browser key. Read [AI_COACH.md](AI_COACH.md).
+2. **Presentation polish:** make rep comparisons readable, show existing issue explanations as
+   “Changes to review”, improve focus/mobile layout, and rehearse timestamp jumps. Use supplied
+   numeric evidence; timing parts are not isolated lifting/lowering durations. No “worst rep”
+   ranking when every score is null. Read [MEASUREMENTS.md](../apps/api/MEASUREMENTS.md) and
+   [COMPARISONS.md](../apps/api/COMPARISONS.md).
+3. **Coordinate live counting with A:** the backend already accepts cumulative pose snapshots.
+   Add explicit start/finish/reset, a new session/time zero, fixed dimensions and hint, at most
+   1800 frames / 120 seconds, one request in flight, stale-response rejection and a final
+   `isFinal: true` snapshot. Replace displayed counts; never add successive totals. The current
+   live renderer samples at up to 10 fps; the contract ceiling is 15 fps. Keep rep math in Python.
+4. **Demo check:** actual laptop webcam after the logging fix, slow/missing model, no person,
+   stop/restart/navigation, backend down, upload cancellation, and one landscape/portrait clip.
+
+A owns measurement algorithms and real positive-case validation. B owns frontend code again
+following the user-authorized overlay work by A. Avoid overlapping edits to camera/upload files;
+coordinate the next live-counting change before starting it on both computers.
+
+## Checks and known evidence
+
+Most recent checkpoint: **300 backend tests, 35 frontend tests**, lint, types, contract checks
+and production build pass. Landscape/portrait upload skeleton alignment and simulated-camera
+stop/restart/missing-model behavior were checked in Chrome. The follow-up dev-browser check
+asserts zero XNNPACK console errors, not just absence of uncaught exceptions.
+
+From `apps/web`, before committing:
+
+```bash
+npm run contracts:check
 npm run lint
 npm run typecheck
 npm test
 npm run build
-npm run contracts:check
 ```
 
-Commit frequently with messages such as `feat(web): add mock results dashboard`.
-Only edit shared files deliberately; announce needed contract changes to A before relying on them.
-
-## Timing and angle measurements (can integrate later)
-
-Computer A now returns per-rep observed elbow excursion and time to/from the minimum angle.
-Read `apps/api/MEASUREMENTS.md` for exact keys, units, sample window, and suggested labels.
-`contracts/examples/pushup-analysis.json` is an explicitly synthetic one-rep fixture for
-building this view without the backend. Keep its label visible and scores unavailable.
-These additions use the existing measurements dictionary; generated types are unchanged.
-Do not label the two timing parts as exact lowering/lifting phases, compare different
-camera angles as quality scores, or infer a worst rep from range alone. Older responses
-may lack the keys. Backend work can continue while B integrates on its own schedule.
-
-## Comparison flags (can also integrate later)
-
-Use `contracts/examples/pushup-comparison-analysis.json` for an explicitly synthetic
-three-rep result with duration/range changes on rep 3. Read `apps/api/COMPARISONS.md`.
-Render existing issue cards/timeline as **Changes to review**; show explanations containing
-reference reps, differences, and thresholds. Confidence and all scores remain null.
-Do not label these as bad form, fatigue, injury risk, or a worst-rep score. Missing comparison
-keys mean unavailable; one/two-rep clips cannot yet be compared. No new TypeScript schema.
-
-## Skeleton feature handoff
-
-User authorized A to implement camera/upload overlays on `pose-overlay`, based on backend PR #2.
-Read [POSE_OVERLAY.md](POSE_OVERLAY.md) and integrate the branch after #2 is merged. B retains
-frontend ownership afterward. Run `npm ci` and `npm run pose:setup` in apps/web. Live skeleton
-tracking works locally; live rep counting remains the next integration. Uploads use
-`analyzeVideoWithPose`, with one extraction and no added server storage. The UI also hides
-unmeasured elbow columns, de-emphasizes missing scores, fixes the file label, and collapses
-lengthy technical limitations while keeping key uncertainty visible.
+Success ends in matching types, passing tests and a successful Next.js build. Backend/CV
+validation details: [INTEGRATION_STATUS.md](INTEGRATION_STATUS.md),
+[POSE_OVERLAY.md](POSE_OVERLAY.md), [VALIDATION.md](../apps/api/VALIDATION.md).
+Keys, personal recordings, downloaded model/runtime binaries and generated build output
+are intentionally not in Git. `npm ci` plus `npm run pose:setup` restores browser dependencies.
