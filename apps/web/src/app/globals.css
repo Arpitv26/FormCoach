@@ -1,16 +1,58 @@
 @import "tailwindcss";
 
-:root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #172d2a; background: #f5f7f6; }
+:root {
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #172d2a;
+  background: #f5f7f6;
+}
+
+* { box-sizing: border-box; }
 body { margin: 0; }
-main { max-width: 800px; margin: 0 auto; padding: 56px 24px; }
-h1 { font-size: 48px; font-weight: 700; margin: 12px 0; }
-h2 { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+main { max-width: 1000px; margin: 0 auto; padding: 56px 24px 32px; }
+h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); font-weight: 700; letter-spacing: -0.05em; margin: 12px 0; }
+h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 600; line-height: 1.2; }
+h3 { font-size: 1rem; font-weight: 600; }
 p { line-height: 1.6; margin: 12px 0; }
-section { background: white; border: 1px solid #d3dfdb; border-radius: 12px; padding: 24px; margin-top: 24px; }
+section { background: white; border: 1px solid #d3dfdb; border-radius: 16px; padding: 28px; margin-top: 24px; }
 .eyebrow, .muted, footer { color: #4b605b; }
-.reps { display: flex; flex-wrap: wrap; gap: 12px; padding: 0; list-style: none; }
-.reps li { padding: 10px; background: #edf5f1; border-radius: 6px; }
-button { background: #174e40; color: white; padding: 12px 18px; border: 0; border-radius: 6px; cursor: pointer; }
+.eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.brand-dot { color: #28735c; }
+.page-header { padding-bottom: 12px; }
+.page-intro { color: #4b605b; font-size: 1.125rem; }
+
+.session-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.session-header .eyebrow { margin-top: 0; }
+.provenance-badge { border: 1px solid #d7c590; background: #faf3dc; color: #665014; border-radius: 999px; padding: 6px 12px; font-size: 0.8125rem; font-weight: 700; }
+.session-status { color: #4b605b; font-size: 0.875rem; margin: 24px 0 4px; }
+.session-headline { font-size: 1.125rem; margin-top: 0; }
+.session-stats { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; margin-top: 24px; }
+.session-stat { padding: 24px; border: 1px solid #d3dfdb; border-radius: 12px; background: #f5f7f6; }
+.session-stat dt { font-size: 0.875rem; font-weight: 600; }
+.session-stat dd { margin: 16px 0 0; font-size: clamp(2.5rem, 6vw, 3.5rem); font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.session-stat-primary { background: #174e40; border-color: #174e40; color: white; }
+.score-unit { font-size: 1rem; font-weight: 400; color: #dceae4; }
+.unavailable-value { display: block; font-size: 1.25rem; line-height: 1.4; }
+.rep-summary { margin-top: 28px; }
+.reps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; padding: 0; margin-top: 12px; list-style: none; }
+.reps li { padding: 16px 12px; background: #edf5f1; border-radius: 8px; }
+.reps span, .reps strong { display: block; }
+.reps span { font-size: 0.8125rem; }
+.reps strong { margin-top: 8px; font-variant-numeric: tabular-nums; }
+.session-limitations { border-top: 1px solid #d3dfdb; margin-top: 28px; padding-top: 20px; }
+.session-limitations ul { list-style: disc; padding-left: 20px; margin: 12px 0 0; color: #4b605b; font-size: 0.875rem; line-height: 1.6; }
+.session-limitations li + li { margin-top: 6px; }
+.session-results { overflow-wrap: anywhere; }
+
+button { background: #174e40; color: white; padding: 12px 18px; border: 0; border-radius: 8px; cursor: pointer; font: inherit; }
+button:hover:not(:disabled) { background: #103b30; }
 button:disabled { opacity: 0.65; cursor: wait; }
 button:focus-visible { outline: 3px solid #ae4b0f; outline-offset: 4px; }
-footer { font-size: 14px; margin-top: 24px; }
+footer { font-size: 0.875rem; line-height: 1.6; margin-top: 24px; }
+
+@media (max-width: 640px) {
+  main { padding: 28px 16px; }
+  section { padding: 20px; }
+  .session-stats { grid-template-columns: minmax(0, 1fr); }
+  .reps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
