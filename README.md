@@ -3,8 +3,8 @@
 UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measured evidence.
 
 **FormCoach is in development.** The frontend/backend foundation, shared data formats,
-mock squat results, and tested joint-angle and visibility helpers are ready.
-Real pose tracking, rep counting, form scoring, and AI coaching are still being built.
+mock squat results, tested joint-angle/visibility helpers, and an internal squat rep counter are ready.
+Live pose tracking, analyzer API integration, form scoring, and AI coaching are still being built.
 No API key, database, Docker, or GPU is needed to run this foundation.
 
 ## How it works
@@ -135,9 +135,11 @@ AGENTS.md      Rules and ownership for future coding agents                   [S
 Mock results are labeled **MOCK DEMO DATA**. No exercise is analyzed yet. The squat
 profile is an example configuration; all other profiles are planned.
 
-The first backend feature adds tested 2D joint-angle calculations and checks for missing,
-outside-frame, or insufficiently visible joints. These helpers are not connected to a real
-live analyzer yet. Our next checkpoint is squat rep counting.
+Backend helpers now measure 2D joint angles, check visibility, and count completed squat
+cycles from angle sequences. The counter has synthetic tests for partial reps, jitter,
+tracking loss, and repeatable live-batch replay; real-camera accuracy is still unverified.
+These helpers are not connected to the live route yet. Our next checkpoint is analyzer API
+integration. See the [backend progress and plan](apps/api/README.md#remaining-backend-plan).
 
 ## Check your work
 

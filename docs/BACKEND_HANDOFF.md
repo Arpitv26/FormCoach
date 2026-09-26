@@ -14,8 +14,11 @@ Computer B builds the UI independently from the shared fixture. Preserve its con
 - Explicit placeholder analysis, upload 501 response, local coach fallback.
 - Tests for routes, invalid requests, fixture semantics, and deterministic score arithmetic.
 
-There is no actual geometry, smoothing, rep detection, CV model, form scorer, or OpenAI call yet.
-Do not mistake example profiles or authored fixture angles for implemented measurement.
+Since bootstrap, geometry/visibility helpers and an internal squat rep counter with median
+smoothing have been implemented and tested on synthetic inputs. Next: connect them to the
+live API, then validate against real footage. See apps/api/README.md for current thresholds,
+limitations, and the remaining checkpoint plan. There is no integrated CV model, real form
+scorer, or OpenAI call yet. Authored fixture angles are not measurements from a video.
 
 ## Work order after bootstrap
 

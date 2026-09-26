@@ -17,8 +17,10 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 
 ## BACKEND
 
-- [ ] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
-- [ ] [A] Phase 1: squat phase transitions and completed-rep segmentation.
+- [x] [A] Phase 1: aspect-ratio-aware geometry, visibility checks, smoothing.
+- [x] [A] Phase 1: squat phase transitions and completed-rep segmentation (synthetic tests).
+- [ ] [A] Connect the internal squat counter to live API responses without changing the contract.
+- [ ] [SHARED] Validate counts and timestamps against real camera footage before claiming demo readiness.
 - [ ] [A] Phase 2: measured squat metrics, documented score formulas, grounded issues.
 - [ ] [A] Phase 2: tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Phase 3: push-up and lunge analyzers after reliable squat.
