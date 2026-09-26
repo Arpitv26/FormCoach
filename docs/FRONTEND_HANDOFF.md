@@ -8,7 +8,8 @@ The demo is **prerecorded push-ups**. Squat JSON is a legacy fixture, not the de
 
 1. Frontend PR #1 is already merged into main.
 2. Merge [backend PR #2](https://github.com/Arpitv26/helloHacks/pull/2) into main.
-3. Merge the **`pose-overlay` → `main` PR** after its checks pass. It includes the upload
+3. Merge [overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3)
+   (`pose-overlay` → `main`) after its checks pass. It includes the upload
    skeleton, live skeleton, UI cleanup, startup-log fix, display smoothing, and this handoff.
 4. Only after both feature PRs are merged, update Computer B using the commands below.
 

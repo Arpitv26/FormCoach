@@ -2,7 +2,9 @@
 
 ## New overlay checkpoint — 2026-09-26
 
-`pose-overlay` branches from published backend PR #2 at `f049013`; #2 remains unchanged.
+[Overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3) contains the complete feature,
+fixes and refreshed handoff. `pose-overlay` branches from backend PR #2 at `f049013`;
+#2 remains unchanged. Merge #2 first, then #3 after its checks pass.
 User explicitly authorized A to implement the camera/upload overlay UI because B was not
 editing those screens. Remote frontend rechecked: still `5dd6bb4`.
 Read **POSE_OVERLAY.md** for setup, changed seams and test evidence. The new endpoint is
