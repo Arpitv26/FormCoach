@@ -72,7 +72,7 @@ No frames are sent to the backend or OpenAI from the camera screen. No microphon
 
 ## Verified on Computer A — 2026-09-26
 
-- **300 backend tests, 32 frontend tests**, lint, type checks and contract checks pass.
+- **300 backend tests, 35 frontend tests**, lint, type checks and contract checks pass.
 - Python tests cover matching analysis, single extraction, temporal/dimension bounds,
   portrait metadata, empty frames, cleanup, existing endpoint compatibility and synthetic schema.
 - Frontend tests cover aspect-ratio offsets, seeking/gaps, visibility, canonical mapping,
@@ -95,3 +95,29 @@ and finalization. Do not copy rep math into React. Scoring, biomechanical form j
 deadlift analysis and automatic exercise recognition remain separate unfinished features.
 
 Provider reference: [Google's browser Pose Landmarker guide](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/web_js).
+
+## Physical-camera follow-up: startup logging and jitter
+
+The human reported a working physical camera with some flicker and a red Next.js console
+error for `INFO: Created TensorFlow Lite XNNPACK delegate for CPU.` This is a successful
+native initialization notice emitted on stderr. The original browser check caught it in
+console output but only asserted against uncaught exceptions; that missed the Next.js issue UI.
+
+`setup-pose.mjs` now adapts the copied runtime's local error logger to send **only that exact
+single-argument notice** to `console.info`. All other diagnostics remain errors. It does not
+patch the application's global console or node_modules. The adapter fails clearly if an SDK
+upgrade changes its expected logging declaration. Predev/prebuild and pose:setup apply it.
+Refresh the camera page after updating to load the corrected runtime; restarting the frontend
+also regenerates these ignored assets automatically.
+
+`DisplayPoseFilter` lightly smooths live x/y display positions with a 70 ms exponential
+filter. It never changes raw input poses, recorded playback, or analyzer measurements.
+It immediately drops joints below the existing visibility threshold, resets on empty/missing
+poses, gaps over 150 ms, nonincreasing timestamps, or large jumps. This reduces small position
+jitter; uncertain joints can still disappear. It does not establish form or tracking accuracy.
+
+Verification: 35 frontend tests, lint and typecheck pass. The development browser's real model
+with a simulated camera now emits **zero XNNPACK console errors**, renders joints, restarts and
+releases the camera, and still exposes the deliberate missing-model failure. A new test checks
+that other error messages remain errors. Physical-camera smoothness still needs the human's
+comparison after refresh. PR #2 is separate, mergeable, and its exact head CI passed.

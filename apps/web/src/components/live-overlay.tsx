@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { drawPose } from "@/lib/pose/drawing";
+import { DisplayPoseFilter } from "@/lib/pose/display-filter";
 import { startLivePose, type TrackingStatus } from "@/lib/pose/live";
 
 const messages: Record<TrackingStatus, string> = {
@@ -18,8 +19,9 @@ export function LiveOverlay({ video }: { video: RefObject<HTMLVideoElement | nul
   useEffect(() => {
     const player = video.current, surface = canvas.current;
     if (!player || !surface) return;
+    const filter = new DisplayPoseFilter();
     return startLivePose(player,
-      (frame) => drawPose(surface, frame, player.videoWidth, player.videoHeight), setStatus);
+      (frame) => drawPose(surface, filter.update(frame), player.videoWidth, player.videoHeight), setStatus);
   }, [video]);
   return <>
     <canvas ref={canvas} aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", transform: "scaleX(-1)" }} />

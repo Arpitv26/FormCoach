@@ -1,11 +1,17 @@
-import { cp, mkdir, rename, access } from "node:fs/promises";
+import { cp, mkdir, rename, access, readdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import { configurePoseRuntimeLogging } from "./pose-runtime-logging.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const output = join(root, "public", "pose");
 await mkdir(output, { recursive: true });
 await cp(join(root, "node_modules", "@mediapipe", "tasks-vision", "wasm"), join(output, "wasm"), { recursive: true });
+for (const name of await readdir(join(output, "wasm"))) {
+  if (!name.endsWith(".js")) continue;
+  const path = join(output, "wasm", name);
+  await writeFile(path, configurePoseRuntimeLogging(await readFile(path, "utf8")));
+}
 if (process.argv.includes("--model")) {
   const target = join(output, "pose_landmarker_lite.task");
   try {
@@ -14,7 +20,6 @@ if (process.argv.includes("--model")) {
   } catch {
     const response = await fetch("https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task", { signal: AbortSignal.timeout(120_000) });
     if (!response.ok) throw new Error(`Pose download failed (${response.status}). Run npm run pose:setup again.`);
-    const { writeFile } = await import("node:fs/promises");
     const bytes = new Uint8Array(await response.arrayBuffer());
     if (bytes.length < 1_000_000) throw new Error("Pose model download was incomplete.");
     await writeFile(`${target}.download`, bytes);
