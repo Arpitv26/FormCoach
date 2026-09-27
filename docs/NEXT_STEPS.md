@@ -133,6 +133,13 @@ the recorded push-up demo and integration are already reliable and time remains.
 
 ## Validation baseline
 
+Latest backend rehearsal: fresh extraction through multipart route handling, returned pose
+track → identical analysis, and local next-set coaching pass for all four original clips.
+Counts remain 3/1/1/2; blank input returns unknown count and corrupt MOV returns 400 followed
+by successful uploads. See apps/api/VALIDATION.md for timings and test scope. Current code
+checkpoint has 375 passing tests. The human confirms new gym footage and B's PR are still
+in progress; do not treat this rehearsal as completion of those pending checkpoints.
+
 Coach follow-up: 359 backend tests plus lint/format/schema checks passed. Four saved analyses
 passed local next-set coaching checks with body-line evidence; no paid API calls.
 

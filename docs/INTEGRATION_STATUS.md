@@ -2,6 +2,12 @@
 
 ## New overlay checkpoint — 2026-09-26
 
+**Current native backend rehearsal (`4b87e35`):** four fresh real-video extractions through
+TestClient multipart handling return 3/1/1/2 reps, exact matching pose-track analysis, and
+local body-line coaching. Blank-video and corrupt-video/recovery checks pass. No browser
+claim or paid API call; details in apps/api/VALIDATION.md. The human confirms the gym recording
+and B's PR are not ready yet. Remote frontend remains `5dd6bb4`; active UI ownership stays with B.
+
 **Latest backend checks:** 375 tests, lint, formatting and schema checks pass after adding
 explicit expected timing/range flags to the replay tool. All four saved captures pass zero-flag
 regressions with counts 3/1/1/2. Earlier coach follow-up `7a29d34` adds descriptive body-line

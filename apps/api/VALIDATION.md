@@ -173,3 +173,37 @@ Local reports: `artifacts/comparison-check/`. Policy: COMPARISONS.md.
 
 Comparison checkpoint: **263 backend tests pass**; lint, formatting, Python schema checks,
 and frontend generated-type checks pass. No new runtime dependencies or schema fields.
+
+## Follow-up: current backend rehearsal (code `4b87e35`)
+
+Fresh native MediaPipe extraction was run through multipart `/videos/analyze-with-pose`
+route handling with FastAPI TestClient, then each returned analysis was sent to `/coach`
+in `next_set` mode. This exercised actual video bytes and the current tracking/body-line
+features, rather than reusing cached poses. It did not exercise a network socket or browser.
+The coach was explicitly local; no paid API request or credential change was made.
+
+| Clip | HTTP | Reps | Status | Wall time, one run |
+| --- | --- | --- | --- | --- |
+| 6939 | 200 | 1 | complete | 7.15 s |
+| 6938 (portrait) | 200 | 1 | complete | 9.79 s |
+| 6940 | 200 | 2 | complete | 14.59 s |
+| 6937 | 200 | 3 | complete | 41.56 s |
+| Generated blank video | 200 | null | insufficient_data | 0.37 s |
+
+- All returned pose tracks reproduced the exact rep measurements, timeline and summary when
+  passed back through the analyzer. Portrait dimensions were 2160 × 3840; others 3840 × 2160.
+- Each real result supplied descriptive body-line coaching with resolvable evidence paths.
+  All scores remained null and the real clips retained zero comparison flags.
+- The blank clip had 15 empty-landmark frames, no reps and no invented body-line finding.
+  This is an artificial no-person input, not a real occlusion benchmark.
+- A corrupt MOV returned `400 INVALID_VIDEO`; subsequent real uploads succeeded in the
+  same app instance. Health requests during extraction all succeeded, with maximum observed
+  time 65.69 ms. These single local runs are not performance guarantees.
+- MediaPipe's macOS graphics initialization aborted in the restricted tool sandbox. The
+  approved rerun outside that sandbox passed. The user's existing servers were left running.
+
+Private script, responses and timing summary are ignored under `artifacts/backend-rehearsal/`.
+The latest unit suite remains **375 passing tests** (previous code checkpoint); this rehearsal
+required no runtime change. Real positive comparison validation and B's complete browser flow
+remain pending. The human confirmed the gym trip/recording and frontend PR are not ready yet;
+remote `frontend` still points to `5dd6bb4` at this check.

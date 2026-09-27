@@ -135,3 +135,10 @@ flag rep numbers (omitted = unchecked, empty option = expect none). It reports m
 flags and exits 1 on mismatch; original frames/thresholds are unchanged. See apps/api/examples/README.md.
 375 backend tests, lint/format/schema checks pass; four saved captures retain 3/1/1/2 reps and
 pass explicit zero-flag checks. Real positive footage and B's handoff remain pending.
+
+Latest human update: they still need to drive to the gym; the new recording and B's PR are
+not ready. Continue checking published frontend commits periodically; do not assume a handoff.
+Native backend rehearsal on `4b87e35` passed fresh uploads of all four original clips through
+TestClient plus matching pose-track analysis and local coach evidence. Blank video returns
+unknown count; corrupt-video error then recovery passes. See apps/api/VALIDATION.md for scope.
+No runtime changes were needed. Remaining footage/browser checkpoints are still open.
