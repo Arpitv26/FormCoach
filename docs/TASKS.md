@@ -33,7 +33,7 @@ reviewed and integrated. PRs #1/#2/#3 are already merged into main `79f8da3`.
 - [x] [A] Causal within-set timing/range comparisons with traceable review flags and synthetic positive cases.
 - [ ] [A] Validate a real positive comparison case; do not infer positive-case accuracy from current unflagged clips.
 - [x] [A] Review IMG_6942 pace variation: 4/4 count, missed rep-3 timing flag documented in apps/api/REVIEW_6942.md.
-- [ ] [A] Explain skipped timing comparisons and review reference eligibility using all five clips; preserve validation/development distinction.
+- [x] [A] Timing v2 compares against BOTH preceding durations, explains unavailable comparisons, passes five-clip regressions; 6942 rep 3 flags, separate validation still pending.
 - [x] [A] Improve measured tracking coverage and actionable missing-joint feedback (apps/api/TRACKING_FEEDBACK.md; counts unchanged).
 - [x] [A] Implement descriptive 2D shoulder–hip–ankle median; synthetic tests, independent arithmetic and seven real-frame checks (apps/api/BODY_LINE.md).
 - [ ] [A] Validate a body-alignment interpretation/cue separately; current angle is not a form judgment.

@@ -38,7 +38,7 @@ def test_reports_extra_and_missing_flags_independently_of_count(
     client, expected, missing, unexpected
 ):
     request = flagged_request()
-    # A second copy of the changed cycle gives rep 4, without two stable reference durations.
+    # Rep 4 repeats the changed cycle, so it does not differ substantially from BOTH references.
     extra = request["frames"][-35:]
     request["frames"] += [
         {

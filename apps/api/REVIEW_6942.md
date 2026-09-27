@@ -1,5 +1,9 @@
 # IMG_6942: four-rep timing variation review
 
+**Update:** timing policy v2 now flags rep 3 as a development regression. The initial review
+below preserves the original failure and unchanged thresholds at that time; see the follow-up
+at the end for revised behavior. This clip is not independent validation of the revision.
+
 Reviewed 2026-09-26 on backend code `5dfaa63` (runtime unchanged since `4b87e35`).
 Human annotation: **four completed push-ups; first two normal, third slower, fourth faster**.
 The original MOV stays private and ignored at the repository root.
@@ -74,3 +78,27 @@ Coordinate any additional measurement keys with the frontend handoff. Keep score
 
 Do not request a replacement recording merely to satisfy the current threshold. The uploaded
 clip already provides the intended pace variation and remains a useful review case.
+
+## Implemented follow-up: timing policy v2
+
+The hard 20% reference-spread gate is replaced with the requirement to differ substantially
+from BOTH preceding durations, in the same direction. The 500 ms / 30% margins are unchanged
+but applied to each reference independently; see COMPARISONS.md for equations/versioned keys.
+Unavailable comparisons now have rep-specific reasons in `limitations`.
+
+For rep 3, the lower/upper review boundaries are 900 / 2255.5 ms. Its 3068 ms duration triggers
+one timing issue starting at **8.737 s**, with references 1735 / 1400 ms. Its median delta is
++1500.5 ms (+95.73%). Rep 4's lower boundary is 900 ms; at 1068 ms it remains unflagged because
+it is only 332 ms shorter than rep 2. No range-reduction flag is produced.
+
+Cumulative route replay now passes the declared expectation of four reps and a timing flag
+on rep 3 only; repeated final responses match. Counts, intervals, elbow/body-line measurements,
+and key moments are unchanged across all five saved real captures. The four older clips
+remain unflagged. Independent arithmetic checks each timing decision against each reference.
+Local next-set coaching now selects rep 3 and describes 3.07 s vs 1.57 s median (+1.50 s), with
+resolvable evidence paths and no score/form-quality claim. No paid API request was needed.
+Updated private reports: `artifacts/timing-v2-check/`.
+
+399 backend tests and 35 frontend tests pass, including variable-reference boundaries,
+returning to prior pace, tracking gaps, unavailable evidence and old fixture compatibility.
+This fixes the development case; separate footage and B's browser integration remain to test.

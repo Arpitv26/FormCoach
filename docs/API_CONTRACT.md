@@ -201,10 +201,12 @@ for exact semantics, limits, and the reviewed real-clip values.
 
 **Push-up comparison flags:** from rep 3 onward, compare with the immediately preceding two
 completed reps. Require continuous usable angles across that entire reference/current span,
-including between reps. Duration references must differ by at most 20% of their median;
-excursion references by at most 10°. Eligible comparisons emit numeric evidence even without a flag.
+including between reps. Timing policy v2 compares with each prior duration independently;
+excursion references must differ by at most 10°. Eligible comparisons emit numeric evidence even without a flag.
 
-- `PUSHUP_REP_DURATION_CHANGED`: absolute duration change >= max(500 ms, 30% of reference median).
+- `PUSHUP_REP_DURATION_CHANGED` (timing v2): current duration is longer than BOTH preceding
+  durations by at least max(500 ms, 30% of each reference), or shorter than BOTH by those
+  margins. This replaces the original 20% reference-spread eligibility gate; no count/angle change.
 - `PUSHUP_ELBOW_EXCURSION_REDUCED`: excursion reduction >= max(15°, 20% of reference median).
 
 These are uncalibrated review heuristics. Issue severity is `low`, confidence is null,
@@ -215,9 +217,17 @@ Earlier rep results never change when frames are appended, including later track
 
 New optional measurement keys: `comparisonReferenceStartRep`, `comparisonReferenceEndRep`,
 `referenceMedianDurationMs`, `durationDeltaMs`, `durationDeltaPercent`, `durationChangeThresholdMs`,
+`durationComparisonVersion` (2), `referenceMinDurationMs`, `referenceMaxDurationMs`,
+`durationReviewLowerBoundMs`, `durationReviewUpperBoundMs`,
 `referenceMedianElbowExcursionDeg`, `elbowExcursionDeltaDeg`, `elbowExcursionDeltaPercent`,
 `elbowExcursionReductionThresholdDeg`. Deltas are current minus reference. Missing keys mean
-unavailable (too few reps, tracking loss, unstable/missing reference metric), not zero change.
+unavailable (too few reps, tracking loss, invalid duration or unstable/missing range reference),
+not zero change. Existing `limitations` gives rep-specific unavailability reasons.
+Timing bounds are current-duration boundaries, not delta values or desired tempo. The lower
+bound can be negative, making shorter flags impossible for positive durations. In v2,
+`durationChangeThresholdMs` is the distance from the median to the bound in the current delta's
+direction (upper for zero/positive delta); older results without the version key use the original
+median margin. Clients should render supplied flags/explanations and support absent optional keys.
 See [comparison policy](../apps/api/COMPARISONS.md) for exact units and limitations and
 `contracts/examples/pushup-comparison-analysis.json` for a clearly synthetic flagged example.
 The user-selected push-up demo replaces the earlier squat demo priority; wire shapes are unchanged.

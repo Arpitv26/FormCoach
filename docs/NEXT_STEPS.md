@@ -18,10 +18,10 @@ do not try to finish every stretch feature before the demo.
 
 | Capability | State | Evidence / remaining limitation |
 | --- | --- | --- |
-| Upload decoding and pretrained pose extraction | Implemented | Four real MOV clips; portrait rotation supported; bounded inputs and cleanup |
-| Push-up counting | Implemented | Human counts 3/1/1/2 match; small sample, not a general accuracy benchmark |
+| Upload decoding and pretrained pose extraction | Implemented | Five real MOV clips; portrait rotation supported; bounded inputs and cleanup |
+| Push-up counting | Implemented | Human counts 3/1/1/2/4 match; small sample, not a general accuracy benchmark |
 | Rep timestamps and elbow measurements | Implemented | Duration, min/max, excursion, time around minimum angle; 2D observations |
-| Rep comparisons | Implemented, partly validated | Timing/range changes use two stable prior reps; real clips currently have zero flags; positive cases synthetic |
+| Rep comparisons | Timing policy v2 implemented | Change must exceed a margin against both preceding durations; 6942 rep 3 now flags as a development regression. Separate validation still needed |
 | Tracking coverage / missing-joint feedback | Implemented | Sample counts and actionable joint reasons; no readiness or quality score |
 | Live analysis API | Implemented | Cumulative snapshots, deterministic replay; B is connecting the browser |
 | Live / uploaded skeleton | Implemented | Browser and portrait/landscape playback checks; actual webcam smoothness needs recheck |
@@ -41,13 +41,20 @@ is explicitly unsupported. The UI can show multiple interactions, but each API c
 
 ### 1. Validate a real comparison flag
 
-**New result:** IMG_6942 was supplied and reviewed: four counted reps with durations
+**Original failure:** IMG_6942 was supplied and reviewed: four counted reps with durations
 1.735 / 1.400 / 3.068 / 1.068 s. Video review agrees with the slow-third/fast-fourth annotation.
 The expected timing flag is missing because the first two durations have 21.37% spread,
 just above the current 20% reference gate. Replay correctly reports `comparison_mismatch`.
-See [REVIEW_6942.md](../apps/api/REVIEW_6942.md). Footage is now available; the next backend
-task is to explain skipped comparisons and review the reference policy, with thresholds
-unchanged during this validation. Positive detection remains unverified. B's PR is still pending.
+See [REVIEW_6942.md](../apps/api/REVIEW_6942.md) for that original unchanged-policy check.
+
+**Implemented follow-up:** timing policy v2 requires the current duration to differ from BOTH
+previous durations in the same direction by the existing max(500 ms, 30% of each reference)
+margin. It supplies versioned numeric boundaries and reasons for unavailable comparisons.
+All five saved captures pass count/stability checks; 6942 now flags rep 3 and the local coach
+explains it. Rep 4 does not differ enough from BOTH references to flag. The first four clips
+remain unflagged and all rep measurements/timestamps are unchanged. This is a development
+regression, since 6942 motivated the revision. Next: validate v2 on separate footage and review
+B's integrated UI when ready. Do not keep retuning against 6942 or claim general detection accuracy.
 
 Use a fixed side-view recording with two similar-paced comfortable reps, followed by a
 noticeably slower third rep. Include a brief straight-arm pause before and after the set.
@@ -72,7 +79,7 @@ excursion-reduction rule. That still needs its own real example before demonstra
 **Completed:** see [TRACKING_FEEDBACK.md](../apps/api/TRACKING_FEEDBACK.md). Existing
 camera-quality text now reports angle/landmark sample coverage and blocked joints. No
 schema change; 311 tests pass and the four saved real-pose replays retain 3/1/1/2 reps.
-The next independent implementation is checkpoint 3; checkpoint 1 still needs new footage.
+Checkpoint 3 measurement work is also completed; independent timing-policy validation remains open.
 
 Expose useful measured coverage/reasons for missing joints instead of only generic limitations.
 Start with the selected shoulder/elbow/wrist; evaluate hip/ankle coverage before body-line work.
@@ -88,12 +95,12 @@ proceed while waiting for a new recording or B's frontend PR.
 **Measurement completed:** [BODY_LINE.md](../apps/api/BODY_LINE.md) defines the per-rep
 median shoulder–hip–ankle angle. Synthetic tests, saved-clip regressions, independent
 arithmetic and seven actual-frame overlays were checked. No form cue/score is implemented.
-The next decision is validation of interpretation, alongside the pending real comparison clip.
+The next decision is validation of interpretation, alongside independent timing-policy validation.
 
 **Coaching follow-up completed:** the coach can describe these medians with concrete evidence
 paths, rejecting inconsistent sample/side metadata. Local next-set feedback can include it;
 the optional selector can choose it for QA. This is an explanation of geometry, not a
-validated corrective cue. Real positive comparison validation still needs a new recording.
+validated corrective cue. Timing v2 flags the development clip; separate validation is still needed.
 
 Candidate: side-view shoulder–hip–ankle alignment during a rep, only when those landmarks
 are reliably observed. First document geometry, units, measurement window, missing-data policy
@@ -140,6 +147,10 @@ custom ML training, history/accounts, voice feedback and fatigue claims. Add one
 the recorded push-up demo and integration are already reliable and time remains.
 
 ## Validation baseline
+
+Timing v2: 399 backend tests and 35 frontend tests pass; five saved-pose replays keep all
+counting/geometry/timestamps unchanged, with the intended rep-3 duration flag on 6942 only.
+Local coaching evidence checks pass; no paid request. Frontend lint/types/contracts pass.
 
 Latest backend rehearsal: fresh extraction through multipart route handling, returned pose
 track → identical analysis, and local next-set coaching pass for all four original clips.

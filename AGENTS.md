@@ -81,13 +81,18 @@ If a contract must change:
 
 ## Current capabilities
 
-**Latest review (supersedes footage-pending notes below):** IMG_6942.MOV is now available,
-human count 4 (normal/normal/slow/fast). Extraction/replay counts 4; sampled video and twelve
-rep-moment overlays agree. Expected rep-3 timing flag is missing: reference spread 21.37%
-exceeds the existing 20% gate. Read apps/api/REVIEW_6942.md. No thresholds/code changed.
-Next: explain skipped comparisons and review timing-reference policy using all five clips;
-do not claim positive detection passed or ask to refilm just to fit the gate. B's published
-branch remains `5dd6bb4`; frontend handoff/redesign is still pending.
+**Latest checkpoint:** IMG_6942 counts 4 (normal/normal/slow/fast). It exposed a missed timing
+flag under the old 20% reference gate. Timing policy v2 now requires a substantial change from
+BOTH preceding durations, each using max(500 ms, 30% of that reference). Rep 3 now flags;
+rep 4 remains unflagged. Read apps/api/COMPARISONS.md and REVIEW_6942.md. Unavailable comparisons
+have rep-specific limitations; new numeric keys identify policy version/boundaries, with no
+schema/type/endpoint changes. FRONTEND_HANDOFF and API_CONTRACT explain compatibility.
+All five clips retain counts/measurements/timestamps; original four stay unflagged. 399 backend
+and 35 frontend tests pass. Local coaching describes rep 3; no paid calls. This is development
+regression evidence, not independent validation. Next: separate footage and B's integrated UI.
+B's published branch remains `5dd6bb4`; frontend handoff/redesign is still pending.
+
+### Earlier checkpoints (historical)
 
 Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no

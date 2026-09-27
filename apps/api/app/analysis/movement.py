@@ -157,6 +157,7 @@ class RuleBasedAnalyzer:
         ]
         result = movement.segment(samples)
         reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
+        comparison_limitations = []
         if profile.id == "push-up" and side:
             reps = add_body_line_measurements(
                 reps,
@@ -166,7 +167,9 @@ class RuleBasedAnalyzer:
                 image_height=image_height,
                 minimum_visibility=profile.minimum_visibility,
             )
-            reps = compare_pushup_reps(reps, samples, side, profile)
+            comparisons = compare_pushup_reps(reps, samples, side, profile)
+            reps = comparisons.reps
+            comparison_limitations = comparisons.limitations
         issues = [issue for rep in reps for issue in rep.issues]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
@@ -216,9 +219,11 @@ class RuleBasedAnalyzer:
             limitations.append(
                 "Comparison flags are uncalibrated review heuristics, not bad-form or fatigue "
                 "detections. Each rep needs two preceding completed reps with continuous tracking; "
-                "unstable reference metrics are skipped. Camera/view stability is not evaluated. "
+                "timing must differ substantially from both references in the same direction. "
+                "Unstable range references are skipped. Camera/view stability is not evaluated. "
                 "Absent comparison keys mean unavailable, not no change."
             )
+            limitations.extend(comparison_limitations)
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable or result.tracking_breaks:

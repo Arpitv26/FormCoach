@@ -72,5 +72,6 @@ user selection is the reliable starting point.
 
 The push-up profile now configures two descriptive comparison rules and their heuristic
 thresholds. `pushup_comparisons.py` compares each completed rep with its two predecessors,
-gates tracking/reference stability, and supplies evidence in the existing measurements and
+gates continuous tracking, checks timing changes against BOTH preceding durations (policy v2),
+retains a separate range-reference stability gate, and supplies evidence in the existing measurements and
 issue fields. See `apps/api/COMPARISONS.md`. These do not establish correct form or scores.

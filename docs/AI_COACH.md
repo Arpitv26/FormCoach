@@ -74,6 +74,11 @@ video, or landmarks. Questions themselves may contain user-entered personal info
 
 ## Validation checkpoint
 
+- Timing v2: local next-set feedback for IMG_6942 prioritizes the new rep-3 review issue and
+  explains 3.07 s versus the preceding median 1.57 s (+1.50 s). Evidence paths resolve to
+  numeric data; all five saved clips pass local coach route checks. No selector/SDK changes
+  or paid requests. Missing-comparison reasons pass through existing `limitations`.
+
 - Body-line follow-up: all seven reps in the four saved real analyses produce evidence cards;
   local `next_set` requests for each clip pass through HTTP handling and retain camera limits.
   Evidence paths resolve to supplied numeric values. Invalid/partial metadata, opposite-side

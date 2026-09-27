@@ -1,14 +1,22 @@
 """Causal within-set review flags. Thresholds are uncalibrated demo heuristics."""
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from statistics import median
 
 from app.analysis.angle_segmentation import AngleCycleConfig
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.pushup_timing import timing_measurements
 from app.analysis.rep_segmentation import AngleSample
 from app.domain.analysis import Issue, RepAnalysis
 
 MAX_COMPARISON_GAP_MS = AngleCycleConfig().maximum_gap_ms
+
+
+@dataclass(frozen=True)
+class ComparisonResult:
+    reps: list[RepAnalysis]
+    limitations: list[str]
 
 
 def _continuous(samples: Sequence[AngleSample], start_ms: int, end_ms: int) -> bool:
@@ -45,57 +53,67 @@ def compare_pushup_reps(
     samples: Sequence[AngleSample],
     side: str,
     profile: ExerciseProfile,
-) -> list[RepAnalysis]:
+) -> ComparisonResult:
     """Each completed rep uses only its two predecessors; never revise an earlier rep.
 
     Missing observations anywhere from the first reference's start through this rep's
-    end suppress both comparisons. Reference stability is evaluated separately per metric.
+    end suppress both comparisons. Timing requires agreement against both prior durations;
+    excursion retains its independent reference-stability gate.
     """
     compared = [rep.model_copy(deep=True) for rep in reps]
+    limitations = []
+    if compared:
+        label = "Rep 1" if len(compared) == 1 else "Reps 1–2"
+        limitations.append(f"{label}: comparisons unavailable with fewer than two preceding reps.")
     thresholds = profile.thresholds
     excursion_key = f"smoothed{side.title()}ElbowExcursionDeg"
     for index in range(2, len(compared)):
         rep = compared[index]
         references = compared[index - 2 : index]
         if not _continuous(samples, references[0].start_ms, rep.end_ms):
+            limitations.append(
+                f"Rep {rep.rep_number}: timing/range comparisons unavailable because tracking "
+                "is incomplete across the reference/current reps, including between reps."
+            )
             continue
-        durations = [ref.measurements.get("durationMs") for ref in references]
         excursions = [ref.measurements.get(excursion_key) for ref in references]
         reference_label = f"reps {references[0].rep_number}–{references[1].rep_number}"
-        values: dict[str, float] = {}
-        if all(value is not None and value > 0 for value in durations):
-            baseline = median(durations)
-            current = rep.measurements.get("durationMs")
-            stable = (max(durations) - min(durations)) / baseline <= thresholds[
-                "maximumReferenceDurationSpreadFraction"
-            ]
-            if stable and current is not None and current > 0:
-                delta = current - baseline
-                trigger = max(
-                    thresholds["minimumDurationChangeMs"],
-                    baseline * thresholds["durationChangeFraction"],
-                )
-                values.update(
-                    referenceMedianDurationMs=baseline,
-                    durationDeltaMs=delta,
-                    durationDeltaPercent=100 * delta / baseline,
-                    durationChangeThresholdMs=trigger,
-                )
-                if abs(delta) >= trigger:
-                    direction = "longer" if delta > 0 else "shorter"
-                    rep.issues.append(
-                        _issue(
-                            rep,
-                            side,
-                            "PUSHUP_REP_DURATION_CHANGED",
-                            "Counted rep time changed",
-                            f"Rep {rep.rep_number} took {current / 1000:.2f} s versus "
-                            f"{baseline / 1000:.2f} s for the median of {reference_label}: "
-                            f"{abs(delta) / 1000:.2f} s {direction}. The review threshold is "
-                            f"{trigger / 1000:.2f} s. Timing includes pauses "
-                            "and confirmation delay.",
-                        )
+        values = timing_measurements(
+            references,
+            rep,
+            floor_ms=thresholds["minimumDurationChangeMs"],
+            fraction=thresholds["durationChangeFraction"],
+        )
+        if values:
+            current = rep.measurements["durationMs"]
+            lower = values["durationReviewLowerBoundMs"]
+            upper = values["durationReviewUpperBoundMs"]
+            if current <= lower or current >= upper:
+                direction = "longer" if current >= upper else "shorter"
+                boundary = upper if current >= upper else lower
+                rep.issues.append(
+                    _issue(
+                        rep,
+                        side,
+                        "PUSHUP_REP_DURATION_CHANGED",
+                        "Counted rep time changed",
+                        f"Rep {rep.rep_number} took {current / 1000:.2f} s, "
+                        f"substantially {direction} than both {reference_label} "
+                        f"({references[0].measurements['durationMs'] / 1000:.2f} s and "
+                        f"{references[1].measurements['durationMs'] / 1000:.2f} s). "
+                        f"The {direction}-duration review boundary is {boundary / 1000:.2f} s. "
+                        f"The threshold against each reference is the greater of "
+                        f"{thresholds['minimumDurationChangeMs'] / 1000:.2f} s and "
+                        f"{thresholds['durationChangeFraction'] * 100:g}%. "
+                        "Timing includes pauses and confirmation delay.",
                     )
+                )
+        else:
+            limitations.append(
+                f"Rep {rep.rep_number}: timing comparison unavailable because a reference/current "
+                "duration is missing, nonpositive or inconsistent with its rep timestamps."
+            )
+        excursion_available = False
         if all(value is not None and value > 0 for value in excursions):
             baseline = median(excursions)
             current = rep.measurements.get(excursion_key)
@@ -104,6 +122,7 @@ def compare_pushup_reps(
                 <= thresholds["maximumReferenceExcursionSpreadDeg"]
             )
             if stable and current is not None and current >= 0:
+                excursion_available = True
                 delta = current - baseline
                 trigger = max(
                     thresholds["minimumExcursionReductionDeg"],
@@ -130,10 +149,16 @@ def compare_pushup_reps(
                             "can affect it.",
                         )
                     )
+        if not excursion_available:
+            limitations.append(
+                f"Rep {rep.rep_number}: range comparison unavailable because reference/current "
+                "excursion is missing/invalid or the two reference excursions differ by more "
+                f"than {thresholds['maximumReferenceExcursionSpreadDeg']:g}°."
+            )
         if values:
             rep.measurements.update(
                 comparisonReferenceStartRep=references[0].rep_number,
                 comparisonReferenceEndRep=references[1].rep_number,
                 **values,
             )
-    return compared
+    return ComparisonResult(compared, limitations)

@@ -122,7 +122,12 @@
         "referenceMedianElbowExcursionDeg": 105.0,
         "elbowExcursionDeltaDeg": -41.0,
         "elbowExcursionDeltaPercent": -39.04761904761905,
-        "elbowExcursionReductionThresholdDeg": 21.0
+        "elbowExcursionReductionThresholdDeg": 21.0,
+        "durationComparisonVersion": 2.0,
+        "referenceMinDurationMs": 1700.0,
+        "referenceMaxDurationMs": 1700.0,
+        "durationReviewLowerBoundMs": 1190.0,
+        "durationReviewUpperBoundMs": 2210.0
       },
       "issues": [
         {
@@ -132,7 +137,7 @@
           "confidence": null,
           "title": "Counted rep time changed",
           "shortCue": "Review this rep alongside the two preceding reps in the same camera view.",
-          "explanation": "Rep 3 took 3.20 s versus 1.70 s for the median of reps 1–2: 1.50 s longer. The review threshold is 0.51 s. Timing includes pauses and confirmation delay. This is a measured difference, not a judgment of form quality.",
+          "explanation": "Rep 3 took 3.20 s, substantially longer than both reps 1–2 (1.70 s and 1.70 s). The longer-duration review boundary is 2.21 s. The threshold against each reference is the greater of 0.50 s and 30%. Timing includes pauses and confirmation delay. This is a measured difference, not a judgment of form quality.",
           "startMs": 4600,
           "endMs": 7800,
           "involvedJoints": [
@@ -175,7 +180,7 @@
       "confidence": null,
       "title": "Counted rep time changed",
       "shortCue": "Review this rep alongside the two preceding reps in the same camera view.",
-      "explanation": "Rep 3 took 3.20 s versus 1.70 s for the median of reps 1–2: 1.50 s longer. The review threshold is 0.51 s. Timing includes pauses and confirmation delay. This is a measured difference, not a judgment of form quality.",
+      "explanation": "Rep 3 took 3.20 s, substantially longer than both reps 1–2 (1.70 s and 1.70 s). The longer-duration review boundary is 2.21 s. The threshold against each reference is the greater of 0.50 s and 30%. Timing includes pauses and confirmation delay. This is a measured difference, not a judgment of form quality.",
       "startMs": 4600,
       "endMs": 7800,
       "involvedJoints": [
@@ -288,7 +293,8 @@
     "Scores, biomechanical form assessment, and automatic exercise recognition are not implemented. The exercise is a user selection. Empty issues do not establish good form.",
     "Uses the left elbow throughout this set (first usable side; left wins ties). Three-sample median smoothing and phase confirmation delay event timestamps.",
     "Elbow excursion is the observed 2D maximum minus minimum from confirmed descent through completion, not a calibrated full range-of-motion score. Time to/from minimum splits the counted interval at its first lowest angle; it includes pauses and confirmation delay, not isolated lowering/lifting time.",
-    "Comparison flags are uncalibrated review heuristics, not bad-form or fatigue detections. Each rep needs two preceding completed reps with continuous tracking; unstable reference metrics are skipped. Camera/view stability is not evaluated. Absent comparison keys mean unavailable, not no change."
+    "Comparison flags are uncalibrated review heuristics, not bad-form or fatigue detections. Each rep needs two preceding completed reps with continuous tracking; timing must differ substantially from both references in the same direction. Unstable range references are skipped. Camera/view stability is not evaluated. Absent comparison keys mean unavailable, not no change.",
+    "Reps 1–2: comparisons unavailable with fewer than two preceding reps."
   ],
   "scoring": null
 }

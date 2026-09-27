@@ -2,6 +2,14 @@
 
 ## New overlay checkpoint — 2026-09-26
 
+**Latest timing follow-up:** policy v2 compares the current duration with BOTH preceding
+durations using the existing 500 ms / 30% margin per reference. IMG_6942 now flags rep 3;
+rep 4 remains unflagged. All five captures preserve counts/rep geometry/timestamps, and local
+coaching explains the measured slower third rep. Unavailable comparisons have rep-specific
+limitations. Shared contract docs/example and frontend handoff updated; no frontend source
+or generated schema/type changes. 399 backend and 35 frontend tests pass; B's published branch
+remains `5dd6bb4`. The 6942 result is a development regression, not independent validation.
+
 **Latest recording:** IMG_6942 counts 4/4 with observed durations 1.735/1.400/3.068/1.068 s.
 Video/rep-moment overlays reviewed, live-route cumulative replay stable, local coach evidence
 valid. Expected rep-3 timing flag is absent due to 21.37% reference spread exceeding the 20%

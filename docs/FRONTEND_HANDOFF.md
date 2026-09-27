@@ -95,6 +95,16 @@ The older `SessionResults` component is not the current upload view. Its `partia
 
 ## API and rendering boundary
 
+**Timing-policy follow-up (v2):** the existing duration issue now requires a substantial
+change from both preceding durations in the same direction. Optional numeric keys in the
+existing measurements dictionary identify `durationComparisonVersion: 2`, reference min/max
+and lower/upper duration boundaries; API_CONTRACT.md defines them. Render the returned issues
+and explanations; do not recompute flags from a hardcoded 20% reference gate. Older results
+may omit these keys. Unavailable comparisons now have rep-specific `limitations` strings.
+No schema/type/endpoint change or frontend source edit. The synthetic comparison fixture is
+updated, still explicitly synthetic. IMG_6942 now flags rep 3; rep 4 remains unflagged under
+the two-reference rule. Integrate this backend checkpoint before relying on this behavior.
+
 **Additive backend follow-up:** push-up rep measurements now optionally include a median
 shoulder–hip–ankle angle and usable/received sample counts. See
 [BODY_LINE.md](../apps/api/BODY_LINE.md). Existing types and endpoints are unchanged; B can

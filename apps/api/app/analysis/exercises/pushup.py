@@ -26,7 +26,6 @@ PUSHUP_PROFILE = ExerciseProfile(
         # Review thresholds, not targets or a validated definition of correct form.
         "minimumDurationChangeMs": 500,
         "durationChangeFraction": 0.30,
-        "maximumReferenceDurationSpreadFraction": 0.20,
         "minimumExcursionReductionDeg": 15,
         "excursionReductionFraction": 0.20,
         "maximumReferenceExcursionSpreadDeg": 10,
