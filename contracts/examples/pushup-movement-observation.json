@@ -1,0 +1,58 @@
+{
+  "contractVersion": "1.0",
+  "sessionId": "demo-body-bend-zero-reps",
+  "status": "complete",
+  "provenance": {
+    "kind": "synthetic",
+    "label": "Authored geometry example; no video was analyzed."
+  },
+  "source": {
+    "type": "upload",
+    "durationMs": 1000
+  },
+  "exercise": {
+    "id": "push-up",
+    "name": "Push-up",
+    "confidence": null
+  },
+  "cameraQuality": {
+    "score": null,
+    "fullBodyVisible": null,
+    "issues": []
+  },
+  "summary": {
+    "overallScore": null,
+    "totalReps": 0,
+    "primaryFocus": null,
+    "headline": "Synthetic example: body-line bend with no completed reps."
+  },
+  "metrics": {
+    "rangeOfMotion": null,
+    "symmetry": null,
+    "tempo": null,
+    "stability": null,
+    "consistency": null
+  },
+  "reps": [],
+  "issues": [],
+  "timeline": [],
+  "limitations": [
+    "Synthetic demo: 11 authored samples at 100 ms intervals, each with a 130-degree body-line angle. No matching video.",
+    "A body-line bend is a 2D review observation, not a count of attempts or a form grade."
+  ],
+  "scoring": null,
+  "movementObservations": [
+    {
+      "code": "PUSHUP_BODY_LINE_BEND",
+      "ruleVersion": "1.0",
+      "side": "left",
+      "startMs": 0,
+      "endMs": 1000,
+      "sampleCount": 11,
+      "minAngleDeg": 130,
+      "medianAngleDeg": 130,
+      "maxAngleDeg": 130,
+      "thresholdAngleDeg": 150
+    }
+  ]
+}

@@ -2,7 +2,8 @@ import type { RepAnalysis } from "../api/types";
 export type RepMetric = "duration" | "range";
 export function repMetric(rep: RepAnalysis, metric: RepMetric): number | null {
   const value = metric === "duration" ? rep.measurements.durationMs :
-    rep.measurements.smoothedLeftElbowExcursionDeg ?? rep.measurements.smoothedRightElbowExcursionDeg;
+    rep.measurements.smoothedLeftElbowExcursionDeg ?? rep.measurements.smoothedRightElbowExcursionDeg ??
+    rep.measurements.smoothedLeftShoulderExcursionDeg ?? rep.measurements.smoothedRightShoulderExcursionDeg;
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
 }
 export function formatMetric(value: number | null, metric: RepMetric) {

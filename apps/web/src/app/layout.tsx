@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { DesignMotionProvider } from "@/components/design/motion-provider";
+import { AppNavigation } from "@/components/app-navigation";
 
 export const metadata: Metadata = {
   title: "FormCoach | HelloHacks 2026",
-  description: "Movement coaching grounded in measured evidence. Hackathon foundation.",
+  description: "Review your movement, understand your reps, and keep a personal workout log.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en"><body><DesignMotionProvider><AppNavigation />{children}</DesignMotionProvider></body></html>;
 }

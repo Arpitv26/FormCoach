@@ -156,9 +156,12 @@ The user changed the demo to **prerecorded push-ups**, with no squat demo. Selec
 tests protect that extraction from regressions.
 
 The push-up counter measures shoulder-elbow-wrist angle on one locked side. It first requires
-the straight-arm top position (at least 160 degrees), confirmed descent, flexion at most
-100 degrees, ascent, and return to the top. Other smoothing/timing/gap settings match the
-checkpoint 2 table. These are provisional counting thresholds, not a correct-depth standard.
+the top/return zone (at least 150 degrees), confirmed descent, flexion at most
+100 degrees, ascent, and return. Counter v2 confirms consecutive raw observations over
+60 ms plus the current three-sample median, reusing overlapping phase evidence. It replaces
+the former 160-degree/150-ms policy that merged continuous reps. Other duration/gap settings
+match the checkpoint 2 table. Read [COUNTING.md](COUNTING.md) for the failure, changed timing,
+regressions and remaining checks. These are counting heuristics, not depth/lockout standards.
 Shallow attempts do not count yet. Body alignment, camera orientation, and actual exercise
 identity are not inferred; a selected exercise is not automatic recognition.
 

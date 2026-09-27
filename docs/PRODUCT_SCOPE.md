@@ -1,5 +1,14 @@
 # Product scope
 
+## Current direction — September 27, 2026
+
+The demo is **live push-ups plus uploaded incline dumbbell bench press, cable lateral raise
+and lat pulldown**; triceps is removed. A owns both apps. Fourteen private gym clips are now
+available. Lat pulldown and incline press upload checkpoints are implemented; lateral raise
+is still being reviewed. See [gym exercise evidence](../apps/api/GYM_EXERCISES.md).
+The earlier plan below is historical where it conflicts with this direction.
+
+
 This is the post-bootstrap product roadmap. Checked items are implemented;
 unchecked items require feature work. Prioritize a reliable short demo, with prerecorded push-ups first (updated user direction).
 See NEXT_STEPS.md for current ownership and the order of work. B finishes frontend features;

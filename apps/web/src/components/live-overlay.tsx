@@ -30,10 +30,11 @@ export function LiveOverlay({ video, onFrame, onStatus }: {
         // Analysis receives the raw unmirrored frame, before display-only smoothing.
         onFrame?.(frame, player.videoWidth, player.videoHeight, capturedAt ?? performance.now());
         drawPose(surface, filter.update(frame), player.videoWidth, player.videoHeight);
-      }, (next) => { setStatus(next); onStatus?.(next); });
+      }, (next) => { setStatus(next); onStatus?.(next); }, undefined,
+      () => drawPose(surface, filter.update(null), player.videoWidth, player.videoHeight));
   }, [video, onFrame, onStatus]);
   return <>
     <canvas ref={canvas} aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", transform: "scaleX(-1)" }} />
-    <p role="status" style={{ position: "absolute", bottom: 12, left: 12, right: 12, margin: 0, padding: "8px 12px", background: "#080d14e6", borderRadius: 8, fontSize: ".8rem" }}>{messages[status]}</p>
+    <p role="status" style={{ position: "absolute", bottom: 12, left: 12, right: 12, margin: 0, padding: "8px 12px", background: "#080d14e6", borderRadius: 8, fontSize: ".875rem", color: "#f7f8f5" }}>{messages[status]}</p>
   </>;
 }

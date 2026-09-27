@@ -61,3 +61,31 @@ test("pose track is tied to its upload and cleared when another clip is selected
   assert.equal(state.poseTrack, null); assert.equal(state.result, null);
   session.dispose();
 });
+
+test("a display timeout never inserts a fake missing pose before the fresh observation", async () => {
+  const previous = { raf: globalThis.requestAnimationFrame, cancel: globalThis.cancelAnimationFrame, document: globalThis.document };
+  let tick!: FrameRequestCallback;
+  let displayGaps = 0;
+  const frames: (PoseFrame | null)[] = [];
+  const video = { readyState: 2, paused: false, currentTime: 0 } as HTMLVideoElement;
+  const points = Array.from({ length: 33 }, () => ({ x: .4, y: .4, visibility: .9 }));
+  globalThis.requestAnimationFrame = (callback) => { tick = callback; return 1; };
+  globalThis.cancelAnimationFrame = () => {};
+  Object.defineProperty(globalThis, "document", { configurable: true, value: { hidden: false } });
+  try {
+    const stop = startLivePose(video, (frame) => frames.push(frame), () => {},
+      async () => ({ detectForVideo: () => ({ landmarks: [points] }), close() {} }), () => { displayGaps++; });
+    await Promise.resolve();
+    tick(1000);
+    video.currentTime = 1;
+    tick(1400);
+    assert.equal(displayGaps, 2);
+    assert.equal(frames.length, 2);
+    assert.ok(frames.every((frame) => frame?.landmarks.length === 33));
+    stop();
+  } finally {
+    globalThis.requestAnimationFrame = previous.raf;
+    globalThis.cancelAnimationFrame = previous.cancel;
+    Object.defineProperty(globalThis, "document", { configurable: true, value: previous.document });
+  }
+});

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { WebcamSetup } from "@/components/webcam-setup";
 import { findExercise } from "@/lib/exercises";
 import styles from "@/components/webcam-setup.module.css";
@@ -13,18 +12,13 @@ export default async function CameraPage({ searchParams }: {
   const { exercise: slug = "push-up" } = await searchParams;
   const exercise = typeof slug === "string" ? findExercise(slug) : undefined;
   if (!exercise) notFound();
+  if (exercise.slug !== "push-up") redirect(`/upload?exercise=${exercise.slug}`);
   return (
     <>
-      <a className="skip-link" href="#main-content">Skip to camera setup</a>
-      <header className="site-header">
-        <Link className="brand" href="/" aria-label="FormCoach exercises"><span className="brand-mark" aria-hidden="true">f<span>c</span></span>FormCoach<span className="brand-dot">.</span></Link>
-        <nav aria-label="Main navigation"><Link href="/">Exercises</Link><Link href={`/camera?exercise=${exercise.slug}`} aria-current="page">Camera setup</Link></nav>
-        <span className="header-caption">MOVE WITH INTENTION</span>
-      </header>
       <main id="main-content">
         <div className={styles.intro}>
-          <p className="eyebrow">{exercise.group === "live" ? "Push-ups · live demo" : "Gym session · camera preview"}</p>
-          <h1>Let’s get you <span>in frame.</span></h1>
+          <p className="eyebrow">Live workspace · push-ups</p>
+          <h1>Make room for your next set.</h1>
           <p className="muted">Check your camera and find a comfortable place to move.</p>
         </div>
         <WebcamSetup key={exercise.slug} exercise={exercise} />

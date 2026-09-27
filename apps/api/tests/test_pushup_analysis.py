@@ -33,13 +33,13 @@ def test_top_dwell_starts_on_the_frame_that_confirms_ascent():
     samples = [AngleSample(index * 100, angle) for index, angle in enumerate(angles)]
     result = segment_pushups(samples)
     assert len(result.reps) == 1
-    assert result.reps[0].end_ms == 2000
+    assert result.reps[0].end_ms == 1800
     assert result.current_phase == "top"
-    assert not segment_pushups(samples[:-1]).reps  # Full dwell is still required.
+    assert not segment_pushups(samples[:18]).reps  # One top observation is not enough.
 
 
-def test_brief_top_spike_during_ascent_does_not_complete_a_rep():
-    angles = STANDING + [140] * 5 + [90] * 5 + [130] * 2 + [170] * 2 + [130] * 4
+def test_single_top_spike_during_ascent_does_not_complete_a_rep():
+    angles = STANDING + [140] * 5 + [90] * 5 + [130] * 2 + [170] + [130] * 4
     samples = [AngleSample(index * 100, angle) for index, angle in enumerate(angles)]
     assert not segment_pushups(samples).reps
 
@@ -53,17 +53,17 @@ def test_pushup_http_measures_elbow_not_knee_and_keeps_scores_unknown(client, si
     rep = result.reps[0]
     assert rep.measurements == {
         f"minSmoothed{side.title()}ElbowAngleDeg": pytest.approx(90),
-        "durationMs": 1700,
+        "durationMs": 1600,
         f"maxSmoothed{side.title()}ElbowAngleDeg": pytest.approx(170),
         f"smoothed{side.title()}ElbowExcursionDeg": pytest.approx(80),
-        "angleMeasurementStartMs": 800,
-        "timeToMinElbowAngleMs": 500,
-        "timeFromMinElbowAngleMs": 1200,
-        "bodyLineSampleCount": 18,
+        "angleMeasurementStartMs": 600,
+        "timeToMinElbowAngleMs": 600,
+        "timeFromMinElbowAngleMs": 1000,
+        "bodyLineSampleCount": 17,
         "bodyLineUsableSampleCount": 0,
         f"median{side.title()}ShoulderHipAnkleAngleDeg": None,
     }
-    assert (rep.start_ms, rep.end_ms) == (600, 2300)
+    assert (rep.start_ms, rep.end_ms) == (500, 2100)
     assert rep.key_moments[0].type == "minimum_elbow_angle"
     assert result.summary.overall_score is None and rep.score is None
     assert not result.issues and result.scoring is None

@@ -1,0 +1,315 @@
+{
+  "analysis": {
+    "contractVersion": "1.0",
+    "sessionId": "synthetic-three-pushups-not-video",
+    "status": "complete",
+    "provenance": {
+      "kind": "synthetic",
+      "label": "SYNTHETIC DEMO DATA \u2014 authored three-rep comparison, not a recording"
+    },
+    "source": {
+      "type": "live",
+      "durationMs": 7900
+    },
+    "exercise": {
+      "id": "push-up",
+      "name": "Push-up",
+      "confidence": null
+    },
+    "cameraQuality": {
+      "score": null,
+      "fullBodyVisible": null,
+      "issues": [
+        "Camera orientation and full-body visibility have not been evaluated."
+      ]
+    },
+    "summary": {
+      "overallScore": null,
+      "totalReps": 3,
+      "primaryFocus": "rep_consistency_review",
+      "headline": "3 completed push-up reps; 2 measured changes flagged for review. Scores are not available yet."
+    },
+    "metrics": {
+      "rangeOfMotion": null,
+      "symmetry": null,
+      "tempo": null,
+      "stability": null,
+      "consistency": null
+    },
+    "reps": [
+      {
+        "repNumber": 1,
+        "startMs": 600,
+        "endMs": 2300,
+        "score": null,
+        "metrics": {
+          "rangeOfMotion": null,
+          "symmetry": null,
+          "tempo": null,
+          "stability": null
+        },
+        "measurements": {
+          "minSmoothedLeftElbowAngleDeg": 70.0,
+          "durationMs": 1700.0,
+          "maxSmoothedLeftElbowAngleDeg": 175.0,
+          "smoothedLeftElbowExcursionDeg": 105.0,
+          "angleMeasurementStartMs": 800.0,
+          "timeToMinElbowAngleMs": 500.0,
+          "timeFromMinElbowAngleMs": 1200.0
+        },
+        "issues": [],
+        "keyMoments": [
+          {
+            "timestampMs": 1100,
+            "type": "minimum_elbow_angle",
+            "label": "Lowest smoothed left elbow angle (2D)"
+          }
+        ]
+      },
+      {
+        "repNumber": 2,
+        "startMs": 2600,
+        "endMs": 4300,
+        "score": null,
+        "metrics": {
+          "rangeOfMotion": null,
+          "symmetry": null,
+          "tempo": null,
+          "stability": null
+        },
+        "measurements": {
+          "minSmoothedLeftElbowAngleDeg": 70.0,
+          "durationMs": 1700.0,
+          "maxSmoothedLeftElbowAngleDeg": 175.0,
+          "smoothedLeftElbowExcursionDeg": 105.0,
+          "angleMeasurementStartMs": 2800.0,
+          "timeToMinElbowAngleMs": 500.0,
+          "timeFromMinElbowAngleMs": 1200.0
+        },
+        "issues": [],
+        "keyMoments": [
+          {
+            "timestampMs": 3100,
+            "type": "minimum_elbow_angle",
+            "label": "Lowest smoothed left elbow angle (2D)"
+          }
+        ]
+      },
+      {
+        "repNumber": 3,
+        "startMs": 4600,
+        "endMs": 7800,
+        "score": null,
+        "metrics": {
+          "rangeOfMotion": null,
+          "symmetry": null,
+          "tempo": null,
+          "stability": null
+        },
+        "measurements": {
+          "minSmoothedLeftElbowAngleDeg": 98.0,
+          "durationMs": 3200.0,
+          "maxSmoothedLeftElbowAngleDeg": 162.0,
+          "smoothedLeftElbowExcursionDeg": 64.0,
+          "angleMeasurementStartMs": 4800.0,
+          "timeToMinElbowAngleMs": 1000.0,
+          "timeFromMinElbowAngleMs": 2200.0,
+          "comparisonReferenceStartRep": 1.0,
+          "comparisonReferenceEndRep": 2.0,
+          "referenceMedianDurationMs": 1700.0,
+          "durationDeltaMs": 1500.0,
+          "durationDeltaPercent": 88.23529411764706,
+          "durationChangeThresholdMs": 510.0,
+          "referenceMedianElbowExcursionDeg": 105.0,
+          "elbowExcursionDeltaDeg": -41.0,
+          "elbowExcursionDeltaPercent": -39.04761904761905,
+          "elbowExcursionReductionThresholdDeg": 21.0,
+          "durationComparisonVersion": 2.0,
+          "referenceMinDurationMs": 1700.0,
+          "referenceMaxDurationMs": 1700.0,
+          "durationReviewLowerBoundMs": 1190.0,
+          "durationReviewUpperBoundMs": 2210.0
+        },
+        "issues": [
+          {
+            "id": "push-up-rep-3-pushup_rep_duration_changed",
+            "code": "PUSHUP_REP_DURATION_CHANGED",
+            "severity": "low",
+            "confidence": null,
+            "title": "Counted rep time changed",
+            "shortCue": "Review this rep alongside the two preceding reps in the same camera view.",
+            "explanation": "Rep 3 took 3.20 s, substantially longer than both reps 1\u20132 (1.70 s and 1.70 s). The longer-duration review boundary is 2.21 s. The threshold against each reference is the greater of 0.50 s and 30%. Timing includes pauses and confirmation delay. This is a measured difference, not a judgment of form quality.",
+            "startMs": 4600,
+            "endMs": 7800,
+            "involvedJoints": [
+              "left_shoulder",
+              "left_elbow",
+              "left_wrist"
+            ]
+          },
+          {
+            "id": "push-up-rep-3-pushup_elbow_excursion_reduced",
+            "code": "PUSHUP_ELBOW_EXCURSION_REDUCED",
+            "severity": "low",
+            "confidence": null,
+            "title": "Observed elbow range reduced",
+            "shortCue": "Review this rep alongside the two preceding reps in the same camera view.",
+            "explanation": "Rep 3 had 64.0\u00b0 of observed left elbow excursion versus 105.0\u00b0 for the median of reps 1\u20132: 41.0\u00b0 less. The review threshold is 21.0\u00b0. This uses 2D angles; changes in camera view or pose estimates can affect it. This is a measured difference, not a judgment of form quality.",
+            "startMs": 4600,
+            "endMs": 7800,
+            "involvedJoints": [
+              "left_shoulder",
+              "left_elbow",
+              "left_wrist"
+            ]
+          }
+        ],
+        "keyMoments": [
+          {
+            "timestampMs": 5600,
+            "type": "minimum_elbow_angle",
+            "label": "Lowest smoothed left elbow angle (2D)"
+          }
+        ]
+      }
+    ],
+    "issues": [
+      {
+        "id": "push-up-rep-3-pushup_rep_duration_changed",
+        "code": "PUSHUP_REP_DURATION_CHANGED",
+        "severity": "low",
+        "confidence": null,
+        "title": "Counted rep time changed",
+        "shortCue": "Review this rep alongside the two preceding reps in the same camera view.",
+        "explanation": "Rep 3 took 3.20 s, substantially longer than both reps 1\u20132 (1.70 s and 1.70 s). The longer-duration review boundary is 2.21 s. The threshold against each reference is the greater of 0.50 s and 30%. Timing includes pauses and confirmation delay. This is a measured difference, not a judgment of form quality.",
+        "startMs": 4600,
+        "endMs": 7800,
+        "involvedJoints": [
+          "left_shoulder",
+          "left_elbow",
+          "left_wrist"
+        ]
+      },
+      {
+        "id": "push-up-rep-3-pushup_elbow_excursion_reduced",
+        "code": "PUSHUP_ELBOW_EXCURSION_REDUCED",
+        "severity": "low",
+        "confidence": null,
+        "title": "Observed elbow range reduced",
+        "shortCue": "Review this rep alongside the two preceding reps in the same camera view.",
+        "explanation": "Rep 3 had 64.0\u00b0 of observed left elbow excursion versus 105.0\u00b0 for the median of reps 1\u20132: 41.0\u00b0 less. The review threshold is 21.0\u00b0. This uses 2D angles; changes in camera view or pose estimates can affect it. This is a measured difference, not a judgment of form quality.",
+        "startMs": 4600,
+        "endMs": 7800,
+        "involvedJoints": [
+          "left_shoulder",
+          "left_elbow",
+          "left_wrist"
+        ]
+      }
+    ],
+    "timeline": [
+      {
+        "timestampMs": 600,
+        "type": "rep_start",
+        "repNumber": 1,
+        "issueId": null,
+        "label": "Rep 1 start"
+      },
+      {
+        "timestampMs": 1100,
+        "type": "key_moment",
+        "repNumber": 1,
+        "issueId": null,
+        "label": "Lowest smoothed left elbow angle (2D)"
+      },
+      {
+        "timestampMs": 2300,
+        "type": "rep_end",
+        "repNumber": 1,
+        "issueId": null,
+        "label": "Rep 1 completed"
+      },
+      {
+        "timestampMs": 2600,
+        "type": "rep_start",
+        "repNumber": 2,
+        "issueId": null,
+        "label": "Rep 2 start"
+      },
+      {
+        "timestampMs": 3100,
+        "type": "key_moment",
+        "repNumber": 2,
+        "issueId": null,
+        "label": "Lowest smoothed left elbow angle (2D)"
+      },
+      {
+        "timestampMs": 4300,
+        "type": "rep_end",
+        "repNumber": 2,
+        "issueId": null,
+        "label": "Rep 2 completed"
+      },
+      {
+        "timestampMs": 4600,
+        "type": "rep_start",
+        "repNumber": 3,
+        "issueId": null,
+        "label": "Rep 3 start"
+      },
+      {
+        "timestampMs": 4600,
+        "type": "issue",
+        "repNumber": 3,
+        "issueId": "push-up-rep-3-pushup_rep_duration_changed",
+        "label": "Counted rep time changed"
+      },
+      {
+        "timestampMs": 4600,
+        "type": "issue",
+        "repNumber": 3,
+        "issueId": "push-up-rep-3-pushup_elbow_excursion_reduced",
+        "label": "Observed elbow range reduced"
+      },
+      {
+        "timestampMs": 5600,
+        "type": "key_moment",
+        "repNumber": 3,
+        "issueId": null,
+        "label": "Lowest smoothed left elbow angle (2D)"
+      },
+      {
+        "timestampMs": 7800,
+        "type": "rep_end",
+        "repNumber": 3,
+        "issueId": null,
+        "label": "Rep 3 completed"
+      }
+    ],
+    "limitations": [
+      "Synthetic comparison example: authored geometry, no matching video or person. Not evidence of real-world detection accuracy.",
+      "2D elbow angles use supplied landmarks; their camera origin cannot be verified.",
+      "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
+      "Uncalibrated push-up rules count observed extension-flexion-extension cycles. Shallow, fast, or interrupted attempts may not count; this is not a form judgment.",
+      "Scores, biomechanical form assessment, and automatic exercise recognition are not implemented. The exercise is a user selection. Empty issues do not establish good form.",
+      "Uses the left elbow throughout this set (first usable side; left wins ties). Three-sample median smoothing and phase confirmation delay event timestamps.",
+      "Elbow excursion is the observed 2D maximum minus minimum from confirmed descent through completion, not a calibrated full range-of-motion score. Time to/from minimum splits the counted interval at its first lowest angle; it includes pauses and confirmation delay, not isolated lowering/lifting time.",
+      "Comparison flags are uncalibrated review heuristics, not bad-form or fatigue detections. Each rep needs two preceding completed reps with continuous tracking; timing must differ substantially from both references in the same direction. Unstable range references are skipped. Camera/view stability is not evaluated. Absent comparison keys mean unavailable, not no change.",
+      "Reps 1\u20132: comparisons unavailable with fewer than two preceding reps."
+    ],
+    "scoring": null
+  },
+  "mode": "qa",
+  "responseStyle": "conversation",
+  "question": "Can you explain that more simply?",
+  "history": [
+    {
+      "role": "user",
+      "content": "What changed in rep 3?"
+    },
+    {
+      "role": "assistant",
+      "content": "In this demo, rep 3 took longer than the two before it."
+    }
+  ]
+}

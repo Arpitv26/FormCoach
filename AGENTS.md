@@ -37,7 +37,9 @@ Keep the legacy squat fixture for compatibility, not as the intended presentatio
 - Stateless cumulative HTTP batches first. No database or WebSocket requirement.
 - AI explains measured evidence. It cannot invent detections, diagnose, or predict injury.
 - Coaching defaults to local. OpenAI requires explicit provider opt-in plus a backend key;
-  it selects evidence IDs and the server renders wording. Read docs/AI_COACH.md. Mock JSON is synthetic.
+  the UI now requests short conversational replies with bounded history. Legacy evidence style
+  still selects IDs/server wording. Read docs/AI_COACH.md; citations do not prove prose accuracy.
+  Recognized missed-count disputes use local guidance; do not invent their cause. Mock JSON is synthetic.
 
 ## Ownership
 
@@ -55,7 +57,8 @@ relying on the change; do not send external messages on the human's behalf witho
 **Current human agreement (2026-09-26):** B handed off PR #4 with coach interactions, rep
 comparisons and live counting. It is reviewed, merged into main (`767a98b`) and integrated
 into backend-cv (`ae959a1`). A now owns the next frontend visual overhaul on this computer.
-B should coordinate further screen edits. Physical webcam rehearsal is still pending.
+B should coordinate further screen edits. PR #5 is merged at `7f44566`. A physical rehearsal
+failed: human 5 reps, detected 2. Read docs/LIVE_REHEARSAL_FIX.md before further counting work.
 
 If a contract must change:
 
@@ -81,7 +84,95 @@ If a contract must change:
 
 ## Current capabilities
 
-**Current integration:** PR #4 merged; 399 backend and 49 frontend tests, contracts, lint,
+**Latest visual follow-up:** The supplied five-color palette now uses #0c0a0b / #464954 /
+#f3eff5 / #80af3c / #4f7c30. A centered Archivo Black headline replaces the split/shimmer
+hero title. The explicitly requested optimized gym background video is tracked at
+apps/web/public/media/training-hero.mp4 (1.22 MB, silent loop); private gym recordings
+remain ignored. Pause, visibility and reduced-motion playback are browser-checked.
+See docs/UI_MOTION_REDESIGN.md for the newer reference and media provenance.
+
+**September 27 dark UI follow-up:** The user superseded the light palette with a charcoal /
+electric-lime reference. Actual adapted React Bits SpotlightCard, StarBorder, ShinyText and
+Magic UI BlurFade / BorderBeam are now integrated. Motion replaces Anime.js; Lucide provides
+icons. The dashboard adds interactive 7/28-day saved-set activity (no invented metrics).
+Playwright browser checks are authorized and working; see docs/UI_MOTION_REDESIGN.md and
+design-qa.md. User planning files remain untouched.
+
+**Earlier September 27 UI implementation:** Dashboard / Upload / Live shared a light sage design.
+Uploads and finalized live sets can explicitly save summaries to a versioned device-local
+workout log; saved reviews have no video/pose track and clearly disable playback. Review uses
+Overview / Reps / Coach tabs and retains set-scoped chat. Read docs/UI_IMPLEMENTATION.md
+for persistence semantics, checks and the browser-verification blocker. Analyzer revisions
+are absent from the API, so timing/movement values stay per-set rather than becoming a
+cross-version progress trend. No analyzer/API changes. Original handoff/planning files
+remain uncommitted. Physical live and actual-browser layout/playback checks remain open.
+
+**Visual-review overcorrection follow-up:** normal pulldown feedback was too similar to the
+changed clip. Removed the supplied fault example and correction quota; review now weighs
+within-rep magnitude, counterevidence and sparse-sampling limits. Filenames are never sent
+to OpenAI. Two repeated unlabeled reviews per clip and original uploads with reversed
+GoodForm/BadForm names distinguish normal/slight motion from larger recline. Chat preserves
+neutral observations. See docs/AI_COACH.md; this is development evidence, not a validated
+form classifier. Counts unchanged; 550 backend/56 frontend tests pass.
+
+**September 27 original-upload/visual-review checkpoint:** user explicitly authorized sending
+sampled gym video images to OpenAI for more useful trainer-style feedback. Optional backend
+`VISUAL_REVIEW_ENABLED` now attaches default-null `visualReview` to upload analyses: separately
+labeled model interpretations, phases (exercise/setup/finish), cues and actual sample timestamps.
+It never overwrites numeric rep counts, angles or scores. Both apps/schemas/types must move
+together. See docs/AI_COACH.md and apps/api/GYM_EXERCISES.md. GPT-5.4 development checks identify
+the changed pulldown's torso rocking and support a seven-rep incline chat breakdown. Camera
+ambiguity and possible model mistakes remain; citations are not proof of visual accuracy.
+Original incline side2 counts 7 including initial lift; original good pulldown 6; bad pulldown
+5/6 remains incomplete. Gym phase grace is 200 ms without inferred samples; press tolerance
+145°, minimum completion spacing 1,200 ms. Gym extraction can select a clearly larger person;
+ambiguous people remain unknown. Push-up policy/geometric regression outputs are unchanged.
+550 backend/55 frontend tests and lint/format/contracts/types/build pass. Browser automation
+is unavailable; manually refresh and reanalyze to obtain the new review. Older checkpoints
+below describe the numeric-only coach and prior gym counting behavior.
+
+**Gym upload checkpoint (2026-09-27):** A implemented lat pulldown, incline dumbbell bench
+press and cable lateral raise end to end; triceps is removed from the frontend lineup.
+Read apps/api/GYM_EXERCISES.md for exact selected 1080p exports, counter semantics and known
+bad-form/back-view count failures. Selected demo counts are 6/7/7. Lat/lateral reps also report
+raw 2D torso tilt ranges and peak playback markers when the entire interval is visible.
+This is descriptive geometry, not swing/rotation/bad-form classification; incline dumbbell
+contact/elbow tuck remain unassessed. No model training or schema fields were added.
+523 backend / 54 frontend tests and build/type/lint/contract checks pass. Saved push-up
+counts, rep measurements, flags and body-line observations match the previous checkpoint.
+Browser automation could not start; manual gym upload/playback/switching and a physical live
+push-up rehearsal remain open. Significant visual redesign is deferred until that rehearsal.
+Older priorities/checkpoints below are historical where they conflict with this update.
+
+**Independent movement feedback implemented:** read apps/api/MOVEMENT_OBSERVATIONS.md.
+Additive `movementObservations` now describes sustained visible 2D body-line bends outside
+completed reps. Five reviewed intervals on badpushups; original clip counts retained. Results
+show time links and coach cards even with zero reps. These intervals can include setup, are
+not attempt counts, and cannot label hip sag/pike or spinal posture. Both apps/schemas/types
+must be updated together; older strict coach validators reject the additive field.
+
+**Latest feedback checkpoint:** the human reports improved upload/live counting but zero
+completed reps for deliberately changed torso/hip movement. See apps/api/BAD_MOVEMENT_REVIEW.md:
+187/188 elbow samples usable, only one sample reaches the bend zone, so no sustained bend
+qualifies. This is not bad-form recognition. Next priority in docs/NEXT_STEPS.md is descriptive
+movement feedback outside completed reps. Do not force attempts into the completed-rep count.
+Conversation evidence now prioritizes explicit requested rep numbers and recent user context;
+an actual OpenAI request answered rep 12 correctly. Specific form assessment remains missing.
+
+**Newest counting correction:** read apps/api/COUNTING.md. New live JSON reproduced 4 reps
+and IMG_6943 upload 5. Counter v2 uses a 150° return zone and 60 ms raw dwell plus median
+confirmation, collecting overlapping phase evidence together. Outputs: live JSON 5, IMG_6943
+19; original five clips retain 3/1/1/2/4. Human reported 20; nineteen video cycle pairs were
+reviewed, twentieth unestablished. Boundaries/measurements change; schemas do not. Squat
+behavior is unchanged. Keep captures ignored and verify a fresh physical live set.
+
+**Earlier display/UX correction:** live five-rep rehearsal failed (2 detected). A browser stale-display bug
+could emit a false missing-pose sample before a valid frame. Fixed display/input separation;
+no thresholds changed. New private capture download enables actual replay. Short conversational
+coaching and simpler results replace the verbose panel. A fresh physical count is still required.
+See docs/LIVE_REHEARSAL_FIX.md for the checks and remaining evidence.
+
+**Previous integration:** PR #4 merged; 399 backend and 49 frontend tests, contracts, lint,
 types and production build pass. Actual IMG_6942 browser upload/coaching/flag seeking pass;
 simulated camera → actual API count/final/reset/stop pass. Physical webcam rehearsal and
 independent timing validation remain open. Read docs/INTEGRATION_STATUS.md and NEXT_STEPS.md.

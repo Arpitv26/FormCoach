@@ -23,8 +23,8 @@ def test_extrema_use_causal_median_and_ignore_single_frame_spike():
     rep = segment(angles).reps[0]
     assert rep.min_angle_deg == 90
     assert rep.max_angle_deg == 170
-    assert rep.angle_measurement_start_ms == 800
-    assert (rep.start_ms, rep.bottom_ms, rep.end_ms) == (600, 1100, 2300)
+    assert rep.angle_measurement_start_ms == 600
+    assert (rep.start_ms, rep.bottom_ms, rep.end_ms) == (500, 1100, 2100)
 
 
 def test_each_rep_has_its_own_range_and_later_top_pause_cannot_change_it(client):
@@ -48,19 +48,19 @@ def test_timing_uses_source_milliseconds_not_frame_count(client):
         frame["timestampMs"] = timestamp
     rep = analyze(client, request).reps[0]
     m = rep.measurements
-    assert m["durationMs"] == timestamps[23] - timestamps[6]
-    assert m["timeToMinElbowAngleMs"] == timestamps[11] - timestamps[6]
-    assert m["timeFromMinElbowAngleMs"] == timestamps[23] - timestamps[11]
+    assert m["durationMs"] == timestamps[21] - timestamps[5]
+    assert m["timeToMinElbowAngleMs"] == timestamps[11] - timestamps[5]
+    assert m["timeFromMinElbowAngleMs"] == timestamps[21] - timestamps[11]
     assert m["timeToMinElbowAngleMs"] + m["timeFromMinElbowAngleMs"] == m["durationMs"]
-    assert m["angleMeasurementStartMs"] == timestamps[8]
+    assert m["angleMeasurementStartMs"] == timestamps[6]
 
 
 def test_bottom_plateau_uses_first_minimum_and_does_not_claim_phase_durations(client):
     request = pushup_request(STANDING + [140] * 5 + [90] * 10 + [130] * 5 + STANDING, final=True)
     result = analyze(client, request)
     m = result.reps[0].measurements
-    assert m["timeToMinElbowAngleMs"] == 500
-    assert m["timeFromMinElbowAngleMs"] == 1700  # Includes the bottom pause.
+    assert m["timeToMinElbowAngleMs"] == 600
+    assert m["timeFromMinElbowAngleMs"] == 1500  # Includes the bottom pause.
     assert result.reps[0].key_moments[0].timestamp_ms == 1100
     assert any("includes pauses" in message for message in result.limitations)
     assert all(value is None for value in result.reps[0].metrics.model_dump().values())

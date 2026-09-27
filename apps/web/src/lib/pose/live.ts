@@ -33,6 +33,7 @@ export function startLivePose(
   onFrame: (frame: PoseFrame | null, capturedAt?: number) => void,
   onStatus: (status: TrackingStatus) => void,
   load: () => Promise<PoseDetector> = loadPoseDetector,
+  onDisplayGap: () => void = () => {},
 ) {
   let stopped = false, detector: PoseDetector | null = null, animation = 0;
   let lastInference = -Infinity, lastVideoTime = -1, frameIndex = 0;
@@ -47,7 +48,9 @@ export function startLivePose(
   };
   const tick = (now: number) => {
     if (stopped || !detector) return;
-    if (document.hidden || video.readyState < 2 || video.paused || now - lastInference > 300) onFrame(null);
+    // A stale display is not a failed pose observation. Preserve the next real frame.
+    // The backend already detects elapsed timestamp gaps.
+    if (document.hidden || video.readyState < 2 || video.paused || now - lastInference > 300) onDisplayGap();
     if (!document.hidden && !video.paused && video.readyState >= 2 && video.currentTime !== lastVideoTime && now - lastInference >= 100) {
       try {
         const result = detector.detectForVideo(video, now);

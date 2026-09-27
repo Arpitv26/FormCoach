@@ -86,6 +86,25 @@
               "type": "null"
             }
           ]
+        },
+        "movementObservations": {
+          "items": {
+            "$ref": "#/$defs/MovementObservation"
+          },
+          "maxItems": 240,
+          "title": "Movementobservations",
+          "type": "array"
+        },
+        "visualReview": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VisualReview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -177,6 +196,23 @@
           ],
           "default": null,
           "title": "Question"
+        },
+        "responseStyle": {
+          "default": "evidence",
+          "enum": [
+            "evidence",
+            "conversation"
+          ],
+          "title": "Responsestyle",
+          "type": "string"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/$defs/CoachTurn"
+          },
+          "maxItems": 12,
+          "title": "History",
+          "type": "array"
         }
       },
       "required": [
@@ -244,6 +280,31 @@
         "limitations"
       ],
       "title": "CoachResponse",
+      "type": "object"
+    },
+    "CoachTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "user",
+            "assistant"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "content": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "CoachTurn",
       "type": "object"
     },
     "ErrorDetail": {
@@ -496,6 +557,83 @@
         "imageHeight"
       ],
       "title": "LiveBatchRequest",
+      "type": "object"
+    },
+    "MovementObservation": {
+      "additionalProperties": false,
+      "description": "A descriptive interval independent of completed reps; policy v1, not a grade.",
+      "properties": {
+        "code": {
+          "const": "PUSHUP_BODY_LINE_BEND",
+          "title": "Code",
+          "type": "string"
+        },
+        "ruleVersion": {
+          "const": "1.0",
+          "title": "Ruleversion",
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "startMs": {
+          "minimum": 0,
+          "title": "Startms",
+          "type": "integer"
+        },
+        "endMs": {
+          "minimum": 0,
+          "title": "Endms",
+          "type": "integer"
+        },
+        "sampleCount": {
+          "maximum": 1800,
+          "minimum": 3,
+          "title": "Samplecount",
+          "type": "integer"
+        },
+        "minAngleDeg": {
+          "exclusiveMaximum": 150,
+          "minimum": 0,
+          "title": "Minangledeg",
+          "type": "number"
+        },
+        "medianAngleDeg": {
+          "exclusiveMaximum": 150,
+          "minimum": 0,
+          "title": "Medianangledeg",
+          "type": "number"
+        },
+        "maxAngleDeg": {
+          "exclusiveMaximum": 150,
+          "minimum": 0,
+          "title": "Maxangledeg",
+          "type": "number"
+        },
+        "thresholdAngleDeg": {
+          "const": 150,
+          "title": "Thresholdangledeg",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "code",
+        "ruleVersion",
+        "side",
+        "startMs",
+        "endMs",
+        "sampleCount",
+        "minAngleDeg",
+        "medianAngleDeg",
+        "maxAngleDeg",
+        "thresholdAngleDeg"
+      ],
+      "title": "MovementObservation",
       "type": "object"
     },
     "PoseFrame": {
@@ -1058,6 +1196,116 @@
         "poseTrack"
       ],
       "title": "VideoAnalysisResponse",
+      "type": "object"
+    },
+    "VisualFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "adjustment",
+            "positive",
+            "observation"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "phase": {
+          "default": "exercise",
+          "enum": [
+            "exercise",
+            "setup",
+            "finish"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "observation": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Observation",
+          "type": "string"
+        },
+        "cue": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Cue",
+          "type": "string"
+        },
+        "evidenceTimestampsMs": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 8,
+          "minItems": 2,
+          "title": "Evidencetimestampsms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "observation",
+        "cue",
+        "evidenceTimestampsMs"
+      ],
+      "title": "VisualFinding",
+      "type": "object"
+    },
+    "VisualReview": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "unavailable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "const": "openai_sampled_frames",
+          "default": "openai_sampled_frames",
+          "title": "Source",
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 100,
+          "title": "Model",
+          "type": "string"
+        },
+        "sampledTimestampsMs": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 64,
+          "title": "Sampledtimestampsms",
+          "type": "array"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/VisualFinding"
+          },
+          "maxItems": 8,
+          "title": "Findings",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "model",
+        "sampledTimestampsMs",
+        "findings",
+        "limitations"
+      ],
+      "title": "VisualReview",
       "type": "object"
     }
   },

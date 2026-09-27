@@ -67,7 +67,7 @@ def test_upload_preserves_measured_response_and_uses_unique_sessions(client, upl
     assert result.exercise.id == "push-up" and result.exercise.confidence is None
     assert result.provenance.kind == "measured"
     assert result.summary.overall_score is None and result.reps[0].score is None
-    assert result.reps[0].start_ms == 600 and result.reps[0].end_ms == 2300
+    assert result.reps[0].start_ms == 500 and result.reps[0].end_ms == 2100
     assert result.reps[0].measurements["minSmoothedLeftElbowAngleDeg"] == 90
     assert not result.issues
     assert state.paths[0].name == "input.mov"
@@ -282,3 +282,34 @@ def test_overlay_error_closes_spool_and_releases_gate(upload_service):
     assert upload.file.closed
     assert processor._gate.acquire(blocking=False)
     processor._gate.release()
+
+
+def test_visual_review_uses_ephemeral_frames_and_cleanup_without_changing_count(
+    client, upload_service
+):
+    from app.domain.visual_review import VisualReview
+
+    processor, state = upload_service
+    state.sequence.visual_frames.extend([(0, "private-image"), (1000, "private-image-2")])
+    calls = []
+
+    class Reviewer:
+        def review(self, path, analysis, frames):
+            assert path.exists() and analysis.summary.total_reps == 1
+            assert frames == state.sequence.visual_frames
+            calls.append(path)
+            return VisualReview(
+                status="unavailable",
+                model="test",
+                sampled_timestamps_ms=[0, 1000],
+                findings=[],
+                limitations=["Test failure preserves measurements."],
+            )
+
+    processor.visual_reviewer = Reviewer()
+    result = post(client)
+    assert result.status_code == 200
+    assert result.json()["summary"]["totalReps"] == 1
+    assert result.json()["visualReview"]["status"] == "unavailable"
+    assert "private-image" not in result.text and len(calls) == 1
+    assert not calls[0].exists()

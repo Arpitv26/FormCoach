@@ -20,7 +20,7 @@ def test_checked_in_example_is_explicitly_synthetic_and_replays(client):
     report = replay_live.replay_capture(capture, transport(client), expected_reps=1)
     assert report["outcome"] == "count_match"
     rep = report["analysis"]["reps"][0]
-    assert (rep["startMs"], rep["endMs"]) == (600, 2300)
+    assert (rep["startMs"], rep["endMs"]) == (500, 2100)
     assert rep["keyMoments"][0]["timestampMs"] == 1100
     assert rep["measurements"]["minSmoothedLeftElbowAngleDeg"] == pytest.approx(90)
 

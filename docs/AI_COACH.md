@@ -1,10 +1,139 @@
-# Evidence-only coach
+# AI coach
 
 `POST /api/v1/coach` keeps the v1.0 request/response shape. It accepts an analysis and
-`summary`, `next_set`, or `qa` (nonblank question required for QA). It is stateless.
-No raw video or pose frames go to OpenAI. Computer A owns the implementation.
+`summary`, `next_set`, or `qa` (nonblank question required for QA). The server is stateless.
+The current UI requests `responseStyle: "conversation"` and sends bounded recent history.
+Omitting that field preserves the original `evidence` behavior described below.
+Computer A owns the implementation. Optional upload visual review now sends sampled JPEG
+frames to OpenAI, then attaches its findings to the analysis. Chat receives those findings
+and numeric evidence, not the images again. Live capture remains numeric evidence only.
 
-## Current implementation
+## Uploaded-video visual review
+
+The human explicitly requested visual analysis after the numeric-only coach could not
+identify obvious torso rocking. Enable with backend-only `VISUAL_REVIEW_ENABLED=true`,
+`COACH_PROVIDER=openai` and `OPENAI_API_KEY`. `OPENAI_VISION_MODEL` defaults to
+`gpt-5.4-2026-03-05`; Computer A also uses that snapshot for `OPENAI_MODEL`. Legacy chat's
+default remains `gpt-4.1-mini-2025-04-14`. No keys or images enter frontend environment variables.
+
+One native decode collects upright JPEGs no faster than 2 fps, then evenly retains at most
+64 spanning the clip (960 px long edge, JPEG quality 80). A separate Responses request uses
+image inputs, structured output, `store=False`, zero retries, an 80-second SDK deadline and
+an 8,000-token cap; GPT-5.4 review uses medium reasoning. No new database or stored images.
+User filenames and their GoodForm/BadForm labels are not sent to the model. The upload UI
+discloses the sampled-frame request. Provider retention is governed by the account's terms;
+`store=False` is not a zero-retention promise.
+
+The visual-review prompt requests everyday language for gym beginners: explain what moved
+and give a distinct practical cue, avoiding unexplained gym jargon. The grouped overview
+shows both the original observation and its labeled cue; supporting technical details remain
+in the bottom disclosure. Existing saved observations are not rewritten.
+
+Findings identify an observation, an actionable cue, exercise/setup/finish phase and exact
+sample references. Server code maps frame indices to timestamps and rejects invented
+references. Results and chat label these as AI interpretation, separate from measured
+angles/counts. Neither structured output nor correct citations proves visual accuracy.
+The model must distinguish setup from working reps and avoid invented elbow tuck, forces,
+muscle activation, injury risk and universal angle targets. Visual failures preserve measured
+results and return `visualReview.status=unavailable`; disabled review is null.
+
+GPT-5.4 development checks on press and normal/changed pulldown footage returned completed
+reviews. The changed pulldown identified repeated torso recline/return and supplied a
+steadier-lean cue, which a subsequent real chat used. Earlier GPT-4.1 drafts overinterpreted
+setup/elbow position; those were not accepted as verified technique findings. This is a
+small development check, not general visual coaching validation. Review timestamped claims.
+
+### Follow-up: similar criticism on normal and exaggerated pulldowns
+
+The human's browser rehearsal exposed overcorrection: the normal clip also received the
+torso-rocking cue and an unsupported shortened-return claim. Inspection found no cross-clip
+cache or filename-based answer selection. However, the original visual prompt explicitly
+directed attention to torso rocking, supplied that wording as an example, and prioritized
+1–3 adjustments. That was a leading instruction and inadequate visual validation.
+
+The revised prompt has no example fault to imitate or correction quota. It assesses both
+within-cycle movement and consistency across cycles, considers visible magnitude and
+counterevidence, and permits positive/neutral findings with no correction. Missing a turning
+point in <=2 fps samples cannot establish shortened range. Ordinary setup/finish transitions
+are not defects. Chat must preserve an observation's magnitude/kind instead of escalating
+slight motion into a fault. No exercise thresholds, counts, models or contracts changed.
+
+Two repeated unlabeled reviews per clip on the 1080p images with original measurements
+distinguished the normal set (consistent positions, slight/neutral motion) from the changed
+set (larger within-pull recline and a correction). An earlier neutral draft undercalled one
+changed-set review by confusing repeatable endpoints with steadiness within each rep; the
+final prompt addresses that distinction. This remains development tuning on two clips,
+not independent form-classification accuracy. New unit checks verify renaming GoodForm to
+BadForm leaves provider input unchanged, different image content changes that input, and
+replacing a completed upload clears its visual findings even with an identical filename.
+
+Fresh original-file HTTP tests also deliberately swapped the multipart filename labels:
+normal footage submitted as `BadForm.mov` returned 6 reps and positive/neutral findings with
+no adjustment; changed footage submitted as `GoodForm.mov` returned 5 reps and an adjustment
+for noticeable within-pull recline. No local recording was renamed. A real normal-set chat
+summary preserved the small-motion description and did not repeat the shortened-return
+claim. 550 backend/56 frontend tests, lint/format and TypeScript pass. These original uploads
+and four repeated reviews are a small development evaluation, not a general accuracy claim.
+
+**Latest addition:** independent `movementObservations` now supplies up to six timestamped
+body-line bend cards, including zero-count and count-unavailable results. The model may explain
+the observed shoulder–hip–ankle bend, not infer sag/pike, spinal posture, attempt count or the
+reason reps failed to count. These may include setup. Local summaries and count-dispute replies
+also mention an available interval. The full list remains visible in results. Existing
+per-rep body-line medians retain their stricter rep-window availability rules.
+
+One actual OpenAI HTTP check on the new badpushups analysis described a bend around 4.87–5.60 s
+and cited that interval's measurements. This is one reviewed reply, not general QA validation.
+
+## Conversation style (current UI)
+
+The user asked for a friendly chatbot that explains their set and understands follow-ups.
+`conversation_coach.py` now uses Responses structured output for short model-authored replies,
+with reviewed numeric evidence cards and up to 12 user/assistant messages (2,000 characters
+per message). The browser retains only the last six successful exchanges in memory. A new
+set or reload clears them; no database or OpenAI conversation object is created.
+
+- Usually 2–4 sentences; explicit rep breakdowns can be up to 900 words. Validation permits
+  up to 1,000 words for QA and 200 for summary/next-set; the former 120-word rejection was
+  unsuitable for detailed requests.
+- Answers can explain measured differences or offer clearly general camera/pacing guidance.
+- Conversation evidence prioritizes rep numbers in the current question, then recent user
+  questions, before generic highlights. This keeps later reps (for example rep 12 of 19)
+  available for direct questions and follow-ups within the six-rep input budget. Explicit
+  numeric references such as `rep 12` or `reps 12 and 13` are supported. Questions containing
+  each/every/all/breakdown/whole expand the input budget to 30 reps; otherwise six. This is
+  bounded text matching, not full natural-language retrieval.
+- Greetings should get a natural greeting, not another set summary. Zero counted reps means
+  no completed cycles met the counting rules; it does not establish no movement, bad form,
+  or camera failure. Specific visible technique claims require attached visual findings.
+- User-reported reps and holds remain reports. Chat has measurements and any attached visual
+  findings, not a continuous video stream.
+- No invented form findings, scores, fatigue diagnosis, injury prediction or treatment.
+- Structured output validates shape; known evidence IDs validate references. **Neither proves
+  that every sentence is correct.** Model wording can be mistaken. Keep reviewing real replies.
+- A targeted live evaluation exposed unsupported explanations of missed counts. Recognized
+  count disputes and hold follow-ups now use brief local troubleshooting guidance, with no
+  paid call, because completed-rep summaries cannot establish why unobserved reps were missed.
+  This narrow text matcher is not a general semantic safety guarantee.
+- Other questions use the configured OpenAI provider. Local free-form QA remains unavailable;
+  failed calls say so. Local summaries and next-set camera guidance stay usable without a key.
+- The response schema is unchanged. `provider: fallback` honestly identifies local guidance;
+  `provider: openai` identifies generated wording. Evidence and brief limitations are expandable
+  beside each message; the full analysis limitations remain in the results accordion.
+- 35-second SDK timeout, 40-second overall deadline, zero retries, 3,500 output-token cap.
+  Frontend chat waits 50 seconds; upload waits 300 seconds for pose plus visual processing.
+  Placeholder analyses skip the provider. Calls happen only after a user action.
+- Chat receives numeric and optional visual evidence cards, status/provenance, mode/question and recent text
+  history. No video, raw landmarks, session ID, arbitrary analysis headlines or API key are
+  included in the prompt. Questions/history can contain personal information. `store=False`
+  does not promise zero retention.
+
+Both styles use the backend provider/key/model settings in COACH_SETUP.md. Update the API
+before using the new frontend: old strict v1 validators reject the additive request fields.
+See the [conversation-state guide](https://developers.openai.com/api/docs/guides/conversation-state)
+and [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
+
+## Evidence style (legacy default)
 
 1. `apps/api/app/services/coach_evidence.py` builds reviewed statements from numeric fields.
    It can describe a supplied score, completed count, push-up timestamps, observed elbow
@@ -53,7 +182,7 @@ irrelevant statement cannot introduce new wording or findings.
 - Analysis/camera limitations are preserved as input text. Render all text as plain text,
   never injected HTML, and do not treat limitations as model-generated coaching.
 
-## Configuration and failures
+## Legacy evidence-style configuration and failures
 
 Default `COACH_PROVIDER=fallback` makes no paid calls, even if a key is present.
 Optional setup requires **both** `COACH_PROVIDER=openai` and a backend-only API key,
@@ -73,6 +202,15 @@ statements, mode, and (for QA) the user's question are sent; no session ID, anal
 video, or landmarks. Questions themselves may contain user-entered personal information.
 
 ## Validation checkpoint
+
+- Conversation retrieval follow-up (2026-09-26): 428 backend tests pass. Requested later reps,
+  follow-up context, nonexistent rep references and a zero-result greeting have regression
+  tests. One actual HTTP request using the saved IMG_6943 analysis asked for rep 12's duration:
+  `provider: openai`, reply “Rep 12 took 1.14 seconds from start to finish, including pauses.”
+  Returned evidence references the matching rep's numeric fields. This verifies the configured
+  provider and that one answer; it does not prove general conversational or form accuracy.
+  Prompt instructions now explicitly distinguish unassessed form from absent faults and
+  avoid turning every zero-result reply into a request for another recording.
 
 - Timing v2: local next-set feedback for IMG_6942 prioritizes the new rep-3 review issue and
   explains 3.07 s versus the preceding median 1.57 s (+1.50 s). Evidence paths resolve to

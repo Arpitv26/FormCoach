@@ -1,5 +1,14 @@
 # Demo plan
 
+## Current direction — September 27, 2026
+
+The demo is **live push-ups plus uploaded incline dumbbell bench press, cable lateral raise
+and lat pulldown**; triceps is removed. A owns both apps. Fourteen private gym clips are now
+available. Lat pulldown and incline press upload checkpoints are implemented; lateral raise
+is still being reviewed. See [gym exercise evidence](../apps/api/GYM_EXERCISES.md).
+The earlier plan below is historical where it conflicts with this direction.
+
+
 **Updated user direction: prerecorded push-ups, no squat demo.** Reliability on the actual
 gym clip matters more than live camera tracking or implementing many exercises. Computer B
 is finishing coach interactions, comparisons, live counting and verification. Computer A

@@ -28,8 +28,15 @@ class AngleCycleConfig:
     maximum_rep_ms: int = 15_000
     maximum_gap_ms: int = 300
     smoothing_window: int = 3
+    independent_phase_confirmation: bool = False
+    maximum_missing_ms: int = 0
 
     def __post_init__(self) -> None:
+        if (
+            type(self.maximum_missing_ms) is not int
+            or not 0 <= self.maximum_missing_ms <= self.maximum_gap_ms
+        ):
+            raise ValueError("Missing-data grace must be within the maximum gap")
         angles = (self.flexed_angle_deg, self.extended_angle_deg, self.hysteresis_deg)
         if not all(isfinite(value) for value in angles) or not (
             0
@@ -68,6 +75,7 @@ class _AngleCycleCounter:
         self.window: deque[float] = deque(maxlen=config.smoothing_window)
         self.last_angle: float | None = None
         self.previous_timestamp: int | None = None
+        self.last_usable_timestamp: int | None = None
         self.tracking_breaks = 0
         self.candidate: MovementPhase | None = None
         self.candidate_since = 0
@@ -76,6 +84,7 @@ class _AngleCycleCounter:
         self.min_angle = 180.0
         self.max_angle = 0.0
         self.angle_measurement_start_ms = 0
+        self.zone_since: dict[MovementPhase, int] = {}
 
     def _reset(self) -> None:
         self.phase = "unknown"
@@ -83,12 +92,29 @@ class _AngleCycleCounter:
         self.last_angle = None
         self.candidate = None
         self.start_ms = None
+        self.zone_since.clear()
 
     def update(self, sample: AngleSample) -> None:
         timestamp = sample.timestamp_ms
+        grace = self.config.maximum_missing_ms
+        missing_gap = (
+            self.last_usable_timestamp is not None
+            and timestamp - self.last_usable_timestamp > grace
+        )
+        if sample.angle_deg is None and grace and not missing_gap:
+            if self.window:
+                self.tracking_breaks += 1
+            self.window.clear()
+            self.zone_since.clear()
+            self.candidate = None
+            self.last_angle = None
+            self.previous_timestamp = timestamp
+            return
         gap = self.previous_timestamp is not None and (
             timestamp - self.previous_timestamp > self.config.maximum_gap_ms
         )
+        if grace and not self.window and self.last_usable_timestamp is not None and missing_gap:
+            gap = True
         if gap:
             if self.window:
                 self.tracking_breaks += 1
@@ -99,6 +125,7 @@ class _AngleCycleCounter:
                 self.tracking_breaks += 1
             self._reset()
             return
+        self.last_usable_timestamp = timestamp
 
         if self.start_ms is not None and timestamp - self.start_ms > self.config.maximum_rep_ms:
             self._reset()
@@ -113,6 +140,10 @@ class _AngleCycleCounter:
         if self.start_ms is not None:
             self.max_angle = max(self.max_angle, self.last_angle)
 
+        if self.config.independent_phase_confirmation:
+            self._confirm_observed_zones(timestamp, sample.angle_deg)
+            return
+
         target = self._target(self.last_angle)
         if target is None:
             self.candidate = None
@@ -122,11 +153,41 @@ class _AngleCycleCounter:
             self.candidate_since = timestamp
         elif timestamp - self.candidate_since >= self.config.minimum_phase_ms:
             self._transition(target, timestamp)
-            # This same observation may already satisfy the next phase's threshold
-            # (e.g. the arm is extended when ascent is confirmed). Start its dwell
-            # now; waiting for another frame adds a needless sample of latency.
+            # Reuse this observation when the next phase already meets its threshold.
             self.candidate = self._target(self.last_angle)
             self.candidate_since = timestamp
+
+    def _confirm_observed_zones(self, timestamp: int, observed_angle: float) -> None:
+        """Observe overlapping zones together, without stacking artificial pauses.
+
+        An extended arm also supplies ascent evidence; a flexed arm also supplies
+        descent evidence. Confirming one phase must not throw away that evidence
+        and restart the next phase's clock. Dwell uses consecutive raw observations;
+        the median must ALSO meet the threshold, without another dwell on that delayed
+        signal. This rejects an isolated spike without requiring a pause at each turn.
+        """
+        angle, config = self.last_angle, self.config
+        zones = {
+            "extended": observed_angle >= config.extended_angle_deg,
+            "descent": observed_angle <= config.extended_angle_deg - config.hysteresis_deg,
+            "bottom": observed_angle <= config.flexed_angle_deg,
+            "ascent": observed_angle >= config.flexed_angle_deg + config.hysteresis_deg,
+        }
+        for zone, observed in zones.items():
+            if observed:
+                self.zone_since.setdefault(zone, timestamp)
+            else:
+                self.zone_since.pop(zone, None)
+        # At most descent→bottom or ascent→extended can be confirmed together.
+        for _ in range(2):
+            target = self._target(angle)
+            self.candidate = target
+            if target not in self.zone_since:
+                return
+            self.candidate_since = self.zone_since[target]
+            if timestamp - self.candidate_since < config.minimum_phase_ms:
+                return
+            self._transition(target, timestamp)
 
     def _target(self, angle: float) -> MovementPhase | None:
         config = self.config
@@ -178,13 +239,15 @@ def segment_angle_cycles(
 ) -> SegmentationResult:
     """Replay a whole cumulative set. Return completed reps; never finalize a partial rep.
 
-    Use one anatomical side throughout the set. Any unavailable angle resets readiness
-    and the unfinished rep. A gap over maximum_gap_ms does the same. After either, stable
+    Use one anatomical side throughout the set. An unavailable angle resets readiness
+    unless the profile enables bounded grace; grace never fills median/dwell evidence.
+    A gap over maximum_gap_ms resets the unfinished rep. After a reset, stable
     extension must be observed again. Completed reps survive these resets.
 
-    Boundaries use observed timestamps of the causal smoothed signal: start is the first
-    sample of a confirmed descent; end confirms extension; bottom is the earliest observed
-    minimum after descent confirmation. Angle extrema cover that confirmation through
+    Start is the first observation in a confirmed descent zone; end confirms extension;
+    bottom is the earliest smoothed minimum after descent confirmation. With independent
+    confirmation, zones use raw observations and the median must also pass. Legacy mode
+    confirms the smoothed signal sequentially. Extrema cover descent confirmation through
     completion, inclusive. Smoothing/confirmation add latency. No interpolation.
     """
     for previous, current in zip(samples, samples[1:], strict=False):

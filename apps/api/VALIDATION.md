@@ -1,5 +1,10 @@
 # Recorded push-up validation — September 26, 2026
 
+**Newest correction:** [COUNTING.md](COUNTING.md) documents the later failed live capture
+and IMG_6943: 4→5 and 5→19 after counter v2. Earlier clips retain 3/1/1/2/4 counts, with
+changed timing boundaries. The human-reported twentieth rep and fresh live accuracy remain
+unverified. The earlier checkpoints below describe their original policies and timestamps.
+
 **Latest fifth clip:** [IMG_6942 review](REVIEW_6942.md): 4/4 counted, slow-third/fast-fourth
 pattern visible, but the expected timing flag was withheld by reference-stability gating.
 The original four-clip checks below remain historical baseline evidence.

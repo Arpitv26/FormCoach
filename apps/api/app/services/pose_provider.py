@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
@@ -11,6 +11,7 @@ class PoseSequence:
     image_width: int
     image_height: int
     duration_ms: int
+    visual_frames: list[tuple[int, str]] = field(default_factory=list, repr=False)
 
 
 class PoseProvider(Protocol):

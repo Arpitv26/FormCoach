@@ -30,7 +30,11 @@ apps/web/public/pose/
 *.webm
 uploads/
 artifacts/
+formcoach-live-*.json
 *.log
 .DS_Store
 .idea/
 .vscode/
+
+# User-approved public hero footage; private analysis recordings stay ignored.
+!apps/web/public/media/training-hero.mp4

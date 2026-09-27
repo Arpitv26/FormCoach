@@ -24,8 +24,21 @@ logger = logging.getLogger(__name__)
 
 @lru_cache
 def get_video_processor() -> VideoProcessor:
+    from app.services.visual_review import OpenAIVisualReviewer
+
+    settings = get_settings()
+    review_enabled = bool(
+        settings.visual_review_enabled
+        and settings.coach_provider == "openai"
+        and settings.openai_api_key.strip()
+    )
     return UploadedVideoProcessor(
-        MediaPipePoseProvider(get_settings().pose_model_path), RuleBasedAnalyzer()
+        MediaPipePoseProvider(settings.pose_model_path, include_visual_frames=review_enabled),
+        RuleBasedAnalyzer(),
+        OpenAIVisualReviewer(settings) if review_enabled else None,
+        gym_provider=MediaPipePoseProvider(
+            settings.pose_model_path, include_visual_frames=review_enabled, allow_dominant_pose=True
+        ),
     )
 
 

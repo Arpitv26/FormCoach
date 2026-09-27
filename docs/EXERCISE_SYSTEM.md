@@ -70,6 +70,11 @@ user selection is the reliable starting point.
 
 ## Implemented push-up review rules
 
+Counting policy v2 is documented in [COUNTING.md](../apps/api/COUNTING.md): 150° return,
+100° bend, 60 ms raw confirmation plus median checks and shared phase evidence. These
+are movement-counting heuristics. Existing squat thresholds and comparison rules are unchanged;
+new rep boundaries can change the measurements supplied to those comparisons.
+
 The push-up profile now configures two descriptive comparison rules and their heuristic
 thresholds. `pushup_comparisons.py` compares each completed rep with its two predecessors,
 gates continuous tracking, checks timing changes against BOTH preceding durations (policy v2),

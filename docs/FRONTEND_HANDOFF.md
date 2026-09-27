@@ -1,5 +1,72 @@
 # Frontend handoff — Computer A after B’s PR #4
 
+## Latest: charcoal / lime + integrated motion
+
+Read [UI_MOTION_REDESIGN.md](UI_MOTION_REDESIGN.md). The user explicitly changed the visual
+direction. React Bits and Magic UI sources are now integrated, with licenses and a shared
+Motion engine, responsive activity charts and reduced-motion support. Playwright use was
+approved and browser validation now works. Earlier light-theme and browser-blocker notes
+below are historical.
+
+## September 27: Dashboard / Upload / Live implementation
+
+Read [UI_IMPLEMENTATION.md](UI_IMPLEMENTATION.md) for the new shared design, tabbed review,
+device-local workout log, reanalysis/duplicate prevention and validation. Install the updated
+lockfile with `npm ci` in `apps/web`. The camera/upload/coach controllers and API contracts
+remain intact. Cross-set trends are withheld because analyzer revisions are not reported.
+The earlier sections below record historical checkpoints; browser QA is still pending because
+computer use cannot start. Do not treat DOM interaction tests as visual or camera validation.
+
+## September 27: gym upload and visual-review integration
+
+A owns both apps. Integrate the full current backend-cv checkpoint, including contracts and
+generated types: optional/default-null `visualReview` is posted back to coach, and older
+strict servers reject it. Results show explicitly AI-authored observations/cues, phase labels
+and sampled-frame seek links. Images stay out of response JSON. Chat gets visual findings
+plus numeric evidence/history; detailed questions can request all available rep breakdowns.
+Timeouts are now upload 300 s, coach 50 s, health/live 15 s. Refresh and analyze again to get
+visual findings; old results cannot acquire them automatically. See API_CONTRACT.md and
+AI_COACH.md. Native HTTP and actual OpenAI calls pass; browser seek/render verification
+remains manual because the computer-use service cannot start.
+
+## Latest follow-up: movement feedback even without completed reps
+
+A has added optional/default-empty `movementObservations` to AnalysisResponse with matching
+schemas/types. Update the backend and frontend together; old strict coach endpoints reject
+the new field. `MovementObservations` renders the new “Your body line bent here” section
+before the coach, with existing upload seek callbacks or plain time labels for live results.
+Zero-rep results hide empty rep charts/details/comparisons. Synthetic seek restrictions remain.
+Old responses still render; absence is not evidence of good form.
+
+Each interval describes estimated shoulder–hip–ankle geometry, possibly during setup. Never
+label the number of intervals as bad reps, attempts or a form score. No sag/pike distinction.
+Coach replies now receive independent interval evidence too. See API_CONTRACT.md and
+apps/api/MOVEMENT_OBSERVATIONS.md for timing, availability and validation.
+
+## Latest follow-up: push-up counting policy v2
+
+Read [COUNTING.md](../apps/api/COUNTING.md). The saved live request improves 4→5 and the
+new uploaded recording 5→19; the reported twentieth rep remains unestablished. Earlier
+five clips retain 3/1/1/2/4. No frontend, schema or API-shape changes are needed. New timing
+boundaries affect displayed measurements/comparisons. Existing results must be analyzed
+again; do not display an old response as a test of v2. A fresh live-camera check is pending.
+
+## Earlier follow-up: live rehearsal and chat flow
+
+PR #5 is merged at main `7f44566`; A owns the frontend after B's handoff.
+The physical rehearsal failed: five human-counted push-ups, two detected; the fourth included
+an approximately seven-second hold. The exact raw samples were not retained by that version.
+A stale browser display path could emit a false missing-pose observation. Display gaps now
+clear only the overlay; genuine missing poses and timestamp gaps still reach the analyzer.
+No rep thresholds changed. New final-set downloads retain exact sampled poses for private replay.
+
+The updated UI has one active-set control group, hides setup after finishing, releases the
+camera, and shows summary → short coach chat → charts → expandable details. Coach requests
+add `responseStyle: conversation` and at most 12 history messages; update both apps together.
+Read [LIVE_REHEARSAL_FIX.md](LIVE_REHEARSAL_FIX.md) for checks and the next manual test.
+Previous checkpoint sections below are historical and do not override this failed rehearsal.
+
+
 **Current checkpoint: 2026-09-26, PR #4 reviewed and merged (`767a98b`).**
 Read this file and AGENTS.md before continuing. This replaces the old bootstrap handoff.
 The demo is **prerecorded push-ups**. Squat JSON is a legacy fixture, not the demo.

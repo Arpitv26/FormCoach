@@ -10,6 +10,7 @@ from fastapi import UploadFile
 
 from app.analysis.exercises.registry import PROFILES
 from app.analysis.interfaces import MovementAnalyzer
+from app.analysis.movement import MOVEMENTS
 from app.domain.analysis import AnalysisResponse, Source
 from app.domain.video import PoseTrack, VideoAnalysisResponse
 from app.services.mediapipe_pose import MAX_VIDEO_BYTES
@@ -34,9 +35,17 @@ class VideoProcessor(Protocol):
 
 
 class UploadedVideoProcessor:
-    def __init__(self, provider: PoseProvider, analyzer: MovementAnalyzer) -> None:
+    def __init__(
+        self,
+        provider: PoseProvider,
+        analyzer: MovementAnalyzer,
+        visual_reviewer=None,
+        gym_provider: PoseProvider | None = None,
+    ) -> None:
         self.provider = provider
         self.analyzer = analyzer
+        self.visual_reviewer = visual_reviewer
+        self.gym_provider = gym_provider
         # One native extraction per API process; reject overlapping work rather than queue it.
         self._gate = _EXTRACTION_GATE
 
@@ -47,12 +56,14 @@ class UploadedVideoProcessor:
         self, file: UploadFile, exercise_hint: str | None
     ) -> VideoAnalysisResponse:
         if not exercise_hint:
-            raise VideoRequestError(400, "EXERCISE_REQUIRED", "Select push-up before uploading.")
+            raise VideoRequestError(
+                400, "EXERCISE_REQUIRED", "Select an exercise before uploading."
+            )
         if exercise_hint not in PROFILES:
             raise VideoRequestError(400, "UNKNOWN_EXERCISE", "Use a registered exercise ID.")
-        if exercise_hint not in {"push-up", "squat"}:
+        if exercise_hint not in MOVEMENTS:
             raise VideoRequestError(
-                400, "EXERCISE_NOT_SUPPORTED", "Video counting supports push-up and squat only."
+                400, "EXERCISE_NOT_SUPPORTED", "Video counting is not available for this exercise."
             )
         suffix = Path(file.filename or "").suffix.lower()
         if suffix not in {".mp4", ".mov", ".webm"}:
@@ -69,7 +80,15 @@ class UploadedVideoProcessor:
             with TemporaryDirectory(prefix="formcoach-upload-") as directory:
                 path = Path(directory) / f"input{suffix}"
                 self._copy_upload(file, path)
-                sequence = self.provider.extract(path)
+                gym = exercise_hint in {
+                    "incline-dumbbell-bench-press",
+                    "lat-pulldown",
+                    "cable-lateral-raise",
+                }
+                provider = (
+                    self.gym_provider if gym and self.gym_provider is not None else self.provider
+                )
+                sequence = provider.extract(path)
                 result = self.analyzer.analyze(
                     sequence.frames,
                     session_id=str(uuid4()),
@@ -80,9 +99,19 @@ class UploadedVideoProcessor:
                     is_final=True,
                 )
                 result.limitations.append(
-                    "Poses extracted with MediaPipe Pose Landmarker Full. No-pose/multiple-person "
+                    "Poses extracted with MediaPipe Pose Landmarker Full. No-pose/ambiguous-person "
                     "frames are unavailable. Model estimates and rep counts need video review."
                 )
+                if gym and self.gym_provider is not None:
+                    result.limitations.append(
+                        "Gym uploads may select a dominant person when visible landmark area is "
+                        "at least twice that of the other detected person. This is not identity "
+                        "recognition; review the skeleton to confirm the intended person."
+                    )
+                if self.visual_reviewer is not None:
+                    result.visual_review = self.visual_reviewer.review(
+                        path, result, sequence.visual_frames
+                    )
                 return VideoAnalysisResponse(
                     analysis=result,
                     pose_track=PoseTrack(

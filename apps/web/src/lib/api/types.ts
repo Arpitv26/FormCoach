@@ -31,6 +31,11 @@ export interface AnalysisResponse {
   timeline: TimelineEvent[];
   limitations: string[];
   scoring: ScoringInfo | null;
+  /**
+   * @maxItems 240
+   */
+  movementObservations?: MovementObservation[];
+  visualReview?: VisualReview | null;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema
@@ -161,6 +166,60 @@ export interface ScoringInfo {
   };
 }
 /**
+ * A descriptive interval independent of completed reps; policy v1, not a grade.
+ *
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "MovementObservation".
+ */
+export interface MovementObservation {
+  code: "PUSHUP_BODY_LINE_BEND";
+  ruleVersion: "1.0";
+  side: "left" | "right";
+  startMs: number;
+  endMs: number;
+  sampleCount: number;
+  minAngleDeg: number;
+  medianAngleDeg: number;
+  maxAngleDeg: number;
+  thresholdAngleDeg: 150;
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "VisualReview".
+ */
+export interface VisualReview {
+  status: "complete" | "unavailable";
+  source?: "openai_sampled_frames";
+  model: string;
+  /**
+   * @maxItems 64
+   */
+  sampledTimestampsMs: number[];
+  /**
+   * @maxItems 8
+   */
+  findings: VisualFinding[];
+  /**
+   * @maxItems 8
+   */
+  limitations: string[];
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "VisualFinding".
+ */
+export interface VisualFinding {
+  kind: "adjustment" | "positive" | "observation";
+  phase?: "exercise" | "setup" | "finish";
+  observation: string;
+  cue: string;
+  /**
+   * @minItems 2
+   * @maxItems 8
+   */
+  evidenceTimestampsMs: number[];
+}
+/**
  * This interface was referenced by `ApiContract`'s JSON-Schema
  * via the `definition` "VideoAnalysisResponse".
  */
@@ -230,6 +289,19 @@ export interface CoachRequest {
   analysis: AnalysisResponse;
   mode: "summary" | "next_set" | "qa";
   question?: string | null;
+  responseStyle?: "evidence" | "conversation";
+  /**
+   * @maxItems 12
+   */
+  history?: CoachTurn[];
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "CoachTurn".
+ */
+export interface CoachTurn {
+  role: "user" | "assistant";
+  content: string;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema

@@ -1,7 +1,95 @@
 # Remaining work — after backend and overlay integration
 
-Updated 2026-09-26. Main `767a98b` includes PRs #1–#4; backend-cv `ae959a1` combines
-that frontend with the newer backend follow-ups. Those follow-ups still need their PR into main.
+## Current direction — September 27, 2026
+
+**Latest checkpoint: implemented redesign and PR preparation.** Dashboard / Upload / Live
+now share the supplied charcoal, slate, off-white and green palette, React Bits / Magic UI
+motion, and a local looping gym-video hero. Reviewed upload and live sets can be saved in a
+device-local workout log. Overview groups complete AI observations with clear keep/next-time
+cues; technical details live in a bottom disclosure. Rep expansion and trainer chat are
+simplified. Future visual reviews request plain language for beginners.
+
+See [UI_IMPLEMENTATION.md](UI_IMPLEMENTATION.md), [UI_MOTION_REDESIGN.md](UI_MOTION_REDESIGN.md)
+and [design-qa.md](../design-qa.md) for implementation and browser checks. The original
+[UI_REDESIGN_PLAN.md](UI_REDESIGN_PLAN.md) is retained as historical context; later user
+requests supersede its light palette, motion-library choices and review-card layout.
+Known counting and physical-rehearsal limitations below remain open; no form score or
+cross-version movement trend is implied by the redesign.
+
+**Latest user-rehearsal fix:** original incline side2 now counts 7 including the initial lift
+(human: 6 working reps excluding that lift), original normal pulldown 6, changed pulldown
+5/6. Optional GPT-5.4 sampled-image review now supplies timestamped technique observations
+to results and chat. The actual changed-pulldown review identifies torso rocking; detailed
+chat can return all seven incline intervals. Read apps/api/GYM_EXERCISES.md and AI_COACH.md.
+Both apps/schemas/types must be integrated together for additive `visualReview`.
+
+Next small checks: refresh/reanalyze the original files in the browser, verify visual seek
+links and coach follow-ups, review the remaining 5/6 pulldown counting limitation, rehearse
+live push-ups physically, then proceed with the user-authorized visual overhaul. Do not
+claim all camera views or every visual finding are validated. 550 backend/55 frontend tests
+and the existing push-up recordings pass. Computer-use automation remains unavailable.
+
+The demo is **live push-ups plus uploaded incline dumbbell bench press, cable lateral raise
+and lat pulldown**; triceps is removed. A owns both apps. Fourteen private gym clips are now
+available. All three upload checkpoints are implemented. The selected 1080p exports count
+6 pulldowns, 7 presses and 7 lateral raises; several bad-form/back-view clips still undercount.
+See [gym exercise evidence](../apps/api/GYM_EXERCISES.md). Descriptive torso measurements are
+implemented for lat pulldown/lateral raise. Browser rehearsal and a fresh physical push-up
+set precede the deferred visual overhaul. Investigate failed views from actual poses without
+equating missing counts with bad form; do not promise equipment/rotation detection.
+The earlier plan below is historical where it conflicts with this direction.
+
+
+Updated 2026-09-26. Main `7f44566` includes PRs #1–#5. The next checkpoint fixes a failed
+physical rehearsal and the confusing coach/results flow. Read LIVE_REHEARSAL_FIX.md first.
+
+## Current priority: useful feedback when no complete reps count
+
+**First observation implemented:** see apps/api/MOVEMENT_OBSERVATIONS.md. A separate geometry
+pass now supplies timestamped body-line bends to results and coach even with zero reps.
+badpushups has five intervals; these are not five classified attempts. Existing clip counts
+are unchanged. The remaining work below is broader interpretation/independent validation,
+not a claim that this narrow observation fully assesses form.
+
+The latest human rehearsal reports that the long upload now works and live counted 19;
+a brief pause at the top helps live counting. This is human feedback, not a new captured
+live accuracy benchmark. Keep the existing counting policy while investigating new evidence.
+
+`badpushups.MOV` demonstrates the next product gap: the human deliberately moved the torso/
+hips for about 4–5 attempts. Fresh extraction returns zero completed cycles despite 187/188
+usable selected-elbow samples. Only one raw sample reaches the current bend zone; a sustained
+bend is required. This result is not a bad-form classification. Read
+[BAD_MOVEMENT_REVIEW.md](../apps/api/BAD_MOVEMENT_REVIEW.md) for the measured evidence.
+
+Next implementation checkpoint:
+
+1. Analyze reliably visible movement intervals independently of completed rep segmentation.
+   Keep attempted movement separate from the completed-rep count; do not force this clip to
+   count 4 or 5 or infer that every uncounted movement is an incorrect push-up.
+2. Start with one descriptive elbow/body-line observation and timestamps. Review matching
+   normal and deliberately changed footage before assigning any specific form label.
+   The present unsigned body-line angle cannot distinguish hip sag from pike.
+3. Expose that evidence in results and conversational coaching, including zero-count results.
+   Any additive contract requires matching documentation, examples, types and tests.
+4. Test normal recordings, static holds, partial movements, fast turns and tracking gaps;
+   preserve the working counts. Use a separate clip for validation after tuning.
+5. Then continue the visual overhaul: show a short useful explanation and one next action;
+   keep diagnostic detail expandable. Do not present developer troubleshooting as coaching.
+
+Conversation fix completed in this checkpoint: requested rep numbers and follow-up context
+now take priority over generic six-rep highlights. A real OpenAI request correctly answered
+rep 12's duration; 428 backend tests pass. Specific form findings remain unimplemented.
+More labeled videos help us develop and test the analysis rules; adding files does not train
+MediaPipe or OpenAI. No model training is planned for this checkpoint.
+
+## Earlier counting checkpoint
+
+**Latest counting correction:** read [COUNTING.md](../apps/api/COUNTING.md). The new live
+capture reproduced 4 and now returns 5; IMG_6943 reproduced 5 and now returns 19 distinct
+cycles. The human reported 20; a twentieth cycle is not established by the video review.
+Old top/bottom dwell and return thresholds merged continuous cycles. Counter v2 addresses
+that behavior; original five recordings retain 3/1/1/2/4. A fresh physical live set and
+independent footage remain required before declaring counting reliable.
 This is the current work order. Keep the longer product vision in PRODUCT_SCOPE.md;
 do not try to finish every stretch feature before the demo.
 
@@ -10,8 +98,8 @@ do not try to finish every stretch feature before the demo.
 - **Computer B:** feature handoff complete in merged PR #4. Coordinate any further screen edits.
 - **Computer A:** owns integration, backend and the upcoming frontend visual overhaul.
   Preserve tested upload/pose pairing, raw live input, request lifecycle and evidence behavior.
-- **Next order:** publish the integrated backend follow-up PR; rehearse physical camera and
-  separate footage; then redesign the UI in small screen-by-screen commits. No redesign yet.
+- **Next order:** implement the bounded movement-feedback checkpoint above, preserve counting
+  regressions, capture any new live mismatch, then continue the visual overhaul in small commits.
 
 ## What the code actually does today
 
@@ -22,7 +110,7 @@ do not try to finish every stretch feature before the demo.
 | Rep timestamps and elbow measurements | Implemented | Duration, min/max, excursion, time around minimum angle; 2D observations |
 | Rep comparisons | Timing policy v2 implemented | Change must exceed a margin against both preceding durations; 6942 rep 3 now flags as a development regression. Separate validation still needed |
 | Tracking coverage / missing-joint feedback | Implemented | Sample counts and actionable joint reasons; no readiness or quality score |
-| Live analysis API | Implemented | Browser cumulative snapshots, final/reset/stop verified against actual API using simulated media; physical rehearsal pending |
+| Live analysis API | Implemented | Physical rehearsal failed 5 → 2; false missing-pose emission fixed, new capture/replay needed |
 | Live / uploaded skeleton | Implemented | Browser and portrait/landscape playback checks; actual webcam smoothness needs recheck |
 | Coach API | Implemented | Integrated panel; actual local summary/next-set/evidence links verified; optional OpenAI configured separately |
 | Form score and five quality metric scores | **Missing** | `analysis/scoring.py` is a placeholder; real scores remain null |
@@ -32,9 +120,10 @@ do not try to finish every stretch feature before the demo.
 | Worst-form rep ranking | **Missing** | No quality score exists; a flagged change can be reviewed without calling it the worst rep |
 | Other gym exercises / automatic recognition | **Missing** | Registered profiles and UI choices do not establish analysis support |
 
-The coach selects reviewed statements from supplied numbers. It does not independently
-watch video, generate new findings, or maintain conversation history. Local fallback QA
-is explicitly unsupported. The UI can show multiple interactions, but each API call is independent.
+The current coach UI requests short generated replies grounded in numeric evidence and sends
+the last six exchanges for follow-ups. The server remains stateless and never watches video.
+Recognized missed-count questions use local troubleshooting guidance. Legacy evidence selection
+remains available. Read AI_COACH.md for limits and the distinction between the two modes.
 
 ## Computer A: small checkpoints in order
 

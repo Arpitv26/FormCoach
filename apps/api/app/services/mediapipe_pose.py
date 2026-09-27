@@ -1,5 +1,6 @@
 """Optional local-video adapter. SDK objects never leave this module."""
 
+import logging
 from math import isfinite
 from pathlib import Path
 from time import monotonic
@@ -11,6 +12,7 @@ MAX_VIDEO_BYTES = 250 * 1024 * 1024
 MAX_DURATION_MS = 120_000
 MAX_SAMPLED_FRAMES = 1800
 MAX_DECODED_FRAMES = 30_000
+logger = logging.getLogger(__name__)
 
 
 class VideoInputError(ValueError):
@@ -25,8 +27,28 @@ class VideoProcessingTimeout(VideoInputError):
     """Cooperative processing budget expired between native calls."""
 
 
-def map_landmarks(poses: list) -> list[PoseLandmark]:
+def map_landmarks(poses: list, *, allow_dominant_pose=False) -> list[PoseLandmark]:
     """Use normalized coordinates, never world-meter coordinates or fabricated poses."""
+    if allow_dominant_pose and len(poses) > 1:
+
+        def area(pose):
+            points = [
+                p
+                for p in pose
+                if p.visibility is not None
+                and p.visibility >= 0.7
+                and 0 <= p.x <= 1
+                and 0 <= p.y <= 1
+            ]
+            if len(points) < 8:
+                return 0
+            return (max(p.x for p in points) - min(p.x for p in points)) * (
+                max(p.y for p in points) - min(p.y for p in points)
+            )
+
+        ranked = sorted(((area(pose), i) for i, pose in enumerate(poses)), reverse=True)
+        if ranked[0][0] > 0 and ranked[0][0] >= 2 * ranked[1][0]:
+            poses = [poses[ranked[0][1]]]
     if len(poses) != 1:
         return []  # No pose / multiple people cannot establish a single participant.
     if len(poses[0]) != len(LANDMARK_NAMES):
@@ -45,8 +67,16 @@ def map_landmarks(poses: list) -> list[PoseLandmark]:
 
 
 class MediaPipePoseProvider:
-    def __init__(self, model_path: Path) -> None:
+    def __init__(
+        self,
+        model_path: Path,
+        *,
+        include_visual_frames: bool = False,
+        allow_dominant_pose: bool = False,
+    ) -> None:
         self.model_path = model_path
+        self.include_visual_frames = include_visual_frames
+        self.allow_dominant_pose = allow_dominant_pose
 
     def extract(self, video_path: Path) -> PoseSequence:
         if not video_path.is_file():
@@ -98,13 +128,23 @@ class MediaPipePoseProvider:
                 output_segmentation_masks=False,
             )
             with mp.tasks.vision.PoseLandmarker.create_from_options(options) as detector:
-                return self._extract_frames(capture, cv2, mp, detector)
+                return self._extract_frames(
+                    capture,
+                    cv2,
+                    mp,
+                    detector,
+                    include_visual_frames=self.include_visual_frames,
+                    allow_dominant_pose=self.allow_dominant_pose,
+                )
         finally:
             capture.release()
 
     @staticmethod
-    def _extract_frames(capture, cv2, mp, detector) -> PoseSequence:
+    def _extract_frames(
+        capture, cv2, mp, detector, *, include_visual_frames=False, allow_dominant_pose=False
+    ) -> PoseSequence:
         frames = []
+        visual_frames = []
         previous_time = -1.0
         last_bucket = -1
         image_shape = None
@@ -142,6 +182,17 @@ class MediaPipePoseProvider:
             if bucket == last_bucket:
                 continue
             last_bucket = bucket
+            if include_visual_frames and (
+                not visual_frames or timestamp - visual_frames[-1][0] >= 500
+            ):
+                from app.services.visual_review import encode_review_frame
+
+                try:
+                    visual_frames.append((round(timestamp), encode_review_frame(bgr)))
+                except Exception as error:
+                    logger.warning("Visual sampling unavailable (%s)", type(error).__name__)
+                    visual_frames.clear()
+                    include_visual_frames = False
             if len(frames) >= MAX_SAMPLED_FRAMES:
                 raise VideoInputError(
                     "Video exceeds 1800 sampled frames; trim it below 120 seconds."
@@ -154,9 +205,17 @@ class MediaPipePoseProvider:
                 PoseFrame(
                     frame_index=frame_index,
                     timestamp_ms=round(timestamp),
-                    landmarks=map_landmarks(result.pose_landmarks),
+                    landmarks=map_landmarks(
+                        result.pose_landmarks, allow_dominant_pose=allow_dominant_pose
+                    ),
                 )
             )
         if not frames:
             raise VideoInputError("Video contains no decodable frames.")
-        return PoseSequence(frames, image_shape[0], image_shape[1], round(previous_time))
+        if len(visual_frames) > 64:
+            visual_frames = [
+                visual_frames[round(i * (len(visual_frames) - 1) / 63)] for i in range(64)
+            ]
+        return PoseSequence(
+            frames, image_shape[0], image_shape[1], round(previous_time), visual_frames
+        )

@@ -243,3 +243,46 @@ def test_local_cli_writes_valid_pose_and_upload_analysis_without_overwriting(tmp
     before = (output / "analysis.json").read_text()
     assert analyze_video.main(args) == 2
     assert (output / "analysis.json").read_text() == before
+
+
+def test_visual_samples_share_decode_and_are_not_pose_or_returned_images(adapter, monkeypatch):
+    provider, path, state = adapter
+    from app.services import visual_review
+
+    monkeypatch.setattr(visual_review, "encode_review_frame", lambda _: "private-jpeg")
+    provider.include_visual_frames = True
+    result = provider.extract(path)
+    assert result.visual_frames == [(0, "private-jpeg")]
+    assert all("private-jpeg" not in f.model_dump_json() for f in result.frames)
+    assert "private-jpeg" not in repr(result)
+
+
+def test_gym_dominant_person_selection_rejects_ambiguity_and_preserves_default():
+    def body(scale, offset):
+        return [
+            NS(x=offset + scale * (i % 3) / 2, y=0.1 + scale * i / 33, z=0, visibility=0.9)
+            for i in range(33)
+        ]
+
+    large, small = body(0.6, 0.1), body(0.1, 0.8)
+    assert video.map_landmarks([small, large]) == []
+    assert video.map_landmarks([small, large], allow_dominant_pose=True) == video.map_landmarks(
+        [large]
+    )
+    assert video.map_landmarks([large, body(0.55, 0.2)], allow_dominant_pose=True) == []
+    assert video.map_landmarks([points(), points()], allow_dominant_pose=True) == []
+
+
+def test_failed_visual_encoding_keeps_pose_extraction(adapter, monkeypatch, caplog):
+    provider, path, state = adapter
+    from app.services import visual_review
+
+    def fail(_):
+        raise ValueError("private image content")
+
+    monkeypatch.setattr(visual_review, "encode_review_frame", fail)
+    provider.include_visual_frames = True
+    result = provider.extract(path)
+    assert result.frames and not result.visual_frames
+    assert state.released and state.closed
+    assert "private image content" not in caplog.text

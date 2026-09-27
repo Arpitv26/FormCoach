@@ -9,6 +9,83 @@ Canonical sources: `apps/api/app/domain/` models, generated `contracts/*.schema.
 generated `apps/web/src/lib/api/types.ts`, and fixtures under `contracts/examples/`.
 Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated files.
 
+## Optional visual review (2026-09-27)
+
+`AnalysisResponse.visualReview` defaults to `null` for older responses and live analysis.
+Upload responses can attach a separate, model-authored interpretation of sampled images.
+Version remains 1.0; deploy backend, schemas and generated frontend types together. Older
+strict coach validators reject the new field. This does not change numeric rep counts,
+angles, issues, scores or their provenance; visual findings are explicitly AI interpretations.
+
+- `status`: `complete` or `unavailable`; unavailable reviews have no findings.
+- `source`: `openai_sampled_frames`; `model` identifies the configured visual model.
+- `sampledTimestampsMs`: up to 64 strictly increasing actual video timestamps, within duration.
+- `findings`: up to 8 items with `kind` (`adjustment`, `positive`, `observation`),
+  `phase` (`exercise`, `setup`, `finish`; default exercise), `observation`, `cue`, and
+  2–8 distinct `evidenceTimestampsMs` drawn from the supplied samples.
+- `limitations`: short model/view limitations. An empty finding list is not a good-form grade.
+
+JPEG samples stay in backend memory during processing and are sent to OpenAI only when
+explicitly configured. They are not in JSON responses or pose tracks. Playback links seek
+the user's local clip. Coach evidence paths reference `visualReview.findings.N.*`.
+Timestamp validation proves a reference exists, not that the interpretation is correct.
+The new `visual-review-analysis.json` fixture is synthetic, not a reviewed recording.
+See AI_COACH.md for provider configuration, image sampling and failure behavior.
+
+## Gym exercise IDs (2026-09-27)
+
+`lat-pulldown`, `incline-dumbbell-bench-press` and `cable-lateral-raise` support upload and normalized-pose analysis. Selected exercise IDs
+are strings, so this adds no schema fields. Existing elbow measurement keys and key moments
+retain their 2D meanings; the lat-pulldown counting policy is in apps/api/GYM_EXERCISES.md.
+Incline-press duration covers bent arms to extension, including pauses; its new
+`press_completed` key moment marks extension. Push-up comparisons/body-line rules
+do not apply to gym exercises. Scores stay null.
+The frontend uses the same ID; old servers reject this hint until updated.
+
+Lateral raises use projected hip–shoulder–elbow geometry, not anatomical abduction. Keys:
+`minSmoothed{Left|Right}ShoulderAngleDeg`, `maxSmoothed{Left|Right}ShoulderAngleDeg`,
+`smoothed{Left|Right}ShoulderExcursionDeg`, `timeToMinShoulderAngleMs`,
+`timeFromMinShoulderAngleMs`, plus existing `angleMeasurementStartMs` and `durationMs`.
+Intervals cover the low run through confirmed raised position; `raised_position` marks
+completion. Lowering only rearms. These additive dictionary keys need no schema change;
+unknown keys remain safe for older clients, which may not display them.
+
+Lat-pulldown/lateral-raise rep dictionaries also contain `torsoSampleCount`,
+`torsoUsableSampleCount`, `min{Left|Right}TorsoTiltDeg`, `max{Left|Right}TorsoTiltDeg`,
+and `{left|right}TorsoTiltRangeDeg`. Only the counter's selected side is emitted.
+The angle is the raw unsigned shoulder-to-hip line against upward image vertical (0°
+upright, 90° horizontal). Angles/range are null unless every sample in `[startMs,endMs]`
+is usable, both boundaries exist, at least 3 samples exist and no gap exceeds 300 ms.
+No interpolation/smoothing; range is max minus min, not total angular travel. Camera tilt
+and projection affect it; it cannot establish axial rotation, momentum, a quality target
+or a missed-rep cause. `maximum_torso_tilt` marks the first maximum sample when available.
+It adds no issue, score or threshold. Incline press and push-up measurements are unchanged.
+
+## Additive movement observations (2026-09-26)
+
+`AnalysisResponse.movementObservations` is a new list, defaulting to `[]` when an older
+response omits it. New servers emit it. Version stays `1.0`; update the server and generated
+client types together: older strict backend validators reject this field on coach requests.
+It exists because per-rep measurements cannot explain movement when no complete rep counts.
+
+Current item: `code: "PUSHUP_BODY_LINE_BEND"`, `ruleVersion: "1.0"`, `side: "left" | "right"`,
+`startMs`, `endMs`, `sampleCount`, `minAngleDeg`, `medianAngleDeg`, `maxAngleDeg`,
+`thresholdAngleDeg: 150`. Intervals are chronological/non-overlapping, at least 500 ms,
+inside source duration when known. At least three samples; `0 <= min <= median <= max < 150`.
+No confidence or score is invented. Item count is **not** attempted or completed rep count.
+
+The analyzer uses the selected elbow side, checks shoulder/hip/ankle visibility and geometry,
+and requires predominantly horizontal shoulder-to-ankle direction in image pixels. Runs
+stop at an unavailable sample, angle >=150°, ineligible direction, or gap >300 ms. Median
+is sample-weighted. Non-final live responses include only closed intervals; finalization can
+close the last run. No interpolation or side switching. See apps/api/MOVEMENT_OBSERVATIONS.md.
+
+Observations may coexist with zero or unknown counts and `insufficient_data` for counting.
+An empty/omitted list does not establish good form or complete evaluation. They are descriptive
+geometry review moments, potentially including setup, not hip-sag/pike diagnoses or a reason
+for missed reps. The coach references numeric `movementObservations.N.*` evidence paths.
+Fixture: `contracts/examples/pushup-movement-observation.json` (synthetic, no video).
+
 ## Ground rules
 
 - Scores are 0–100; confidence, visibility, and camera quality are 0–1.
@@ -167,9 +244,13 @@ poses; it does not attest that the client captured them from a camera. Keep synt
 clearly labeled in demos/tests. Counting heuristics are not a validated fitness assessment.
 
 **Push-up support:** select `exerciseHint: "push-up"`. The same status, replay, visibility,
-side-locking, timing, and finalization policies apply, using the straight-arm top position
-instead of standing. The triplet is shoulder-elbow-wrist; initial thresholds are top >=160
-and bottom <=100 degrees. Results use `minSmoothedLeftElbowAngleDeg` or
+side-locking and finalization policies apply, using a top/return zone instead of standing.
+The triplet is shoulder-elbow-wrist. Counter v2 uses top >=150 and bottom <=100 degrees,
+60 ms of consecutive raw observations plus current median confirmation, and overlapping
+phase evidence. Squat's old sequential confirmation is unchanged. Start is the first raw
+descent-zone observation in the confirmed run. Reanalysis changes earlier timestamps and
+measurements; the wire shape is unchanged. See [counting policy](../apps/api/COUNTING.md).
+Results use `minSmoothedLeftElbowAngleDeg` or
 `minSmoothedRightElbowAngleDeg`, plus `durationMs` and a `minimum_elbow_angle` key moment.
 Additional push-up `measurements` keys (the dictionary is extensible; old results may lack them):
 
@@ -288,7 +369,8 @@ Application errors retain the existing `detail.code` / `detail.message` shape:
 Missing/malformed multipart fields use FastAPI's existing HTTP 422 shape. Insufficient pose
 evidence returns HTTP 200 with honest `insufficient_data`/`partial` analysis, never mock data.
 See [HTTP upload guide](../apps/api/HTTP_UPLOAD.md) for exact curl commands and B's checklist.
-**Frontend behavior:** the integrated client uses a separate 240-second upload timeout.
+**Frontend behavior:** the integrated client uses a separate 300-second upload timeout,
+including optional visual review.
 Health/live/coach requests retain 15 seconds.
 
 ## AnalysisResponse
@@ -372,6 +454,8 @@ type CoachRequest = {
   analysis: AnalysisResponse;
   mode: "summary" | "next_set" | "qa";
   question?: string | null; // required, nonblank for qa; max 1000 characters
+  responseStyle?: "evidence" | "conversation"; // default evidence
+  history?: { role: "user" | "assistant"; content: string }[]; // max 12, 1–2000 chars each
 };
 ```
 
@@ -383,7 +467,14 @@ labeled and unknown scores stay unknown. Local free-form QA is unsupported.
 Optional `COACH_PROVIDER=openai` plus a backend key and SDK enables bounded evidence
 selection; the backend renders reviewed wording. Provider failures fall back honestly.
 `evidence` uses zero-based array dot paths; display `limitations` alongside `message`.
-No contract fields changed. See AI_COACH.md and apps/api/COACH_SETUP.md.
+Conversation style is an additive request extension: the model writes short replies using
+reviewed evidence plus bounded history. Recognized count disputes use local guidance;
+unknown causes must not become invented explanations. The response shape stays unchanged.
+The server stores no conversation; the caller supplies recent messages on each request.
+The current UI uses conversation style, shows short replies and keeps evidence/limitations
+in expandable details. Omitted fields retain legacy behavior. **Update backend and frontend
+together:** older strict validators reject these new fields with 422.
+See AI_COACH.md, `contracts/examples/coach-conversation-request.json`, and apps/api/COACH_SETUP.md.
 
 ## Errors and frontend behavior
 
@@ -392,7 +483,7 @@ No contract fields changed. See AI_COACH.md and apps/api/COACH_SETUP.md.
   Client shows a friendly message; developers inspect the network response for field errors.
 - Upload-specific statuses and codes are listed above; all use the application error shape.
 - Network/unexpected server errors: client throws `ApiError`; no mock substitution.
-- Client timeout is 15 seconds for short requests and 240 seconds for uploads. Never automatically retry a timed-out upload.
+- Client timeout is 15 seconds for health/live, 50 seconds for coach and 300 seconds for uploads. Never automatically retry a timed-out upload.
 - No auth or durable session storage exists. Health does not expose secrets/settings.
 
 Change procedure and regeneration commands are in `contracts/README.md` and AGENTS.md.

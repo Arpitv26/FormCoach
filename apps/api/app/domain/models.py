@@ -15,10 +15,17 @@ class HealthResponse(ContractModel):
     service: Literal["formcoach-api"]
 
 
+class CoachTurn(ContractModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=2000)
+
+
 class CoachRequest(ContractModel):
     analysis: AnalysisResponse
     mode: Literal["summary", "next_set", "qa"]
     question: str | None = Field(default=None, max_length=1000)
+    response_style: Literal["evidence", "conversation"] = "evidence"
+    history: list[CoachTurn] = Field(default_factory=list, max_length=12)
 
     @model_validator(mode="after")
     def require_qa_question(self) -> Self:

@@ -37,13 +37,13 @@ test("incompatible successful responses are rejected", async () => {
 });
 
 
-test("upload timeout is four minutes; health remains fifteen seconds", async (t) => {
+test("upload timeout is five minutes; health remains fifteen seconds", async (t) => {
   const durations: number[] = [];
   t.mock.method(AbortSignal, "timeout", (ms: number) => { durations.push(ms); return new AbortController().signal; });
   const api = createApiClient("http://localhost:8000", async () => Response.json({ contractVersion: "1.0" }));
   await api.health();
   await api.analyzeVideo(new File(["video"], "clip.mp4"), "push-up");
-  assert.deepEqual(durations, [15_000, 240_000]);
+  assert.deepEqual(durations, [15_000, 300_000]);
 });
 test("caller cancellation is distinct from network failure", async () => {
   const controller = new AbortController();
@@ -67,7 +67,7 @@ test("deadline covers reading the response body", async (t) => {
     (error: unknown) => error instanceof ApiError && error.code === "REQUEST_TIMEOUT");
 });
 
-test("coach and live JSON requests keep their short timeout and caller abort signal", async (t) => {
+test("detailed coaching gets fifty seconds; live keeps fifteen and both retain cancellation", async (t) => {
   const durations: number[] = [];
   t.mock.method(AbortSignal, "timeout", (ms: number) => { durations.push(ms); return new AbortController().signal; });
   const bodies: unknown[] = [];
@@ -83,7 +83,7 @@ test("coach and live JSON requests keep their short timeout and caller abort sig
   const analysis = getMockAnalysis();
   await api.coach({ analysis, mode: "summary" }, controller.signal);
   await api.analyzeLiveBatch({ sessionId: "test", exerciseHint: "push-up", frames: [], imageWidth: 640, imageHeight: 480, isFinal: true }, controller.signal);
-  assert.deepEqual(durations, [15_000, 15_000]);
+  assert.deepEqual(durations, [50_000, 15_000]);
   assert.equal(bodies.length, 2);
   controller.abort();
   assert.ok(signals.every((signal) => signal.aborted));

@@ -6,6 +6,16 @@ from statistics import median
 
 from app.domain.models import AnalysisResponse, CoachRequest, CoachResponse
 
+GYM_CONTEXT = {
+    "cable-lateral-raise": " The selected exercise is cable lateral raise; angles describe "
+    "projected hip-shoulder-elbow geometry, not anatomical abduction or a form grade.",
+    "lat-pulldown": " The selected exercise is lat pulldown.",
+    "incline-dumbbell-bench-press": (
+        " The selected exercise is incline dumbbell bench press; timings cover "
+        "bent arms to extension, including pauses."
+    ),
+}
+
 
 @dataclass(frozen=True)
 class EvidenceCard:
@@ -48,6 +58,51 @@ def body_line_card(analysis: AnalysisResponse, index: int, side: str) -> Evidenc
             f"{path}.measurements.{key}",
             f"{path}.measurements.bodyLineSampleCount",
             f"{path}.measurements.bodyLineUsableSampleCount",
+        ),
+    )
+
+
+def torso_card(analysis: AnalysisResponse, index: int, side: str) -> EvidenceCard | None:
+    if analysis.exercise is None or analysis.exercise.id not in {
+        "lat-pulldown",
+        "cable-lateral-raise",
+    }:
+        return None
+    rep = analysis.reps[index]
+    keys = [f"min{side}TorsoTiltDeg", f"max{side}TorsoTiltDeg", f"{side.lower()}TorsoTiltRangeDeg"]
+    low, high, span = [rep.measurements.get(key) for key in keys]
+    total = rep.measurements.get("torsoSampleCount")
+    usable = rep.measurements.get("torsoUsableSampleCount")
+    if (
+        low is None
+        or high is None
+        or span is None
+        or not 0 <= low <= high <= 180
+        or not isclose(high - low, span, abs_tol=0.01)
+        or total is None
+        or not 3 <= total <= 1800
+        or total != int(total)
+        or usable != total
+    ):
+        return None
+    path = f"reps.{index}"
+    return EvidenceCard(
+        f"rep-{rep.rep_number}-{side.lower()}-torso",
+        f"During detected rep {rep.rep_number} "
+        f"({rep.start_ms / 1000:.2f}–{rep.end_ms / 1000:.2f} s), "
+        f"the tracked {side.lower()} shoulder-to-hip line tilted {low:.1f}° to {high:.1f}° "
+        f"from image vertical, a {span:.1f}° range across {int(total)} samples. "
+        "This is unsigned 2D image geometry, not a diagnosis of swinging, rotation, momentum "
+        "or bad form. Camera tilt/projection and tracking affect it. No acceptable target "
+        "or reason for missing reps is established; range is not total angular travel.",
+        (
+            f"{path}.repNumber",
+            f"{path}.startMs",
+            f"{path}.endMs",
+            *(
+                f"{path}.measurements.{key}"
+                for key in [*keys, "torsoSampleCount", "torsoUsableSampleCount"]
+            ),
         ),
     )
 
@@ -112,10 +167,64 @@ def comparison(
     return detail, paths
 
 
-def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
-    if analysis.status in {"insufficient_data", "not_implemented"}:
+def evidence_cards(
+    analysis: AnalysisResponse, *, preferred_reps: tuple[int, ...] = (), max_reps: int = 6
+) -> list[EvidenceCard]:
+    if analysis.status == "not_implemented" or analysis.provenance.kind == "placeholder":
         return []
     cards = []
+    for index, observation in enumerate(analysis.movement_observations[:6]):
+        path = f"movementObservations.{index}"
+        cards.append(
+            EvidenceCard(
+                f"movement-{index + 1}-body-line",
+                f"From {observation.start_ms / 1000:.2f} to "
+                f"{observation.end_ms / 1000:.2f} s, the tracked {observation.side} "
+                "shoulder, hip and ankle formed a sustained bend in the image. "
+                f"The median angle was {observation.median_angle_deg:.1f}°, across "
+                f"{observation.sample_count} samples, all below the provisional "
+                "150° review threshold (180° would be a straight line). "
+                "This can be reviewed even with zero counted reps. It does not identify "
+                "hip sag versus pike, spinal posture, an attempt count or the reason reps "
+                "did not count. Setup and other movements can trigger it; review the video.",
+                tuple(
+                    f"{path}.{key}"
+                    for key in (
+                        "startMs",
+                        "endMs",
+                        "side",
+                        "medianAngleDeg",
+                        "sampleCount",
+                        "thresholdAngleDeg",
+                    )
+                ),
+            )
+        )
+    review = analysis.visual_review
+    if review is not None and review.status == "complete":
+        for index, finding in enumerate(review.findings):
+            path = f"visualReview.findings.{index}"
+            times = ", ".join(f"{time / 1000:.2f}s" for time in finding.evidence_timestamps_ms)
+            cards.append(
+                EvidenceCard(
+                    f"visual-{index + 1}",
+                    f"AI VISUAL INTERPRETATION ({finding.kind}, phase: {finding.phase}), "
+                    f"supported by sampled frames at {times}: "
+                    f"{finding.observation} Coaching suggestion: {finding.cue} "
+                    "This is a visual model observation, not a measured biomechanical fact "
+                    "or form grade.",
+                    (
+                        f"{path}.observation",
+                        f"{path}.cue",
+                        *(
+                            f"{path}.evidenceTimestampsMs.{i}"
+                            for i in range(len(finding.evidence_timestamps_ms))
+                        ),
+                    ),
+                )
+            )
+    if analysis.status == "insufficient_data":
+        return cards
     score = analysis.summary.overall_score
     if score is not None:
         cards.append(
@@ -126,21 +235,35 @@ def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
             )
         )
     count = analysis.summary.total_reps
+    exercise_context = GYM_CONTEXT.get(analysis.exercise.id, "") if analysis.exercise else ""
     if count is not None:
         cards.append(
             EvidenceCard(
                 "count",
-                f"The supplied analysis counts {count} completed rep(s).",
-                ("summary.totalReps",),
+                f"The supplied analysis counts {count} completed rep(s)." + exercise_context,
+                ("summary.totalReps", "exercise.id")
+                if exercise_context
+                else ("summary.totalReps",),
             )
         )
-    if analysis.exercise is None or analysis.exercise.id != "push-up":
+    if analysis.exercise is None or analysis.exercise.id not in {
+        "push-up",
+        "lat-pulldown",
+        "incline-dumbbell-bench-press",
+        "cable-lateral-raise",
+    }:
         return cards
-    # Bound the model input. Prioritize review flags, then the first and last reps.
-    ordered = [i for i, rep in enumerate(analysis.reps) if rep.issues]
+    # Bound the model input, but don't omit the very rep the user asked about.
+    ordered = [
+        i
+        for number in preferred_reps
+        for i, rep in enumerate(analysis.reps)
+        if rep.rep_number == number
+    ]
+    ordered += [i for i, rep in enumerate(analysis.reps) if rep.issues]
     ordered += [0, len(analysis.reps) - 1]
     ordered += list(range(len(analysis.reps)))
-    for index in list(dict.fromkeys(ordered))[:6]:
+    for index in list(dict.fromkeys(ordered))[:max_reps]:
         if not 0 <= index < len(analysis.reps):
             continue
         rep = analysis.reps[index]
@@ -156,11 +279,12 @@ def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
                 (f"{path}.repNumber", f"{path}.startMs", f"{path}.endMs", *paths),
             )
         )
+        joint = "Shoulder" if analysis.exercise.id == "cable-lateral-raise" else "Elbow"
         for side in ("Left", "Right"):
             keys = [
-                f"minSmoothed{side}ElbowAngleDeg",
-                f"maxSmoothed{side}ElbowAngleDeg",
-                f"smoothed{side}ElbowExcursionDeg",
+                f"minSmoothed{side}{joint}AngleDeg",
+                f"maxSmoothed{side}{joint}AngleDeg",
+                f"smoothed{side}{joint}ExcursionDeg",
             ]
             minimum, maximum, excursion = [rep.measurements.get(key) for key in keys]
             if (
@@ -176,14 +300,17 @@ def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
                 EvidenceCard(
                     f"rep-{rep.rep_number}-{side.lower()}-range",
                     f"Rep {rep.rep_number} has {excursion:.1f}° of observed {side.lower()}"
-                    f" elbow excursion ({minimum:.1f}° to {maximum:.1f}°)."
+                    f" {joint.lower()} excursion ({minimum:.1f}° to {maximum:.1f}°)."
                     " This is a 2D measurement, not a form score." + detail,
                     (f"{path}.repNumber", *(f"{path}.measurements.{key}" for key in keys), *paths),
                 )
             )
-            body_line = body_line_card(analysis, index, side)
+            body_line = body_line_card(analysis, index, side) if joint == "Elbow" else None
             if body_line is not None:
                 cards.append(body_line)
+            torso = torso_card(analysis, index, side)
+            if torso is not None:
+                cards.append(torso)
     return cards
 
 

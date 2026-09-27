@@ -68,6 +68,21 @@ test("cancel protects a new request from late failure", async () => {
   assert.equal(app.state.result, response);
   app.session.dispose();
 });
+test("replacing a completed clip clears its visual review even with the same filename", async () => {
+  const first = { sessionId: "first", visualReview: { status: "complete", findings: [{ observation: "First clip only" }] } } as AnalysisResponse;
+  const second = { sessionId: "second", visualReview: { status: "complete", findings: [{ observation: "Second clip only" }] } } as AnalysisResponse;
+  let calls = 0;
+  const app = setup(async () => ++calls === 1 ? first : second);
+  app.session.select(clip("input.mov"));
+  await app.session.submit();
+  assert.equal(app.state.result, first);
+  app.session.select(clip("input.mov"));
+  assert.equal(app.state.result, null);
+  await app.session.submit();
+  assert.equal(app.state.result, second);
+  assert.doesNotMatch(JSON.stringify(app.state.result), /First clip only/);
+  app.session.dispose();
+});
 test("dispose releases URL and prevents late updates", async () => {
   const pending = deferred<AnalysisResponse>();
   const app = setup(() => pending.promise);

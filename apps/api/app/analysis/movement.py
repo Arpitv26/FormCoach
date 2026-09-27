@@ -4,9 +4,14 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.cable_lateral_raise import segment_cable_lateral_raises
+from app.analysis.exercises.gym_torso import add_torso_measurements
+from app.analysis.exercises.incline_press import segment_incline_presses
+from app.analysis.exercises.lat_pulldown import segment_lat_pulldowns
 from app.analysis.exercises.pushup_body_line import add_body_line_measurements
 from app.analysis.exercises.pushup_comparisons import compare_pushup_reps
 from app.analysis.exercises.pushup_measurements import pushup_measurements
+from app.analysis.exercises.pushup_observations import observe_body_line
 from app.analysis.exercises.pushup_segmentation import segment_pushups
 from app.analysis.exercises.squat_segmentation import segment_squats
 from app.analysis.geometry import AngleMeasurement, measure_joint_angle
@@ -41,6 +46,24 @@ MOVEMENTS = {
     "squat": MovementSpec(("hip", "knee", "ankle"), "standing", "standing", segment_squats),
     "push-up": MovementSpec(
         ("shoulder", "elbow", "wrist"), "top", "the straight-arm top position", segment_pushups
+    ),
+    "incline-dumbbell-bench-press": MovementSpec(
+        ("shoulder", "elbow", "wrist"),
+        "top",
+        "a visible bent-arm starting position",
+        segment_incline_presses,
+    ),
+    "cable-lateral-raise": MovementSpec(
+        ("hip", "shoulder", "elbow"),
+        "top",
+        "the lowered working arm beside your torso",
+        segment_cable_lateral_raises,
+    ),
+    "lat-pulldown": MovementSpec(
+        ("shoulder", "elbow", "wrist"),
+        "extended",
+        "the arms-overhead return position",
+        segment_lat_pulldowns,
     ),
 }
 
@@ -77,8 +100,8 @@ def _rep_result(segment: RepSegment, number: int, side: str, joint: str) -> RepA
         f"minSmoothed{side.title()}{joint.title()}AngleDeg": segment.min_angle_deg,
         "durationMs": segment.end_ms - segment.start_ms,
     }
-    if joint == "elbow":
-        measurements.update(pushup_measurements(segment, side))
+    if joint in {"elbow", "shoulder"}:
+        measurements.update(pushup_measurements(segment, side, joint=joint))
     return RepAnalysis(
         rep_number=number,
         start_ms=segment.start_ms,
@@ -141,9 +164,7 @@ class RuleBasedAnalyzer:
                 profile=profile,
                 is_final=is_final,
             )
-            response.limitations.append(
-                "Select push-up or squat to use an implemented rep counter."
-            )
+            response.limitations.append("Select an implemented exercise to use a rep counter.")
             return response
 
         movement = MOVEMENTS[profile.id]
@@ -158,7 +179,25 @@ class RuleBasedAnalyzer:
         result = movement.segment(samples)
         reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
         comparison_limitations = []
+        observations = []
+        if profile.id in {"lat-pulldown", "cable-lateral-raise"} and side:
+            reps = add_torso_measurements(
+                reps,
+                frames,
+                side=side,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+            )
         if profile.id == "push-up" and side:
+            observations = observe_body_line(
+                frames,
+                side=side,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+                is_final=is_final,
+            )
             reps = add_body_line_measurements(
                 reps,
                 frames,
@@ -170,6 +209,17 @@ class RuleBasedAnalyzer:
             comparisons = compare_pushup_reps(reps, samples, side, profile)
             reps = comparisons.reps
             comparison_limitations = comparisons.limitations
+        if profile.id in {"incline-dumbbell-bench-press", "cable-lateral-raise"}:
+            for rep in reps:
+                rep.key_moments.append(
+                    KeyMoment(
+                        timestamp_ms=rep.end_ms,
+                        type="raised_position" if joint == "shoulder" else "press_completed",
+                        label="Arm reached the raised zone"
+                        if joint == "shoulder"
+                        else "Press reached the extension zone",
+                    )
+                )
         issues = [issue for rep in reps for issue in rep.issues]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
@@ -190,7 +240,7 @@ class RuleBasedAnalyzer:
             "or form quality.",
             f"2D {joint} angles use supplied landmarks; their camera origin cannot be verified.",
             "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
-            f"Uncalibrated {profile.id} rules count observed extension-flexion-extension cycles. "
+            f"Uncalibrated {profile.id} rules count observed movement under its selected profile. "
             "Shallow, fast, or interrupted attempts may not count; this is not a form judgment.",
             "Scores, biomechanical form assessment, and automatic exercise recognition "
             "are not implemented. "
@@ -202,6 +252,19 @@ class RuleBasedAnalyzer:
                 "Three-sample median smoothing and phase confirmation delay event timestamps."
             )
         if profile.id == "push-up":
+            limitations.append(
+                "Movement observations review sustained 2D shoulder-hip-ankle bends below "
+                "150 degrees for at least 500 ms, with no gaps over 300 ms and a mostly "
+                "horizontal shoulder-to-ankle direction. This uncalibrated rule is independent "
+                "of counted reps; it cannot distinguish hip sag from pike, measure spinal "
+                "posture, identify attempts or confirm correct form. Empty observations do "
+                "not establish a straight body line. Live intervals appear after they close."
+            )
+            limitations.append(
+                "Push-up counter v2 uses a 150-degree return zone and 100-degree bend zone, "
+                "with 60 ms of consecutive observations plus median confirmation. "
+                "These count movement cycles, not full lockout, depth quality or correct form."
+            )
             limitations.append(
                 "Body-line angles are sample medians of raw 2D shoulder-hip-ankle angles "
                 "over each counted rep, using the same side as the elbow. Require at least "
@@ -224,6 +287,49 @@ class RuleBasedAnalyzer:
                 "Absent comparison keys mean unavailable, not no change."
             )
             limitations.extend(comparison_limitations)
+        if profile.id == "lat-pulldown":
+            limitations.append(
+                "Lat-pulldown counter v2 uses a 120-degree elbow return zone and "
+                "70-degree pulled zone, with 100 ms of raw observations plus median "
+                "confirmation. One rep runs from a pull through the overhead return. "
+                "These are uncalibrated counting zones, not full-extension or depth targets. "
+                "Elbow excursion and timing describe the observed cycle. Geometry alone does "
+                "not assess equipment, torso swing, bilateral symmetry or form quality. "
+                "Automatic rep comparison flags are not implemented for this exercise."
+            )
+        if profile.id == "incline-dumbbell-bench-press":
+            limitations.append(
+                "Incline-press counter v2 confirms bent elbows <=100 degrees before each "
+                "press, starts timing on the confirmed bent run and completes at >=145 degrees, "
+                "with 100 ms raw dwell plus median confirmation. These are uncalibrated "
+                "counting zones, not form or lockout targets. Timing and elbow excursion "
+                "cover the bent-to-extended interval, including pauses/confirmation delay; "
+                "lowering rearms the counter but is not part of that interval. "
+                "Geometry alone does not evaluate dumbbells, bench angle, symmetry or form. "
+                "Automatic rep comparison flags are not implemented for this exercise."
+            )
+        if profile.id in {"lat-pulldown", "incline-dumbbell-bench-press"}:
+            limitations.append(
+                "Counter v2 can preserve phase across missing samples only when visible samples "
+                "are at most 200 ms apart; smoothing and dwell restart after each interruption. "
+                "No angles are filled in. Longer gaps discard the unfinished rep. "
+                "Press completions must be at least 1200 ms apart "
+                "to reject rapid duplicate cycles. "
+                "Raw torso measurements still require uninterrupted visibility."
+            )
+        if profile.id == "cable-lateral-raise":
+            limitations.append(
+                "Cable-raise counter v1 measures the projected hip-shoulder-elbow angle. "
+                "It requires a lowered zone <=30 degrees then a raised zone >=60 degrees, "
+                "100 ms raw dwell plus median confirmation. Returning low rearms the counter. "
+                "Intervals run from the confirmed low run to the raised zone, including pauses; "
+                "lowering before the low zone is excluded. These uncalibrated zones count visible "
+                "lifts, not correct lateral raises or anatomical shoulder abduction. "
+                "A side view strongly changes projected angles. Back-view footage has not "
+                "produced reliable counts. Geometry alone does not assess rotation, cable path "
+                "or form. "
+                "Automatic rep comparison flags are not implemented for this exercise."
+            )
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable or result.tracking_breaks:
@@ -246,7 +352,13 @@ class RuleBasedAnalyzer:
             status = "partial"
             if (
                 is_final
-                and result.current_phase == movement.ready_phase
+                and (
+                    result.current_phase == movement.ready_phase
+                    or (
+                        profile.id in {"incline-dumbbell-bench-press", "cable-lateral-raise"}
+                        and result.current_phase == "bottom"
+                    )
+                )
                 and not unavailable
                 and not result.tracking_breaks
             ):
@@ -254,7 +366,12 @@ class RuleBasedAnalyzer:
             headline = (
                 f"{len(reps)} completed {profile.id} reps observed. Scores are not available yet."
             )
-        if is_final and result.current_phase in {"descent", "bottom", "ascent"}:
+        unfinished = (
+            {"ascent"}
+            if profile.id in {"incline-dumbbell-bench-press", "cable-lateral-raise"}
+            else {"descent", "bottom", "ascent"}
+        )
+        if is_final and result.current_phase in unfinished:
             limitations.append("The set ended during an unfinished repetition; it was not counted.")
 
         if issues:
@@ -297,4 +414,5 @@ class RuleBasedAnalyzer:
             timeline=timeline,
             limitations=limitations,
             scoring=None,
+            movement_observations=observations,
         )

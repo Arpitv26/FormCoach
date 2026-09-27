@@ -12,6 +12,8 @@ def segment_pushups(samples: Sequence[AngleSample]) -> SegmentationResult:
     config = AngleCycleConfig(
         extended_angle_deg=PUSHUP_PROFILE.thresholds["topElbowAngleDeg"],
         flexed_angle_deg=PUSHUP_PROFILE.thresholds["bottomElbowAngleDeg"],
+        minimum_phase_ms=PUSHUP_PROFILE.thresholds["minimumPhaseMs"],
+        independent_phase_confirmation=True,
     )
     result = segment_angle_cycles(samples, config=config)
     return replace(result, current_phase="top") if result.current_phase == "extended" else result
