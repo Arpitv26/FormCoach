@@ -3,6 +3,7 @@ import test from "node:test";
 import fixture from "../../../contracts/examples/pushup-analysis.json";
 import type { AnalysisResponse, LiveBatchRequest, PoseFrame } from "../src/lib/api/types";
 import { LiveSession, initialLiveState, LIVE_LIMIT_MS } from "../src/lib/live/session";
+import { ApiError } from "../src/lib/api/client";
 const flush = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); };
 const pose = (): PoseFrame => ({ frameIndex: 80, timestampMs: 99999, landmarks: [{ index: 11, name: "left_shoulder", x: .123, y: .4, z: null, visibility: .9 }] });
 function result(batch: LiveBatchRequest, count: number | null = 1): AnalysisResponse {
@@ -119,6 +120,64 @@ test("backend failure freezes capture, avoids auto-retry and allows explicit fin
   assert.equal(app.requests[1].frames.length, 1);
   assert.equal(app.state.result?.summary.totalReps, 0);
   assert.equal(app.state.phase, "finished");
+});
+
+test("a dropped live connection retains raw frames and the last count, then resumes automatically", async () => {
+  let calls = 0;
+  const app = setup(async batch => {
+    if (++calls === 2) throw new ApiError(0, "Cannot reach API");
+    return result(batch, batch.frames.length);
+  });
+  app.session.start(1280, 720); app.session.capture(pose(), 1280, 720);
+  app.time(6000); app.session.pulse(); await flush();
+  app.time(6100); app.session.capture(pose(), 1280, 720);
+  app.time(7000); app.session.pulse(); await flush();
+  assert.equal(app.state.phase, "capturing");
+  assert.equal(app.state.reconnecting, true);
+  assert.equal(app.state.result?.summary.totalReps, 1);
+  app.time(7100); app.session.capture(pose(), 1280, 720);
+  app.time(8000); app.session.pulse(); await flush();
+  assert.equal(app.requests.length, 2);
+  app.time(9000); app.session.pulse(); await flush();
+  assert.deepEqual(app.requests[2].frames.map(frame => frame.timestampMs), [0, 1100, 2100]);
+  assert.equal(app.state.reconnecting, false);
+  assert.equal(app.state.result?.summary.totalReps, 3);
+  assert.equal(app.state.error, null);
+});
+
+test("final connection retries are bounded and preserve the frozen set for explicit recovery", async () => {
+  let failing = true;
+  const app = setup(async batch => {
+    if (failing) throw new ApiError(503, "Unavailable");
+    return result(batch);
+  });
+  app.session.start(1280, 720); app.session.capture(pose(), 1280, 720);
+  app.session.finish(); await flush();
+  assert.equal(app.state.phase, "finishing");
+  for (const time of [7000, 11000, 19000]) {
+    app.time(time); app.session.capture(pose(), 1280, 720); app.session.pulse(); await flush();
+  }
+  assert.equal(app.requests.length, 4);
+  assert.ok(app.requests.every(batch => batch.isFinal && batch.frames.length === 1));
+  assert.equal(app.state.phase, "error");
+  app.time(30000); app.session.pulse(); await flush();
+  assert.equal(app.requests.length, 4);
+  failing = false; app.session.retryFinal(); await flush();
+  assert.equal(app.state.phase, "finished");
+});
+
+test("reset cancels scheduled reconnection and contract errors do not retry", async () => {
+  const app = setup(async () => { throw new ApiError(0, "Connection lost"); });
+  app.session.start(1280, 720); app.session.capture(pose(), 1280, 720);
+  app.time(6000); app.session.pulse(); await flush();
+  app.session.reset(); app.time(20000); app.session.pulse(); await flush();
+  assert.equal(app.requests.length, 1);
+  assert.equal(app.state.reconnecting, false);
+  const invalid = setup(async () => { throw new ApiError(422, "Invalid batch"); });
+  invalid.session.start(1280, 720); invalid.session.capture(pose(), 1280, 720);
+  invalid.time(6000); invalid.session.pulse(); await flush();
+  assert.equal(invalid.state.phase, "error");
+  assert.equal(invalid.state.reconnecting, false);
 });
 
 test("invalid dimensions and unrelated responses are rejected", async () => {

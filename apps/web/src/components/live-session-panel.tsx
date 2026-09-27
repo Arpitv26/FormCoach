@@ -12,9 +12,9 @@ export function LiveSessionPanel({ state, canStart, onStart, onFinish, onReset, 
     <div className="section-heading"><h2 id="live-session-heading">{active ? "Your set is running" : finishing ? "Finishing your set…" : state.phase === "error" ? "Let’s retry your analysis" : "Ready to start?"}</h2><span className="outline-tag">Push-ups · up to 2 minutes</span></div>
     {state.phase === "idle" && <p className="muted small">Start in a straight-arm position. Joint positions are sent for counting; video stays on your device.</p>}
     <dl className={styles.liveStats}>
-      <div><dt>Counted reps</dt><dd aria-live="polite" aria-atomic="true">{result?.summary.totalReps ?? "—"}</dd></div>
+      <div><dt>{state.reconnecting ? "Last count" : "Counted reps"}</dt><dd aria-live="polite" aria-atomic="true">{result?.summary.totalReps ?? "—"}</dd></div>
       <div><dt>Set time</dt><dd>{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</dd></div>
-      <div><dt>Analysis</dt><dd className={styles.analysisState}>{state.phase === "idle" ? "Not started" : state.phase === "error" ? "Paused" : finishing ? "Finishing…" : state.phase === "finished" ? "Final response" : state.inFlight ? "Updating…" : "Capturing"}</dd></div>
+      <div><dt>Analysis</dt><dd className={styles.analysisState}>{state.reconnecting ? "Reconnecting…" : state.phase === "idle" ? "Not started" : state.phase === "error" ? "Paused" : finishing ? "Finishing…" : state.phase === "finished" ? "Final response" : state.inFlight ? "Updating…" : "Capturing"}</dd></div>
     </dl>
     {result?.provenance.kind && result.provenance.kind !== "measured" && <p className={styles.liveError}>{result.provenance.label} · {result.provenance.kind} response, not verified camera measurements.</p>}
     {active && <p className="muted small">{result?.status === "insufficient_data" ? "Not enough usable movement yet. Keep one elbow visible and pause at the straight-arm top position." : result?.summary.headline ?? "Waiting for the first analysis. A dash means unknown, not zero."}</p>}

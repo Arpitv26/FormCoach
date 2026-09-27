@@ -21,6 +21,16 @@ To reconnect immediately, use `launchctl kickstart -k gui/$(id -u)/ca.formcoach.
 For a presentation on this Mac, `http://localhost:3000` connects directly to the
 local API on port 8000 and avoids the tunnel entirely.
 
+Live sets now keep collecting the bounded joint-position history during temporary
+connection errors, with a visible Reconnecting status and Last count label.
+Requests retry after 2, 4, 8, then at most 10 seconds while capturing. A successful
+response replaces the count using the full cumulative history. Final analysis
+allows three automatic retries before preserving the set for manual retry.
+Validation/contract errors still stop analysis. Reset cancels pending recovery.
+The deployed UI was checked with a simulated camera and a deliberately failed
+first API request: it retained 10 then 30 frames, recovered, and finalized with
+HTTP 200. This checks connection recovery, not physical rep-count accuracy.
+
 The current deployment was created from the CLI, not connected to GitHub for
 automatic deployments. New Git commits do not automatically update the site.
 

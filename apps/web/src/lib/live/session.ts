@@ -1,4 +1,5 @@
 import type { AnalysisResponse, LiveBatchRequest, PoseFrame } from "../api/types";
+import { ApiError } from "../api/client";
 
 export const LIVE_LIMIT_MS = 120_000;
 export const LIVE_FRAME_LIMIT = 1800;
@@ -8,12 +9,13 @@ export interface LiveState {
   elapsedMs: number;
   frameCount: number;
   inFlight: boolean;
+  reconnecting: boolean;
   result: AnalysisResponse | null;
   message: string | null;
   error: string | null;
 }
 export const initialLiveState: LiveState = {
-  phase: "idle", sessionId: null, elapsedMs: 0, frameCount: 0, inFlight: false, result: null, message: null, error: null,
+  phase: "idle", sessionId: null, elapsedMs: 0, frameCount: 0, inFlight: false, reconnecting: false, result: null, message: null, error: null,
 };
 
 /** Cumulative raw poses only. The backend owns readiness, comparisons and rep counting. */
@@ -23,6 +25,8 @@ export class LiveSession {
   private dimensions = { imageWidth: 0, imageHeight: 0 };
   private startedAt = 0;
   private lastSentAt = 0;
+  private retryAfter = 0;
+  private failures = 0;
   private generation = 0;
   private controller: AbortController | null = null;
   private disposed = false;
@@ -71,15 +75,22 @@ export class LiveSession {
   }
 
   pulse() {
-    if (this.disposed || this.state.phase !== "capturing") return;
+    if (this.disposed) return;
+    if (this.state.phase === "finishing") {
+      if (!this.controller && this.retryAfter && this.now() >= this.retryAfter) void this.send(true);
+      return;
+    }
+    if (this.state.phase !== "capturing") return;
     const elapsedMs = Math.min(LIVE_LIMIT_MS, Math.max(0, Math.round(this.now() - this.startedAt)));
     this.update({ elapsedMs, frameCount: this.frames.length });
     if (elapsedMs >= LIVE_LIMIT_MS) { this.finish("The two-minute set limit was reached."); return; }
-    if (!this.controller && this.frames.length && this.now() - this.lastSentAt >= 1000) void this.send(false);
+    if (!this.controller && this.frames.length && this.now() >= this.retryAfter && this.now() - this.lastSentAt >= 1000) void this.send(false);
   }
 
   finish(message?: string) {
     if (this.disposed || this.state.phase !== "capturing") return;
+    this.failures = 0;
+    this.retryAfter = 0;
     this.update({ phase: "finishing", frameCount: this.frames.length,
       elapsedMs: Math.min(LIVE_LIMIT_MS, Math.max(0, Math.round(this.now() - this.startedAt))),
       message: message ?? "Set ended. Waiting for the final analysis…",
@@ -89,6 +100,8 @@ export class LiveSession {
 
   retryFinal() {
     if (this.disposed || this.state.phase !== "error" || this.controller || !this.state.sessionId) return;
+    this.failures = 0;
+    this.retryAfter = 0;
     this.update({ phase: "finishing", error: null, message: "Retrying the final snapshot of this set…" });
     void this.send(true);
   }
@@ -98,6 +111,7 @@ export class LiveSession {
     const generation = this.generation;
     const controller = new AbortController();
     this.controller = controller;
+    this.retryAfter = 0;
     this.lastSentAt = this.now();
     const batch: LiveBatchRequest = { contractVersion: "1.0", sessionId: this.state.sessionId,
       exerciseHint: "push-up", ...this.dimensions, frames: this.frames.slice(), isFinal,
@@ -108,10 +122,24 @@ export class LiveSession {
       if (this.disposed || generation !== this.generation) return;
       if (result.sessionId !== batch.sessionId || result.source.type !== "live") throw new Error("The response did not match this live set.");
       const waitingMessage = this.state.message === "Set ended. Waiting for the final analysis…" || this.state.message === "Retrying the final snapshot of this set…";
-      this.update({ result, ...(isFinal ? { phase: "finished" as const, message: waitingMessage ? "Final analysis received." : this.state.message } : {}) });
+      const recovered = this.state.reconnecting;
+      this.failures = 0;
+      this.update({ result, reconnecting: false, error: null,
+        ...(isFinal ? { phase: "finished" as const, message: waitingMessage || recovered ? "Final analysis received." : this.state.message }
+          : recovered && this.state.phase === "capturing" ? { message: "Connection restored. Your count is up to date." } : {}) });
     } catch (error) {
       if (this.disposed || generation !== this.generation) return;
-      this.update({ phase: "error", frameCount: this.frames.length, message: "Capture paused. Retry the final analysis or reset to start a new set.", error: error instanceof Error ? error.message : "Live analysis could not finish." });
+      const transient = error instanceof ApiError && error.code !== "REQUEST_ABORTED" && (error.status === 0 || [502, 503, 504].includes(error.status));
+      if (transient && (!isFinal || this.failures < 3)) {
+        this.failures++;
+        this.retryAfter = this.now() + Math.min(1000 * 2 ** this.failures, 10_000);
+        this.update({ reconnecting: true, error: null, frameCount: this.frames.length,
+          message: this.state.phase === "capturing"
+            ? "Reconnecting to analysis. Joint positions are still being collected; the count will update when connected."
+            : "Reconnecting to finish your analysis. Your captured joint positions are kept in this tab." });
+      } else {
+        this.update({ phase: "error", reconnecting: false, frameCount: this.frames.length, message: "Capture paused. Retry the final analysis or reset to start a new set.", error: error instanceof Error ? error.message : "Live analysis could not finish." });
+      }
     } finally {
       if (!this.disposed && generation === this.generation) {
         this.controller = null;
@@ -134,6 +162,8 @@ export class LiveSession {
     this.controller?.abort();
     this.controller = null;
     this.frames = [];
+    this.failures = 0;
+    this.retryAfter = 0;
     this.update({ ...initialLiveState });
   }
   dispose() { this.disposed = true; this.reset(); }
