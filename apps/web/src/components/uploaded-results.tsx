@@ -44,6 +44,16 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
       {analysis.reps.length === 0 && <p className={styles.notice}>{analysis.summary.totalReps === 0 ? "No complete movements met the counting rules. That doesn’t mean no movement happened." : "There wasn’t enough information to count completed reps reliably."}</p>}
       <MovementObservations observations={analysis.movementObservations} onSeek={seekEnabled ? onSeek : undefined} />
       <CoachPanel key={analysis.sessionId} analysis={analysis} onSeek={seekEnabled ? onSeek : undefined} />
+      {analysis.visualReview && <section aria-label="AI visual review">
+        <h3>What the visual review noticed</h3>
+        <p className="muted small">AI interpretation of sampled video frames · separate from measured angles and rep counts.</p>
+        {analysis.visualReview.status === "unavailable" ? <p>Visual review couldn’t finish. Your measured results are still available; analyze again to retry.</p> : analysis.visualReview.findings.length === 0 ? <p>No clear technique observations were established from these frames.</p> : analysis.visualReview.findings.map((finding, index) => <div key={index}>
+          <p className="muted small">{finding.phase === "setup" ? "During setup" : finding.phase === "finish" ? "After the set" : "During the exercise"}</p>
+          <p><strong>{finding.observation}</strong></p><p>{finding.cue}</p>
+          <div className={styles.moments}>{finding.evidenceTimestampsMs.map((time) => <button key={time} type="button" disabled={!seekEnabled} onClick={() => onSeek(time)}>Review {seconds(time)}</button>)}</div>
+        </div>)}
+        <details><summary>Visual review details</summary><p>{analysis.visualReview.sampledTimestampsMs.length} frames reviewed.</p><ul>{analysis.visualReview.limitations.map((limit, index) => <li key={index}>{limit}</li>)}</ul></details>
+      </section>}
       <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} onShowDetails={() => { if (repDetails.current) repDetails.current.open = true; }} />
       {(analysis.reps.length > 0 || analysis.issues.length > 0) && <section className={styles.changes} aria-labelledby={`${id}-changes`}>
         <div className="section-heading"><h3 id={`${id}-changes`}>Rep-to-rep changes</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>

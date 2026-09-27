@@ -2,6 +2,19 @@
 
 ## Current direction — September 27, 2026
 
+**Latest user-rehearsal fix:** original incline side2 now counts 7 including the initial lift
+(human: 6 working reps excluding that lift), original normal pulldown 6, changed pulldown
+5/6. Optional GPT-5.4 sampled-image review now supplies timestamped technique observations
+to results and chat. The actual changed-pulldown review identifies torso rocking; detailed
+chat can return all seven incline intervals. Read apps/api/GYM_EXERCISES.md and AI_COACH.md.
+Both apps/schemas/types must be integrated together for additive `visualReview`.
+
+Next small checks: refresh/reanalyze the original files in the browser, verify visual seek
+links and coach follow-ups, review the remaining 5/6 pulldown counting limitation, rehearse
+live push-ups physically, then proceed with the user-authorized visual overhaul. Do not
+claim all camera views or every visual finding are validated. 550 backend/55 frontend tests
+and the existing push-up recordings pass. Computer-use automation remains unavailable.
+
 The demo is **live push-ups plus uploaded incline dumbbell bench press, cable lateral raise
 and lat pulldown**; triceps is removed. A owns both apps. Fourteen private gym clips are now
 available. All three upload checkpoints are implemented. The selected 1080p exports count

@@ -4,7 +4,8 @@
 analyzer as live batches. The request and response shapes stay at contract version **1.0**.
 This is a synchronous local demo endpoint: one request waits for one analysis result.
 
-**Current integration:** the frontend already uses the 240-second timeout and the additive
+**Current integration:** the frontend uses a 300-second timeout (pose extraction plus optional
+sampled-frame OpenAI review) and the additive
 `/videos/analyze-with-pose` endpoint for skeleton playback. The analysis-only endpoint below
 remains supported. See ../../docs/POSE_OVERLAY.md and ../../docs/NEXT_STEPS.md.
 
@@ -29,7 +30,7 @@ Open a second terminal at the repository root and run:
 
 ```bash
 mkdir -p apps/api/artifacts/upload-demo
-curl --fail-with-body --max-time 240 \
+curl --fail-with-body --max-time 300 \
   -F 'file=@IMG_6939.MOV' \
   -F 'exerciseHint=push-up' \
   http://127.0.0.1:8000/api/v1/videos/analyze \
@@ -55,8 +56,8 @@ Computer B owns the client/UI changes. Read docs/API_CONTRACT.md and retain the 
 - Send multipart fields `file` and `exerciseHint: "push-up"`. Browser `FormData` sets the
   Content-Type boundary automatically. An omitted selection returns `EXERCISE_REQUIRED`;
   there is no automatic recognition. Legacy `squat` also counts; other profiles are rejected.
-- Keep **only the upload request's** timeout at **240 seconds** for local demo testing.
-  Health/live requests keep their shorter timeout.
+- Keep upload timeout at **300 seconds** for local demo testing, including optional visual
+  review. Health/live retain 15 seconds; conversational coaching uses 50 seconds.
   Add a client test that the upload gets that separate timeout. Show an indeterminate
   “Analyzing video” state; the backend does not report progress percentages.
 - Disable repeated submission while processing. HTTP 503 `VIDEO_PROCESSOR_BUSY` means wait
@@ -93,7 +94,7 @@ slot. These are processing limits, not a hard network-body/disk quota. This endp
 the local hackathon demo, not unrestricted public uploads. Native processing runs in a worker
 thread so health requests remain responsive. A 180-second cooperative extraction deadline
 is checked between native calls; it cannot forcibly interrupt a hung native call. The client
-240-second timeout is also not a server cancellation mechanism. No queue/job API was added.
+300-second timeout is also not a server cancellation mechanism. No queue/job API was added.
 
 All application errors use `{"detail":{"code":"...","message":"..."}}`:
 

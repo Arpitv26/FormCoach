@@ -1,5 +1,17 @@
 # Frontend handoff — Computer A after B’s PR #4
 
+## September 27: gym upload and visual-review integration
+
+A owns both apps. Integrate the full current backend-cv checkpoint, including contracts and
+generated types: optional/default-null `visualReview` is posted back to coach, and older
+strict servers reject it. Results show explicitly AI-authored observations/cues, phase labels
+and sampled-frame seek links. Images stay out of response JSON. Chat gets visual findings
+plus numeric evidence/history; detailed questions can request all available rep breakdowns.
+Timeouts are now upload 300 s, coach 50 s, health/live 15 s. Refresh and analyze again to get
+visual findings; old results cannot acquire them automatically. See API_CONTRACT.md and
+AI_COACH.md. Native HTTP and actual OpenAI calls pass; browser seek/render verification
+remains manual because the computer-use service cannot start.
+
 ## Latest follow-up: movement feedback even without completed reps
 
 A has added optional/default-empty `movementObservations` to AnalysisResponse with matching

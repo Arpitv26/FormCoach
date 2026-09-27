@@ -80,7 +80,7 @@ export function VideoUpload({ exercise }: { exercise: Extract<ExerciseOption, { 
             {state.message && <p className={state.phase === "error" ? styles.error : styles.notice}>{state.message}</p>}
             {state.phase === "complete" && <p className={styles.notice}>Response received. Your results are below.</p>}
           </div>
-          <p className="muted small">Analyze sends this video to the configured FormCoach backend. Stopping or leaving this page stops waiting; server processing may continue.</p>
+          <p className="muted small">Analyze sends this video to the FormCoach backend. When AI visual review is enabled, timestamped frames are also sent to OpenAI for technique feedback.</p>
         </section>
         {state.result && <UploadedResults analysis={state.result} canSeek={state.preview === "ready"} onSeek={seek} />}
         </div>

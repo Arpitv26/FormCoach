@@ -33,7 +33,12 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"Extracting {args.exercise} poses locally. This may take a minute...", file=sys.stderr
         )
-        sequence = MediaPipePoseProvider(args.model).extract(args.video)
+        gym = args.exercise in {
+            "lat-pulldown",
+            "incline-dumbbell-bench-press",
+            "cable-lateral-raise",
+        }
+        sequence = MediaPipePoseProvider(args.model, allow_dominant_pose=gym).extract(args.video)
         capture = LiveBatchRequest(
             session_id=str(uuid4()),
             exercise_hint=args.exercise,
@@ -52,9 +57,14 @@ def main(argv: list[str] | None = None) -> int:
             is_final=True,
         )
         analysis.limitations.append(
-            "Poses extracted locally with MediaPipe Pose Landmarker Full. No-pose/multiple-person "
+            "Poses extracted locally with MediaPipe Pose Landmarker Full. No-pose/ambiguous-person "
             "frames are unavailable. Model estimates and rep counts need comparison with the video."
         )
+        if gym:
+            analysis.limitations.append(
+                "Gym uploads can select the clearly larger detected person (2x visible area). "
+                "This is not identity recognition; confirm the intended person in playback."
+            )
         args.output.mkdir(parents=True, exist_ok=False)
         (args.output / "poses.json").write_text(
             capture.model_dump_json(by_alias=True, indent=2) + "\n"

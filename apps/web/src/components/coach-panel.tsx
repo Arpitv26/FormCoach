@@ -41,10 +41,10 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
         <div className={styles.answer}>
           <p className={styles.speaker}>{turn.response.provider === "openai" ? "AI coach" : "FormCoach · local"}</p>
           <p className={styles.message}>{turn.response.message}</p>
-          <details><summary>Measurements behind this reply</summary>
+          <details><summary>Evidence behind this reply</summary>
             {turn.response.evidence.length === 0 ? <p className="muted small">No specific measurements cited.</p> : <ul>{turn.response.evidence.map((path, i) => {
               const item = describeEvidence(analysis, path);
-              return <li key={`${path}-${i}`}><span>{item.label}: <strong>{item.text}</strong></span>{item.rep && onSeek && <button type="button" onClick={() => onSeek(item.rep!.startMs)}>View rep {item.rep.repNumber}</button>}</li>;
+              return <li key={`${path}-${i}`}><span>{item.label}: <strong>{item.text}</strong></span>{item.rep && onSeek && <button type="button" onClick={() => onSeek(item.rep!.startMs)}>View rep {item.rep.repNumber}</button>}{item.seekMs != null && onSeek && <button type="button" onClick={() => onSeek(item.seekMs!)}>Review frame</button>}</li>;
             })}</ul>}
             {turn.response.limitations.length > 0 && <div className={styles.limits}><ul>{turn.response.limitations.map((item, i) => <li key={i}>{item}</li>)}</ul></div>}
           </details>
@@ -60,6 +60,6 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
     </form>
     <div className={styles.feedback}><p role="status" className="small">{state.busy ? "Coach is thinking…" : ""}</p>{state.busy && <button type="button" onClick={() => session.current?.cancel()}>Cancel</button>}</div>
     {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
-    <p className="muted small">Based on this set’s measurements. Camera tracking can miss movement.</p>
+    <p className="muted small">{analysis.visualReview?.status === "complete" ? "Based on measured movement and an AI review of sampled video frames." : "Based on this set’s measurements; no completed AI visual review is attached."}</p>
   </section>;
 }

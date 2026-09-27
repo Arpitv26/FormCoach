@@ -63,7 +63,7 @@ def test_conversation_renders_model_wording_and_resolves_evidence(request_data):
         ConversationReply(message="Great", kind="session", evidence_ids=[]),
         ConversationReply(message="Great", kind="session", evidence_ids=["fake"]),
         ConversationReply(message="Great", kind="session", evidence_ids=["count", "count"]),
-        ConversationReply(message="word " * 121, kind="general", evidence_ids=[]),
+        ConversationReply(message="word " * 1001, kind="general", evidence_ids=[]),
     ],
 )
 def test_bad_reply_falls_back(request_data, reply):

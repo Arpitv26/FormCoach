@@ -84,6 +84,22 @@ If a contract must change:
 
 ## Current capabilities
 
+**September 27 original-upload/visual-review checkpoint:** user explicitly authorized sending
+sampled gym video images to OpenAI for more useful trainer-style feedback. Optional backend
+`VISUAL_REVIEW_ENABLED` now attaches default-null `visualReview` to upload analyses: separately
+labeled model interpretations, phases (exercise/setup/finish), cues and actual sample timestamps.
+It never overwrites numeric rep counts, angles or scores. Both apps/schemas/types must move
+together. See docs/AI_COACH.md and apps/api/GYM_EXERCISES.md. GPT-5.4 development checks identify
+the changed pulldown's torso rocking and support a seven-rep incline chat breakdown. Camera
+ambiguity and possible model mistakes remain; citations are not proof of visual accuracy.
+Original incline side2 counts 7 including initial lift; original good pulldown 6; bad pulldown
+5/6 remains incomplete. Gym phase grace is 200 ms without inferred samples; press tolerance
+145°, minimum completion spacing 1,200 ms. Gym extraction can select a clearly larger person;
+ambiguous people remain unknown. Push-up policy/geometric regression outputs are unchanged.
+550 backend/55 frontend tests and lint/format/contracts/types/build pass. Browser automation
+is unavailable; manually refresh and reanalyze to obtain the new review. Older checkpoints
+below describe the numeric-only coach and prior gym counting behavior.
+
 **Gym upload checkpoint (2026-09-27):** A implemented lat pulldown, incline dumbbell bench
 press and cable lateral raise end to end; triceps is removed from the frontend lineup.
 Read apps/api/GYM_EXERCISES.md for exact selected 1080p exports, counter semantics and known

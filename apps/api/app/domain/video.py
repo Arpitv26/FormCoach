@@ -1,4 +1,4 @@
-"""Additive playback envelope; the original AnalysisResponse stays unchanged."""
+"""Upload analysis and its normalized playback pose track."""
 
 from typing import Literal, Self
 

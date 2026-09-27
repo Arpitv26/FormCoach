@@ -14,6 +14,13 @@ on adequate evidence and the UI must show confidence/visibility limitations.
 perfect scores, invented detections, or an AI-generated substitute finding. A model's landmark
 visibility score is not a medical confidence score. Heuristic weights/thresholds need calibration.
 
+Optional uploaded-video visual review is a separately labeled AI interpretation, not a
+replacement for unavailable geometric measurements. It can describe visible movement and
+suggest cues, citing actual sampled frames, including outside completed reps. It must not
+invent numeric angles, scores, rep counts or diagnoses. Correct sample references do not
+prove the observation is correct. Distinguish setup/finish from working reps and retain
+view-specific uncertainty without burying useful observations in generic caveats.
+
 ## Appropriate product language
 
 Use concrete observations such as “In the measured view, rep 5 had less range of motion”

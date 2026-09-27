@@ -94,6 +94,17 @@
           "maxItems": 240,
           "title": "Movementobservations",
           "type": "array"
+        },
+        "visualReview": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VisualReview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -1185,6 +1196,116 @@
         "poseTrack"
       ],
       "title": "VideoAnalysisResponse",
+      "type": "object"
+    },
+    "VisualFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "adjustment",
+            "positive",
+            "observation"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "phase": {
+          "default": "exercise",
+          "enum": [
+            "exercise",
+            "setup",
+            "finish"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "observation": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Observation",
+          "type": "string"
+        },
+        "cue": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Cue",
+          "type": "string"
+        },
+        "evidenceTimestampsMs": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 8,
+          "minItems": 2,
+          "title": "Evidencetimestampsms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "observation",
+        "cue",
+        "evidenceTimestampsMs"
+      ],
+      "title": "VisualFinding",
+      "type": "object"
+    },
+    "VisualReview": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "unavailable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "const": "openai_sampled_frames",
+          "default": "openai_sampled_frames",
+          "title": "Source",
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 100,
+          "title": "Model",
+          "type": "string"
+        },
+        "sampledTimestampsMs": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 64,
+          "title": "Sampledtimestampsms",
+          "type": "array"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/VisualFinding"
+          },
+          "maxItems": 8,
+          "title": "Findings",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "model",
+        "sampledTimestampsMs",
+        "findings",
+        "limitations"
+      ],
+      "title": "VisualReview",
       "type": "object"
     }
   },

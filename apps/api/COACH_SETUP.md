@@ -1,7 +1,8 @@
 # Try the coach — Computer A
 
 The local coach already works without an account or key. It summarizes supplied measurements.
-Optional OpenAI selects relevant evidence; the server writes the final wording. One live API timing-question check passed on Computer A on 2026-09-26 (3.22 seconds). Read ../../docs/AI_COACH.md for limits.
+The current UI uses optional OpenAI conversational replies grounded in supplied evidence.
+Upload visual review can also send sampled images to OpenAI. Read ../../docs/AI_COACH.md.
 
 ## 1. Start the backend with local coaching
 
@@ -45,7 +46,7 @@ Expect `Provider: fallback`, `Demo data only`, three completed reps, and details
 This file is synthetic. To use your saved real result, change only the `analysis = ...` line
 with the path to an actual **AnalysisResponse JSON** saved from `/videos/analyze`.
 Replay reports wrap it in `analysis`, so those require `json.loads(...)["analysis"]`.
-The coach doesn't analyze video itself.
+Chat explains the attached analysis; optional upload review supplies visual findings first.
 
 ## 3. Optional: enable OpenAI
 
@@ -67,6 +68,19 @@ COACH_PROVIDER=openai
 OPENAI_MODEL=gpt-4.1-mini-2025-04-14
 OPENAI_API_KEY=
 ```
+
+For the richer upload review requested on Computer A, also set:
+
+```dotenv
+VISUAL_REVIEW_ENABLED=true
+OPENAI_VISION_MODEL=gpt-5.4-2026-03-05
+OPENAI_MODEL=gpt-5.4-2026-03-05
+```
+
+Keep only one `OPENAI_MODEL` line. This sends up to 64 sampled JPEGs per analyzed upload to
+OpenAI and spends credits. Restart the backend after changing settings, then analyze the clip
+again; old results do not acquire visual findings automatically. Successful results include
+“What the visual review noticed” with playback links. A failed review leaves counts usable.
 
 Paste your key **after the last equals sign in TextEdit only**, save with Command+S, close
 TextEdit. Do not paste it into chat, source files, screenshots, Git, or any `NEXT_PUBLIC_`

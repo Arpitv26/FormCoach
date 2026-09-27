@@ -4,6 +4,63 @@ Demo direction: live push-ups, plus one uploaded clip each for incline dumbbell 
 cable lateral raise and lat pulldown. Triceps is out of scope. Computer A owns both apps.
 No training or new dependencies. Filenames are human annotations, not classifier labels.
 
+## Current checkpoint: original uploads and visual coaching
+
+The human's browser screenshots exposed failures on the **original 4K files**, not the
+previously selected 1080p exports. These results supersede the historical milestone counts
+and strict missing-sample behavior below. Different exports can produce different poses.
+
+Counting changes are gym-specific:
+
+- Incline press v2 retains bent <=100°, rising >=110°, 100 ms raw dwell and three-sample
+  median; extension tolerance is now >=145°. A 1,200 ms minimum interval between completion
+  timestamps rejects rapid duplicate angle cycles. It can miss genuinely faster cycles.
+- Press and pulldown may preserve an unfinished phase across at most 200 ms since the last
+  usable angle. Missing data clears the median and dwell clocks; fresh observed samples must
+  confirm completion. There is no interpolation. Longer loss resets the unfinished phase.
+- Gym upload/CLI extraction can choose the clearly dominant person when visible landmark
+  bounding area is at least twice the second person's. Comparable people remain unknown.
+  This heuristic is not identity tracking: review the skeleton. Push-up extraction and
+  push-up/squat/cable segmentation policies are unchanged.
+
+`inclinedDumbellChestPressGoodFormSideView2.MOV` reproduced **3** under the prior rules,
+then **7** with the correction. The human reports 7 including the initial lift, 6 excluding
+it. Seven start/completion frame pairs were reviewed; the first interval includes sitting
+back into the bench/setup. It must not be treated as seven independently verified working
+reps or used as an ideal timing/range baseline. Completion times on the original saved poses:
+2.335, 6.468, 8.737, 11.205, 14.205, 17.673, 21.208 seconds.
+
+`latPulldownGoodFormSideView.MOV` reproduced **5**, then **6** with foreground selection.
+Six recovered overlays at 18.142–18.475 s track the main seated exerciser, not a bystander.
+`latPulldownBadFormSideView.MOV` reproduced **3**, now **5/6** in a fresh upload. The second
+pull has only two raw <=70° observations, at 5.068 and 5.135 s, insufficient for the 100 ms
+pull dwell. The missing count remains a documented limitation, not a bad-form label.
+
+Saved 1080p pose replay now counts annotated bad-form press left **7/7**, right **6/6**,
+angled **4/4**; bad pulldown **4/6**. Selected exports retain lat **6**, incline angled2 **7**,
+lateral side **7**. Back-view lateral raises still count **0**. These are development
+regressions, not independent validation or proof all detected intervals match human reps.
+
+Optional visual review uses GPT-5.4 sampled images independently of completed-rep counting.
+The original bad pulldown's actual HTTP review identifies repeated backward/forward torso
+rocking and suggests a steadier lean, with playback references. It does not replace the
+5/6 count. Press/normal-pulldown visual reviews also completed, and actual chat requests
+returned a seven-rep timestamp/angle breakdown and specific torso-rocking guidance.
+See ../../docs/AI_COACH.md for sampling, settings and interpretation limits.
+Final fresh HTTP checks with both extraction and visual review enabled retain original
+incline side2 **7**, changed pulldown **5/6**, and selected lateral side export **7**; all three
+return completed GPT-5.4 visual reviews. The normal pulldown foreground-selection upload
+retains **6**, with its recovered frames checked against the main exerciser.
+
+Checks: **550 backend / 55 frontend tests**, lint/format, schemas/types and production build.
+Eight saved push-up/blank captures preserve complete geometric results against e6693fd:
+counts **3/1/1/2/4/19/0/unknown**, rep timings/angles, flags, tracking and movement observations.
+6942 retains the rep-3 timing flag; badpushups retains five independent bend intervals.
+Browser automation remains unavailable (`codex app-server` missing). Native HTTP upload and
+real OpenAI chat were checked; final browser rendering/seek rehearsal remains manual.
+
+## Earlier implementation milestones (historical)
+
 ## First supported exercise: lat pulldown
 
 Wire ID `lat-pulldown`, shared by selection, upload, analysis and coaching. The existing

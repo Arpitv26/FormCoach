@@ -14,6 +14,8 @@ class Settings:
     pose_model_path: Path = API_ROOT / "artifacts/models/pose_landmarker_full.task"
     coach_provider: str = "fallback"
     openai_model: str = "gpt-4.1-mini-2025-04-14"
+    visual_review_enabled: bool = False
+    openai_vision_model: str = "gpt-5.4-2026-03-05"
 
 
 def get_settings() -> Settings:
@@ -30,6 +32,8 @@ def get_settings() -> Settings:
         openai_api_key=os.getenv("OPENAI_API_KEY", ""),
         coach_provider=os.getenv("COACH_PROVIDER", "fallback"),
         openai_model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini-2025-04-14"),
+        visual_review_enabled=os.getenv("VISUAL_REVIEW_ENABLED", "false").lower() == "true",
+        openai_vision_model=os.getenv("OPENAI_VISION_MODEL", "gpt-5.4-2026-03-05"),
         pose_model_path=API_ROOT
         / os.getenv("POSE_MODEL_PATH", "artifacts/models/pose_landmarker_full.task"),
     )

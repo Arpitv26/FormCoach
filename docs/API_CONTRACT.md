@@ -9,6 +9,29 @@ Canonical sources: `apps/api/app/domain/` models, generated `contracts/*.schema.
 generated `apps/web/src/lib/api/types.ts`, and fixtures under `contracts/examples/`.
 Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated files.
 
+## Optional visual review (2026-09-27)
+
+`AnalysisResponse.visualReview` defaults to `null` for older responses and live analysis.
+Upload responses can attach a separate, model-authored interpretation of sampled images.
+Version remains 1.0; deploy backend, schemas and generated frontend types together. Older
+strict coach validators reject the new field. This does not change numeric rep counts,
+angles, issues, scores or their provenance; visual findings are explicitly AI interpretations.
+
+- `status`: `complete` or `unavailable`; unavailable reviews have no findings.
+- `source`: `openai_sampled_frames`; `model` identifies the configured visual model.
+- `sampledTimestampsMs`: up to 64 strictly increasing actual video timestamps, within duration.
+- `findings`: up to 8 items with `kind` (`adjustment`, `positive`, `observation`),
+  `phase` (`exercise`, `setup`, `finish`; default exercise), `observation`, `cue`, and
+  2–8 distinct `evidenceTimestampsMs` drawn from the supplied samples.
+- `limitations`: short model/view limitations. An empty finding list is not a good-form grade.
+
+JPEG samples stay in backend memory during processing and are sent to OpenAI only when
+explicitly configured. They are not in JSON responses or pose tracks. Playback links seek
+the user's local clip. Coach evidence paths reference `visualReview.findings.N.*`.
+Timestamp validation proves a reference exists, not that the interpretation is correct.
+The new `visual-review-analysis.json` fixture is synthetic, not a reviewed recording.
+See AI_COACH.md for provider configuration, image sampling and failure behavior.
+
 ## Gym exercise IDs (2026-09-27)
 
 `lat-pulldown`, `incline-dumbbell-bench-press` and `cable-lateral-raise` support upload and normalized-pose analysis. Selected exercise IDs
@@ -346,7 +369,8 @@ Application errors retain the existing `detail.code` / `detail.message` shape:
 Missing/malformed multipart fields use FastAPI's existing HTTP 422 shape. Insufficient pose
 evidence returns HTTP 200 with honest `insufficient_data`/`partial` analysis, never mock data.
 See [HTTP upload guide](../apps/api/HTTP_UPLOAD.md) for exact curl commands and B's checklist.
-**Frontend behavior:** the integrated client uses a separate 240-second upload timeout.
+**Frontend behavior:** the integrated client uses a separate 300-second upload timeout,
+including optional visual review.
 Health/live/coach requests retain 15 seconds.
 
 ## AnalysisResponse
@@ -459,7 +483,7 @@ See AI_COACH.md, `contracts/examples/coach-conversation-request.json`, and apps/
   Client shows a friendly message; developers inspect the network response for field errors.
 - Upload-specific statuses and codes are listed above; all use the application error shape.
 - Network/unexpected server errors: client throws `ApiError`; no mock substitution.
-- Client timeout is 15 seconds for short requests and 240 seconds for uploads. Never automatically retry a timed-out upload.
+- Client timeout is 15 seconds for health/live, 50 seconds for coach and 300 seconds for uploads. Never automatically retry a timed-out upload.
 - No auth or durable session storage exists. Health does not expose secrets/settings.
 
 Change procedure and regeneration commands are in `contracts/README.md` and AGENTS.md.

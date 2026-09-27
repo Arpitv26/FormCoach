@@ -59,10 +59,10 @@ export function createApiClient(
     return body as T;
   }
 
-  function post<T>(path: string, body: unknown, signal?: AbortSignal) {
+  function post<T>(path: string, body: unknown, signal?: AbortSignal, timeoutMs = 15_000) {
     return request<T>(path, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal,
-    });
+    }, timeoutMs);
   }
 
   return {
@@ -73,14 +73,14 @@ export function createApiClient(
       form.append("file", file);
       if (exerciseHint) form.append("exerciseHint", exerciseHint);
       // The browser supplies the multipart boundary; do not set Content-Type yourself.
-      return request<AnalysisResponse>("/videos/analyze", { method: "POST", body: form, signal }, 240_000);
+      return request<AnalysisResponse>("/videos/analyze", { method: "POST", body: form, signal }, 300_000);
     },
-    coach: (input: CoachRequest, signal?: AbortSignal) => post<CoachResponse>("/coach", input, signal),
+    coach: (input: CoachRequest, signal?: AbortSignal) => post<CoachResponse>("/coach", input, signal, 50_000),
     analyzeVideoWithPose: (file: File, exerciseHint: string, signal?: AbortSignal) => {
       const form = new FormData();
       form.append("file", file);
       form.append("exerciseHint", exerciseHint);
-      return request<VideoAnalysisResponse>("/videos/analyze-with-pose", { method: "POST", body: form, signal }, 240_000);
+      return request<VideoAnalysisResponse>("/videos/analyze-with-pose", { method: "POST", body: form, signal }, 300_000);
     },
   };
 }

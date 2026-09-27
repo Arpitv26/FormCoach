@@ -2,6 +2,12 @@
 
 Both computers depend on this directory. `contractVersion` is **1.0**.
 
+Latest addition: optional `AnalysisResponse.visualReview`, default null. It holds explicitly
+AI-authored sampled-frame observations with playback timestamps, separate from numeric
+measurements. Update both apps together; older strict coach validators reject it.
+`examples/visual-review-analysis.json` is an authored synthetic UI fixture, not an OpenAI
+evaluation or recording. See API_CONTRACT.md for phase, evidence and failure semantics.
+
 Latest additive field: `AnalysisResponse.movementObservations`; old responses default to an
 empty list. Update API and generated types together before posting new responses to coaching.
 These independent intervals are not rep counts or scores. See API_CONTRACT.md.

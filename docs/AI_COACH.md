@@ -4,7 +4,39 @@
 `summary`, `next_set`, or `qa` (nonblank question required for QA). The server is stateless.
 The current UI requests `responseStyle: "conversation"` and sends bounded recent history.
 Omitting that field preserves the original `evidence` behavior described below.
-No raw video or pose frames go to OpenAI. Computer A owns the implementation.
+Computer A owns the implementation. Optional upload visual review now sends sampled JPEG
+frames to OpenAI, then attaches its findings to the analysis. Chat receives those findings
+and numeric evidence, not the images again. Live capture remains numeric evidence only.
+
+## Uploaded-video visual review
+
+The human explicitly requested visual analysis after the numeric-only coach could not
+identify obvious torso rocking. Enable with backend-only `VISUAL_REVIEW_ENABLED=true`,
+`COACH_PROVIDER=openai` and `OPENAI_API_KEY`. `OPENAI_VISION_MODEL` defaults to
+`gpt-5.4-2026-03-05`; Computer A also uses that snapshot for `OPENAI_MODEL`. Legacy chat's
+default remains `gpt-4.1-mini-2025-04-14`. No keys or images enter frontend environment variables.
+
+One native decode collects upright JPEGs no faster than 2 fps, then evenly retains at most
+64 spanning the clip (960 px long edge, JPEG quality 80). A separate Responses request uses
+image inputs, structured output, `store=False`, zero retries, an 80-second SDK deadline and
+an 8,000-token cap; GPT-5.4 review uses medium reasoning. No new database or stored images.
+User filenames and their GoodForm/BadForm labels are not sent to the model. The upload UI
+discloses the sampled-frame request. Provider retention is governed by the account's terms;
+`store=False` is not a zero-retention promise.
+
+Findings identify an observation, an actionable cue, exercise/setup/finish phase and exact
+sample references. Server code maps frame indices to timestamps and rejects invented
+references. Results and chat label these as AI interpretation, separate from measured
+angles/counts. Neither structured output nor correct citations proves visual accuracy.
+The model must distinguish setup from working reps and avoid invented elbow tuck, forces,
+muscle activation, injury risk and universal angle targets. Visual failures preserve measured
+results and return `visualReview.status=unavailable`; disabled review is null.
+
+GPT-5.4 development checks on press and normal/changed pulldown footage returned completed
+reviews. The changed pulldown identified repeated torso recline/return and supplied a
+steadier-lean cue, which a subsequent real chat used. Earlier GPT-4.1 drafts overinterpreted
+setup/elbow position; those were not accepted as verified technique findings. This is a
+small development check, not general visual coaching validation. Review timestamped claims.
 
 **Latest addition:** independent `movementObservations` now supplies up to six timestamped
 body-line bend cards, including zero-count and count-unavailable results. The model may explain
@@ -24,17 +56,21 @@ with reviewed numeric evidence cards and up to 12 user/assistant messages (2,000
 per message). The browser retains only the last six successful exchanges in memory. A new
 set or reload clears them; no database or OpenAI conversation object is created.
 
-- Usually 2–4 sentences, under 100 words; over-120-word output is rejected.
+- Usually 2–4 sentences; explicit rep breakdowns can be up to 900 words. Validation permits
+  up to 1,000 words for QA and 200 for summary/next-set; the former 120-word rejection was
+  unsuitable for detailed requests.
 - Answers can explain measured differences or offer clearly general camera/pacing guidance.
 - Conversation evidence prioritizes rep numbers in the current question, then recent user
   questions, before generic highlights. This keeps later reps (for example rep 12 of 19)
   available for direct questions and follow-ups within the six-rep input budget. Explicit
-  numeric references such as `rep 12` or `reps 12 and 13` are supported; this is not full
-  natural-language retrieval. Requests about more than six reps still have partial evidence.
+  numeric references such as `rep 12` or `reps 12 and 13` are supported. Questions containing
+  each/every/all/breakdown/whole expand the input budget to 30 reps; otherwise six. This is
+  bounded text matching, not full natural-language retrieval.
 - Greetings should get a natural greeting, not another set summary. Zero counted reps means
   no completed cycles met the counting rules; it does not establish no movement, bad form,
-  or camera failure. Specific form faults are not assessed by the current analyzer.
-- User-reported reps and holds remain reports. The model has measurements, not the video.
+  or camera failure. Specific visible technique claims require attached visual findings.
+- User-reported reps and holds remain reports. Chat has measurements and any attached visual
+  findings, not a continuous video stream.
 - No invented form findings, scores, fatigue diagnosis, injury prediction or treatment.
 - Structured output validates shape; known evidence IDs validate references. **Neither proves
   that every sentence is correct.** Model wording can be mistaken. Keep reviewing real replies.
@@ -47,9 +83,10 @@ set or reload clears them; no database or OpenAI conversation object is created.
 - The response schema is unchanged. `provider: fallback` honestly identifies local guidance;
   `provider: openai` identifies generated wording. Evidence and brief limitations are expandable
   beside each message; the full analysis limitations remain in the results accordion.
-- 8-second SDK timeout, 10-second overall deadline, zero retries, 650 output-token cap.
+- 35-second SDK timeout, 40-second overall deadline, zero retries, 3,500 output-token cap.
+  Frontend chat waits 50 seconds; upload waits 300 seconds for pose plus visual processing.
   Placeholder analyses skip the provider. Calls happen only after a user action.
-- OpenAI receives numeric evidence cards, status/provenance, mode/question and recent text
+- Chat receives numeric and optional visual evidence cards, status/provenance, mode/question and recent text
   history. No video, raw landmarks, session ID, arbitrary analysis headlines or API key are
   included in the prompt. Questions/history can contain personal information. `store=False`
   does not promise zero retention.

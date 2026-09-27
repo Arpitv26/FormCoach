@@ -35,6 +35,7 @@ export interface AnalysisResponse {
    * @maxItems 240
    */
   movementObservations?: MovementObservation[];
+  visualReview?: VisualReview | null;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema
@@ -181,6 +182,42 @@ export interface MovementObservation {
   medianAngleDeg: number;
   maxAngleDeg: number;
   thresholdAngleDeg: 150;
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "VisualReview".
+ */
+export interface VisualReview {
+  status: "complete" | "unavailable";
+  source?: "openai_sampled_frames";
+  model: string;
+  /**
+   * @maxItems 64
+   */
+  sampledTimestampsMs: number[];
+  /**
+   * @maxItems 8
+   */
+  findings: VisualFinding[];
+  /**
+   * @maxItems 8
+   */
+  limitations: string[];
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "VisualFinding".
+ */
+export interface VisualFinding {
+  kind: "adjustment" | "positive" | "observation";
+  phase?: "exercise" | "setup" | "finish";
+  observation: string;
+  cue: string;
+  /**
+   * @minItems 2
+   * @maxItems 8
+   */
+  evidenceTimestampsMs: number[];
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema

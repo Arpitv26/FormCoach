@@ -5,6 +5,7 @@ from typing import Literal, Self
 from pydantic import Field, model_validator
 
 from app.domain.base import Confidence, ContractModel, Milliseconds, Score
+from app.domain.visual_review import VisualReview
 
 
 class Provenance(ContractModel):
@@ -145,6 +146,7 @@ class AnalysisResponse(ContractModel):
     limitations: list[str]
     scoring: ScoringInfo | None
     movement_observations: list[MovementObservation] = Field(default_factory=list, max_length=240)
+    visual_review: VisualReview | None = None
 
     @model_validator(mode="after")
     def validate_consistency(self) -> Self:
@@ -181,6 +183,10 @@ class AnalysisResponse(ContractModel):
             raise ValueError("Body-line observations currently support push-up only")
         endpoints = [rep.end_ms for rep in self.reps] + [issue.end_ms for issue in self.issues]
         endpoints += [item.end_ms for item in self.movement_observations]
+        if self.visual_review:
+            if self.source.type != "upload":
+                raise ValueError("Visual review requires uploaded video")
+            endpoints += self.visual_review.sampled_timestamps_ms
         endpoints += [event.timestamp_ms for event in self.timeline]
         if duration is not None and any(point > duration for point in endpoints):
             raise ValueError("Analysis timestamps must fit inside source.durationMs")

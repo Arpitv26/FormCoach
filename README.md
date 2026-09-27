@@ -8,6 +8,9 @@ bench press and cable lateral raise, with measured joint angles, timing and sele
 geometry. Selected demo exports count 6/7/7; several other views still undercount. See the
 [gym recording checks and limits](apps/api/GYM_EXERCISES.md). No calibrated form score or
 general bad-form classifier is implemented. Coaching works locally or with optional OpenAI.
+Optional upload visual review now examines sampled video images and offers timestamped
+technique observations and cues. These AI interpretations stay separate from measured
+counts and angles. Enable it using the backend settings in the coach setup guide.
 See [video setup](apps/api/VIDEO_SETUP.md)
 and [coach setup](apps/api/COACH_SETUP.md).
 No API key, database, Docker, or GPU is needed to run this foundation.
@@ -63,8 +66,9 @@ Browser and backend pose extraction feed the same measurement interfaces. This d
   and explainable exercise feedback. We start with mathematical rules that we can test.
   For example, following the shoulder-elbow-wrist angle helps identify a push-up's
   downward movement and return to the straight-arm top position.
-- **AI coach:** The backend builds short explanations from measured results. Optional OpenAI
-  selects relevant evidence, and the server renders checked wording. Unknown scores stay
+- **AI coach:** Optional OpenAI writes conversational replies from measured results and any
+  attached sampled-frame visual review. A legacy mode selects server-authored evidence.
+  Unknown scores stay
   unknown, and camera limitations remain visible. No key is required for the local coach.
 
 The same movement-analysis code will handle live and uploaded video because both paths
@@ -165,7 +169,8 @@ and repeatable live-batch replay. Four actual MOV recordings now match human cou
 **3, 1, 1, and 2 push-ups**, after fixing a phase-confirmation timing bug. This checks those
 clips, not general form accuracy. See the [recording validation report](apps/api/VALIDATION.md).
 HTTP upload and matching frontend playback passed a real-clip integration check.
-The frontend now uses a separate 240-second upload timeout. See the [upload guide](apps/api/HTTP_UPLOAD.md).
+The frontend uses a separate 300-second upload timeout, including optional visual review.
+See the [upload guide](apps/api/HTTP_UPLOAD.md).
 Push-up reps also expose observed elbow range and timing around the minimum angle; see
 [measurement definitions](apps/api/MEASUREMENTS.md). Scores remain unavailable.
 For offline UI work, use `contracts/examples/pushup-analysis.json`, an

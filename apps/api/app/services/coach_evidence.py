@@ -168,7 +168,7 @@ def comparison(
 
 
 def evidence_cards(
-    analysis: AnalysisResponse, *, preferred_reps: tuple[int, ...] = ()
+    analysis: AnalysisResponse, *, preferred_reps: tuple[int, ...] = (), max_reps: int = 6
 ) -> list[EvidenceCard]:
     if analysis.status == "not_implemented" or analysis.provenance.kind == "placeholder":
         return []
@@ -200,6 +200,29 @@ def evidence_cards(
                 ),
             )
         )
+    review = analysis.visual_review
+    if review is not None and review.status == "complete":
+        for index, finding in enumerate(review.findings):
+            path = f"visualReview.findings.{index}"
+            times = ", ".join(f"{time / 1000:.2f}s" for time in finding.evidence_timestamps_ms)
+            cards.append(
+                EvidenceCard(
+                    f"visual-{index + 1}",
+                    f"AI VISUAL INTERPRETATION ({finding.kind}, phase: {finding.phase}), "
+                    f"supported by sampled frames at {times}: "
+                    f"{finding.observation} Coaching suggestion: {finding.cue} "
+                    "This is a visual model observation, not a measured biomechanical fact "
+                    "or form grade.",
+                    (
+                        f"{path}.observation",
+                        f"{path}.cue",
+                        *(
+                            f"{path}.evidenceTimestampsMs.{i}"
+                            for i in range(len(finding.evidence_timestamps_ms))
+                        ),
+                    ),
+                )
+            )
     if analysis.status == "insufficient_data":
         return cards
     score = analysis.summary.overall_score
@@ -240,7 +263,7 @@ def evidence_cards(
     ordered += [i for i, rep in enumerate(analysis.reps) if rep.issues]
     ordered += [0, len(analysis.reps) - 1]
     ordered += list(range(len(analysis.reps)))
-    for index in list(dict.fromkeys(ordered))[:6]:
+    for index in list(dict.fromkeys(ordered))[:max_reps]:
         if not 0 <= index < len(analysis.reps):
             continue
         rep = analysis.reps[index]

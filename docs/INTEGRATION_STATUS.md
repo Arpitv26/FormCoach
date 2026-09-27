@@ -1,5 +1,18 @@
 # Computer A / Computer B integration checkpoint
 
+## September 27: original gym uploads and image-based coaching
+
+Work remains on backend-cv; not merged to main. Refreshed origin/frontend is still `60c47bb`
+and origin/main `7f44566`. A owns both apps. Original incline side2 now counts 7 including
+initial lift, normal pulldown 6, changed pulldown 5/6 (remaining limitation). Selected lateral
+side export retains 7 in fresh native HTTP processing. GPT-5.4 visual reviews complete for
+the original press/changed pulldown and selected lateral export; actual coach questions
+return specific torso-rocking cues and a seven-rep timing/angle breakdown. Visual interpretations
+are separately labeled and not validated form grades. New `visualReview` requires both
+apps/schemas/types. 550 backend/55 frontend tests, lint/format/contracts/types/build pass;
+saved push-up geometric results are unchanged. CUA cannot start (`codex app-server` missing),
+so final browser rehearsal and physical live push-ups remain manual. See GYM_EXERCISES.md.
+
 ## Latest follow-up: live rehearsal and chat flow
 
 PR #5 is merged at main `7f44566`; A owns the frontend after B's handoff.

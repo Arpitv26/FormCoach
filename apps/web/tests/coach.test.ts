@@ -76,3 +76,13 @@ test("conversation sends bounded successful history and cancellation does not ad
   session.cancel();
   assert.equal(state.exchanges.length, 6);
 });
+
+test("visual evidence resolves exact frame times separately from rep measurements", () => {
+  const analysis = structuredClone(fixture) as AnalysisResponse;
+  analysis.visualReview = { status: "complete", source: "openai_sampled_frames", model: "synthetic", sampledTimestampsMs: [500, 1500], findings: [{ kind: "observation", observation: "Synthetic visible movement", cue: "Review the frames", evidenceTimestampsMs: [500, 1500] }], limitations: [] };
+  const item = describeEvidence(analysis, "visualReview.findings.0.evidenceTimestampsMs.1");
+  assert.equal(item.text, "1.50 s");
+  assert.equal(item.seekMs, 1500);
+  assert.equal(item.rep, undefined);
+  assert.match(item.label, /Visual observation 1/);
+});
