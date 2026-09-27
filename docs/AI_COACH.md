@@ -38,6 +38,38 @@ steadier-lean cue, which a subsequent real chat used. Earlier GPT-4.1 drafts ove
 setup/elbow position; those were not accepted as verified technique findings. This is a
 small development check, not general visual coaching validation. Review timestamped claims.
 
+### Follow-up: similar criticism on normal and exaggerated pulldowns
+
+The human's browser rehearsal exposed overcorrection: the normal clip also received the
+torso-rocking cue and an unsupported shortened-return claim. Inspection found no cross-clip
+cache or filename-based answer selection. However, the original visual prompt explicitly
+directed attention to torso rocking, supplied that wording as an example, and prioritized
+1–3 adjustments. That was a leading instruction and inadequate visual validation.
+
+The revised prompt has no example fault to imitate or correction quota. It assesses both
+within-cycle movement and consistency across cycles, considers visible magnitude and
+counterevidence, and permits positive/neutral findings with no correction. Missing a turning
+point in <=2 fps samples cannot establish shortened range. Ordinary setup/finish transitions
+are not defects. Chat must preserve an observation's magnitude/kind instead of escalating
+slight motion into a fault. No exercise thresholds, counts, models or contracts changed.
+
+Two repeated unlabeled reviews per clip on the 1080p images with original measurements
+distinguished the normal set (consistent positions, slight/neutral motion) from the changed
+set (larger within-pull recline and a correction). An earlier neutral draft undercalled one
+changed-set review by confusing repeatable endpoints with steadiness within each rep; the
+final prompt addresses that distinction. This remains development tuning on two clips,
+not independent form-classification accuracy. New unit checks verify renaming GoodForm to
+BadForm leaves provider input unchanged, different image content changes that input, and
+replacing a completed upload clears its visual findings even with an identical filename.
+
+Fresh original-file HTTP tests also deliberately swapped the multipart filename labels:
+normal footage submitted as `BadForm.mov` returned 6 reps and positive/neutral findings with
+no adjustment; changed footage submitted as `GoodForm.mov` returned 5 reps and an adjustment
+for noticeable within-pull recline. No local recording was renamed. A real normal-set chat
+summary preserved the small-motion description and did not repeat the shortened-return
+claim. 550 backend/56 frontend tests, lint/format and TypeScript pass. These original uploads
+and four repeated reviews are a small development evaluation, not a general accuracy claim.
+
 **Latest addition:** independent `movementObservations` now supplies up to six timestamped
 body-line bend cards, including zero-count and count-unavailable results. The model may explain
 the observed shoulder–hip–ankle bend, not infer sag/pike, spinal posture, attempt count or the

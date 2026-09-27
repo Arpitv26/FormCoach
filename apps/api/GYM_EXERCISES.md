@@ -6,6 +6,18 @@ No training or new dependencies. Filenames are human annotations, not classifier
 
 ## Current checkpoint: original uploads and visual coaching
 
+**Visual feedback follow-up:** the human reproduced similar corrections on the normal and
+changed pulldowns. The original prompt was too leading; the follow-up removes its supplied
+fault example/correction quota and requires magnitude, within-rep change and counterevidence.
+Two repeated unlabeled reviews per clip distinguish normal/slight motion from the visibly
+larger recline. Manual comparison at matching phases supports that distinction. Normal-set
+counted torso ranges are about 6–10°; the three fully tracked changed-set intervals span
+about 12–22°. These are partial 2D rep windows, not a learned or universal pass/fail cutoff.
+See docs/AI_COACH.md for the overcorrection investigation and validation limits.
+Original-file HTTP checks with deliberately reversed upload names also distinguish the
+clips: normal footage named BadForm gets positive/neutral observations, changed footage
+named GoodForm gets the larger-recline adjustment. Counts remain 6 and 5/6 respectively.
+
 The human's browser screenshots exposed failures on the **original 4K files**, not the
 previously selected 1080p exports. These results supersede the historical milestone counts
 and strict missing-sample behavior below. Different exports can produce different poses.

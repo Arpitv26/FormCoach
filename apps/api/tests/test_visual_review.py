@@ -130,6 +130,18 @@ def test_sdk_gets_images_times_and_measurements_not_filename(analysis, monkeypat
     assert "timestampMs=1000" in json.dumps(content)
     assert "BadForm" not in json.dumps(content) and "test-only" not in json.dumps(content)
     assert received["store"] is False
+    # A human filename label cannot select or alter the review prompt.
+    service.OpenAIVisualReviewer(Settings((), "test-only")).review(
+        Path("GoodForm7reps.mov"), analysis
+    )
+    assert received["input"][0]["content"] == content
+    # Different uploaded images, even under the same name, must produce different input.
+    service.OpenAIVisualReviewer(Settings((), "test-only")).review(
+        Path("GoodForm7reps.mov"), analysis, [(0, "different1"), (1000, "different2")]
+    )
+    changed = received["input"][0]["content"]
+    assert changed != content
+    assert "different1" in json.dumps(changed) and "jpeg1" not in json.dumps(changed)
 
 
 def test_review_failure_preserves_measurements_and_does_not_log_secrets(

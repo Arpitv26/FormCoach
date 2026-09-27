@@ -84,6 +84,14 @@ If a contract must change:
 
 ## Current capabilities
 
+**Visual-review overcorrection follow-up:** normal pulldown feedback was too similar to the
+changed clip. Removed the supplied fault example and correction quota; review now weighs
+within-rep magnitude, counterevidence and sparse-sampling limits. Filenames are never sent
+to OpenAI. Two repeated unlabeled reviews per clip and original uploads with reversed
+GoodForm/BadForm names distinguish normal/slight motion from larger recline. Chat preserves
+neutral observations. See docs/AI_COACH.md; this is development evidence, not a validated
+form classifier. Counts unchanged; 550 backend/56 frontend tests pass.
+
 **September 27 original-upload/visual-review checkpoint:** user explicitly authorized sending
 sampled gym video images to OpenAI for more useful trainer-style feedback. Optional backend
 `VISUAL_REVIEW_ENABLED` now attaches default-null `visualReview` to upload analyses: separately
