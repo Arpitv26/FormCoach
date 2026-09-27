@@ -67,7 +67,7 @@ def test_upload_preserves_measured_response_and_uses_unique_sessions(client, upl
     assert result.exercise.id == "push-up" and result.exercise.confidence is None
     assert result.provenance.kind == "measured"
     assert result.summary.overall_score is None and result.reps[0].score is None
-    assert result.reps[0].start_ms == 600 and result.reps[0].end_ms == 2300
+    assert result.reps[0].start_ms == 500 and result.reps[0].end_ms == 2100
     assert result.reps[0].measurements["minSmoothedLeftElbowAngleDeg"] == 90
     assert not result.issues
     assert state.paths[0].name == "input.mov"

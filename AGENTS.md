@@ -84,7 +84,14 @@ If a contract must change:
 
 ## Current capabilities
 
-**Latest correction:** live five-rep rehearsal failed (2 detected). A browser stale-display bug
+**Newest counting correction:** read apps/api/COUNTING.md. New live JSON reproduced 4 reps
+and IMG_6943 upload 5. Counter v2 uses a 150° return zone and 60 ms raw dwell plus median
+confirmation, collecting overlapping phase evidence together. Outputs: live JSON 5, IMG_6943
+19; original five clips retain 3/1/1/2/4. Human reported 20; nineteen video cycle pairs were
+reviewed, twentieth unestablished. Boundaries/measurements change; schemas do not. Squat
+behavior is unchanged. Keep captures ignored and verify a fresh physical live set.
+
+**Earlier display/UX correction:** live five-rep rehearsal failed (2 detected). A browser stale-display bug
 could emit a false missing-pose sample before a valid frame. Fixed display/input separation;
 no thresholds changed. New private capture download enables actual replay. Short conversational
 coaching and simpler results replace the verbose panel. A fresh physical count is still required.

@@ -21,8 +21,10 @@ PUSHUP_PROFILE = ExerciseProfile(
     rules=("PUSHUP_REP_DURATION_CHANGED", "PUSHUP_ELBOW_EXCURSION_REDUCED"),
     coaching_cues=(),
     thresholds={
-        "topElbowAngleDeg": 160,
+        # Counting zone, not a full-lockout/form requirement. See COUNTING.md.
+        "topElbowAngleDeg": 150,
         "bottomElbowAngleDeg": 100,
+        "minimumPhaseMs": 60,
         # Review thresholds, not targets or a validated definition of correct form.
         "minimumDurationChangeMs": 500,
         "durationChangeFraction": 0.30,

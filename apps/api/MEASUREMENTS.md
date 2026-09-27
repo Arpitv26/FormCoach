@@ -50,7 +50,10 @@ range over this window, not a calibrated anatomical/full-exercise range of motio
 ## Synthetic example for Computer B
 
 `contracts/examples/pushup-analysis.json` is a new one-rep **SYNTHETIC DEMO DATA** fixture
-computed from `apps/api/examples/synthetic-pushup-capture.json`. It is authored geometry,
+computed under the original policy from `apps/api/examples/synthetic-pushup-capture.json`.
+Counter v2 replays that capture with a 500–2100 ms counted interval and 600–2100 ms angle
+window; the fixture preserves its authored original interval. See COUNTING.md.
+It is authored geometry,
 not a person's video. The old squat fixture remains available for compatibility.
 
 The example has an angle window of 800–2300 ms, minimum 90°, maximum 170°, observed range

@@ -203,6 +203,11 @@ class RuleBasedAnalyzer:
             )
         if profile.id == "push-up":
             limitations.append(
+                "Push-up counter v2 uses a 150-degree return zone and 100-degree bend zone, "
+                "with 60 ms of consecutive observations plus median confirmation. "
+                "These count movement cycles, not full lockout, depth quality or correct form."
+            )
+            limitations.append(
                 "Body-line angles are sample medians of raw 2D shoulder-hip-ankle angles "
                 "over each counted rep, using the same side as the elbow. Require at least "
                 "three usable samples, both rep boundaries, no unavailable angles and no "

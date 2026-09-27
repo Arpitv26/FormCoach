@@ -167,9 +167,13 @@ poses; it does not attest that the client captured them from a camera. Keep synt
 clearly labeled in demos/tests. Counting heuristics are not a validated fitness assessment.
 
 **Push-up support:** select `exerciseHint: "push-up"`. The same status, replay, visibility,
-side-locking, timing, and finalization policies apply, using the straight-arm top position
-instead of standing. The triplet is shoulder-elbow-wrist; initial thresholds are top >=160
-and bottom <=100 degrees. Results use `minSmoothedLeftElbowAngleDeg` or
+side-locking and finalization policies apply, using a top/return zone instead of standing.
+The triplet is shoulder-elbow-wrist. Counter v2 uses top >=150 and bottom <=100 degrees,
+60 ms of consecutive raw observations plus current median confirmation, and overlapping
+phase evidence. Squat's old sequential confirmation is unchanged. Start is the first raw
+descent-zone observation in the confirmed run. Reanalysis changes earlier timestamps and
+measurements; the wire shape is unchanged. See [counting policy](../apps/api/COUNTING.md).
+Results use `minSmoothedLeftElbowAngleDeg` or
 `minSmoothedRightElbowAngleDeg`, plus `durationMs` and a `minimum_elbow_angle` key moment.
 Additional push-up `measurements` keys (the dictionary is extensible; old results may lack them):
 

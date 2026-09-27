@@ -30,6 +30,7 @@ apps/web/public/pose/
 *.webm
 uploads/
 artifacts/
+formcoach-live-*.json
 *.log
 .DS_Store
 .idea/

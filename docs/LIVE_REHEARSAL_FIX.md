@@ -2,6 +2,12 @@
 
 ## What failed
 
+**Later captured failure and correction:** see [COUNTING.md](../apps/api/COUNTING.md).
+The new saved live request reproduced 4 and now returns 5; IMG_6943 reproduced 5 and now
+returns 19 observed cycles. Counter v2 supersedes the counting policy described below.
+The display fix is retained. Reported 20 versus reviewed 19 and a physical live retest
+remain open; the earlier synthetic check is not proof of camera accuracy.
+
 The human performed **five push-ups**, including about seven seconds at the bottom of the
 fourth. The live page reported **two**, with 210 sampled frames, 208 usable right-elbow
 samples and two tracking breaks. Detected intervals were 10.42–14.85 s and 18.99–21.32 s.

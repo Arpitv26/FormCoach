@@ -1,6 +1,14 @@
 # Frontend handoff — Computer A after B’s PR #4
 
-## Latest follow-up: live rehearsal and chat flow
+## Latest follow-up: push-up counting policy v2
+
+Read [COUNTING.md](../apps/api/COUNTING.md). The saved live request improves 4→5 and the
+new uploaded recording 5→19; the reported twentieth rep remains unestablished. Earlier
+five clips retain 3/1/1/2/4. No frontend, schema or API-shape changes are needed. New timing
+boundaries affect displayed measurements/comparisons. Existing results must be analyzed
+again; do not display an old response as a test of v2. A fresh live-camera check is pending.
+
+## Earlier follow-up: live rehearsal and chat flow
 
 PR #5 is merged at main `7f44566`; A owns the frontend after B's handoff.
 The physical rehearsal failed: five human-counted push-ups, two detected; the fourth included

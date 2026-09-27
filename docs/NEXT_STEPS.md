@@ -2,6 +2,12 @@
 
 Updated 2026-09-26. Main `7f44566` includes PRs #1–#5. The next checkpoint fixes a failed
 physical rehearsal and the confusing coach/results flow. Read LIVE_REHEARSAL_FIX.md first.
+**Latest counting correction:** read [COUNTING.md](../apps/api/COUNTING.md). The new live
+capture reproduced 4 and now returns 5; IMG_6943 reproduced 5 and now returns 19 distinct
+cycles. The human reported 20; a twentieth cycle is not established by the video review.
+Old top/bottom dwell and return thresholds merged continuous cycles. Counter v2 addresses
+that behavior; original five recordings retain 3/1/1/2/4. A fresh physical live set and
+independent footage remain required before declaring counting reliable.
 This is the current work order. Keep the longer product vision in PRODUCT_SCOPE.md;
 do not try to finish every stretch feature before the demo.
 
