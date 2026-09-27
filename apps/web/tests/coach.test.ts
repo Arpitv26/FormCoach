@@ -59,3 +59,20 @@ test("evidence resolves zero-based reps, preserves unknowns and blocks prototype
   for (const path of ["__proto__.toString", "constructor.name", "reps.100.score", "reps.-1", "reps.0.measurements.__proto__"]) assert.equal(evidenceValue(analysis, path), undefined);
   assert.equal(describeEvidence({ ...analysis, summary: { ...analysis.summary, totalReps: 0 } }, "summary.totalReps").text, "0");
 });
+
+test("conversation sends bounded successful history and cancellation does not add a turn", async () => {
+  const requests: CoachRequest[] = [];
+  let state = initialCoachState;
+  const session = new CoachSession(analysis, async (input) => { requests.push(input); return response(input.mode); }, (next) => { state = next; });
+  await session.submit("summary");
+  await session.submit("qa", "I actually did five. Why did you miss some?");
+  assert.equal(requests[1].responseStyle, "conversation");
+  assert.deepEqual(requests[1].history?.map((turn) => turn.role), ["user", "assistant"]);
+  assert.equal(requests[1].history?.[0].content, "How did my set go?");
+  assert.equal(state.exchanges.length, 2);
+  for (let i = 0; i < 7; i++) await session.submit("qa", "And that one?");
+  assert.equal(requests.at(-1)?.history?.length, 12);
+  assert.equal(state.exchanges.length, 6);
+  session.cancel();
+  assert.equal(state.exchanges.length, 6);
+});

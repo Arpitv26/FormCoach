@@ -30,6 +30,9 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
   const [state, setState] = useState(initialCameraState);
   const [liveState, setLiveState] = useState(initialLiveState);
   const [tracking, setTracking] = useState<TrackingStatus>("loading");
+  useEffect(() => {
+    if (liveState.phase === "finishing" || liveState.phase === "finished") previewRef.current?.stop();
+  }, [liveState.phase]);
   const counterRef = useRef<LiveSession | null>(null);
   const handlePose = useCallback((frame: PoseFrame | null, width: number, height: number, capturedAt: number) => {
     counterRef.current?.capture(frame, width, height, capturedAt);
@@ -89,10 +92,20 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
     router.push(`/camera?exercise=${slug}`);
   }
 
+  const finished = liveState.phase === "finished";
+  function downloadCapture() {
+    const batch = counterRef.current?.snapshot();
+    if (!batch) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(batch)], { type: "application/json" }));
+    const anchor = document.createElement("a");
+    anchor.href = url; anchor.download = `formcoach-live-${batch.sessionId}.json`; anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   return (
-    <div className={styles.layout}>
+    <div className={finished || liveState.phase === "capturing" || liveState.phase === "finishing" ? styles.finishedLayout : styles.layout}>
       <div className={styles.reviewColumn}>
-      <section className={styles.cameraPanel} aria-labelledby="preview-heading">
+      <section hidden={finished} className={styles.cameraPanel} aria-labelledby="preview-heading">
         <header className={styles.panelHeader}>
           <h2 id="preview-heading">{exercise.name}</h2>
           <span className="outline-tag">Live skeleton</span>
@@ -109,7 +122,7 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
           )}
           {live && <span className={styles.previewLabel}>Mirrored preview · not recording</span>}
         </div>
-        <div className={styles.controls}>
+        <div className={styles.controls} hidden={live && exercise.backendHint === "push-up"}>
           <div className={styles.status} role={state.phase === "error" ? "alert" : "status"} aria-atomic="true">
             <p className={state.phase === "error" ? styles.errorTitle : styles.statusTitle}>{labels[state.phase]}</p>
             <p>{state.message}</p>
@@ -122,14 +135,21 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
           </div>
           <p className={styles.privacyNote}>Skeleton tracking runs in this browser. Starting a push-up set sends joint coordinates for analysis. No video recording or microphone is used.</p>
         </div>
-        {exercise.backendHint === "push-up" && <LiveSessionPanel state={liveState} canStart={live && tracking !== "loading" && tracking !== "error"}
+        {exercise.backendHint === "push-up" && (live || liveState.phase !== "idle") && <LiveSessionPanel state={liveState} canStart={live && tracking === "tracking"}
           onStart={() => { if (videoRef.current) counterRef.current?.start(videoRef.current.videoWidth, videoRef.current.videoHeight); }}
-          onFinish={() => counterRef.current?.finish()} onReset={() => counterRef.current?.reset()} onRetry={() => counterRef.current?.retryFinal()} />}
+          onStop={() => previewRef.current?.stop()}
+          onFinish={() => { counterRef.current?.finish(); previewRef.current?.stop(); }} onReset={() => counterRef.current?.reset()} onRetry={() => counterRef.current?.retryFinal()} />}
       </section>
-      {liveState.phase === "finished" && liveState.result && <UploadedResults analysis={liveState.result} canSeek={false} onSeek={() => {}} />}
+      {finished && liveState.result && <>
+        <div className={styles.resultActions}>
+          <button className="primary-action" onClick={() => { counterRef.current?.reset(); enableCamera(); }}>Start a new set</button>
+          <details><summary>Count look wrong?</summary><p>Save joint positions from this set so we can replay the counter. No video or API key is included. Keep this file private.</p><button className={styles.secondaryButton} onClick={downloadCapture}>Download troubleshooting data</button></details>
+        </div>
+        <UploadedResults analysis={liveState.result} canSeek={false} onSeek={() => {}} />
+      </>}
       </div>
 
-      <aside className={styles.guidance} aria-labelledby="framing-heading">
+      <aside hidden={finished || liveState.phase === "capturing" || liveState.phase === "finishing"} className={styles.guidance} aria-labelledby="framing-heading">
         <section className={`panel ${styles.selection}`} aria-labelledby="exercise-heading">
           <h2 id="exercise-heading">Your session</h2>
           <label htmlFor="exercise">Selected exercise</label>

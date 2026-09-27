@@ -131,3 +131,19 @@ test("invalid dimensions and unrelated responses are rejected", async () => {
   assert.equal(app.state.phase, "error");
   assert.match(app.state.error!, /did not match/);
 });
+
+test("troubleshooting export is final-only, independent and cleared on reset", async () => {
+  const session = new LiveSession(async (batch) => ({ contractVersion: "1.0", sessionId: batch.sessionId, source: { type: "live" } }) as AnalysisResponse, () => {}, () => 1000, () => "debug-set");
+  assert.equal(session.snapshot(), null);
+  session.start(640, 480);
+  session.capture({ frameIndex: 0, timestampMs: 0, landmarks: [{ index: 11, name: "left_shoulder", x: .3, y: .4 }] }, 640, 480, 1100);
+  assert.equal(session.snapshot(), null);
+  session.finish();
+  await Promise.resolve(); await Promise.resolve();
+  const capture = session.snapshot()!;
+  assert.equal(capture.isFinal, true);
+  assert.equal(capture.frames[0].timestampMs, 100);
+  capture.frames[0].landmarks[0].x = .9;
+  assert.equal(session.snapshot()!.frames[0].landmarks[0].x, .3);
+  session.reset(); assert.equal(session.snapshot(), null);
+});

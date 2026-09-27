@@ -1,10 +1,47 @@
-# Evidence-only coach
+# AI coach
 
 `POST /api/v1/coach` keeps the v1.0 request/response shape. It accepts an analysis and
-`summary`, `next_set`, or `qa` (nonblank question required for QA). It is stateless.
+`summary`, `next_set`, or `qa` (nonblank question required for QA). The server is stateless.
+The current UI requests `responseStyle: "conversation"` and sends bounded recent history.
+Omitting that field preserves the original `evidence` behavior described below.
 No raw video or pose frames go to OpenAI. Computer A owns the implementation.
 
-## Current implementation
+## Conversation style (current UI)
+
+The user asked for a friendly chatbot that explains their set and understands follow-ups.
+`conversation_coach.py` now uses Responses structured output for short model-authored replies,
+with reviewed numeric evidence cards and up to 12 user/assistant messages (2,000 characters
+per message). The browser retains only the last six successful exchanges in memory. A new
+set or reload clears them; no database or OpenAI conversation object is created.
+
+- Usually 2–4 sentences, under 100 words; over-120-word output is rejected.
+- Answers can explain measured differences or offer clearly general camera/pacing guidance.
+- User-reported reps and holds remain reports. The model has measurements, not the video.
+- No invented form findings, scores, fatigue diagnosis, injury prediction or treatment.
+- Structured output validates shape; known evidence IDs validate references. **Neither proves
+  that every sentence is correct.** Model wording can be mistaken. Keep reviewing real replies.
+- A targeted live evaluation exposed unsupported explanations of missed counts. Recognized
+  count disputes and hold follow-ups now use brief local troubleshooting guidance, with no
+  paid call, because completed-rep summaries cannot establish why unobserved reps were missed.
+  This narrow text matcher is not a general semantic safety guarantee.
+- Other questions use the configured OpenAI provider. Local free-form QA remains unavailable;
+  failed calls say so. Local summaries and next-set camera guidance stay usable without a key.
+- The response schema is unchanged. `provider: fallback` honestly identifies local guidance;
+  `provider: openai` identifies generated wording. Evidence and brief limitations are expandable
+  beside each message; the full analysis limitations remain in the results accordion.
+- 8-second SDK timeout, 10-second overall deadline, zero retries, 650 output-token cap.
+  Placeholder analyses skip the provider. Calls happen only after a user action.
+- OpenAI receives numeric evidence cards, status/provenance, mode/question and recent text
+  history. No video, raw landmarks, session ID, arbitrary analysis headlines or API key are
+  included in the prompt. Questions/history can contain personal information. `store=False`
+  does not promise zero retention.
+
+Both styles use the backend provider/key/model settings in COACH_SETUP.md. Update the API
+before using the new frontend: old strict v1 validators reject the additive request fields.
+See the [conversation-state guide](https://developers.openai.com/api/docs/guides/conversation-state)
+and [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
+
+## Evidence style (legacy default)
 
 1. `apps/api/app/services/coach_evidence.py` builds reviewed statements from numeric fields.
    It can describe a supplied score, completed count, push-up timestamps, observed elbow
@@ -53,7 +90,7 @@ irrelevant statement cannot introduce new wording or findings.
 - Analysis/camera limitations are preserved as input text. Render all text as plain text,
   never injected HTML, and do not treat limitations as model-generated coaching.
 
-## Configuration and failures
+## Legacy evidence-style configuration and failures
 
 Default `COACH_PROVIDER=fallback` makes no paid calls, even if a key is present.
 Optional setup requires **both** `COACH_PROVIDER=openai` and a backend-only API key,

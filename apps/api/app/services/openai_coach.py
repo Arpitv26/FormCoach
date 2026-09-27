@@ -1,4 +1,4 @@
-"""Optional evidence selection via OpenAI, with deterministic server-rendered wording."""
+"""Optional OpenAI coaching: legacy evidence selection or bounded conversation."""
 
 import asyncio
 import json
@@ -76,6 +76,10 @@ class FallbackCoach:
         self.note = note
 
     async def respond(self, request: CoachRequest) -> CoachResponse:
+        if request.response_style == "conversation":
+            from app.services.conversation_coach import local_reply
+
+            return local_reply(request)
         cards = evidence_cards(request.analysis)
         # Preserve the legacy scored fixture summary; never calculate a new score.
         selected = cards[:1] if cards and cards[0].id == "score" else cards[:3]
@@ -92,10 +96,15 @@ class FallbackCoach:
 
 
 class OpenAICoach:
-    def __init__(self, selector: EvidenceSelector):
+    def __init__(self, selector: EvidenceSelector, writer=None):
         self.selector = selector
+        self.writer = writer
 
     async def respond(self, request: CoachRequest) -> CoachResponse:
+        if request.response_style == "conversation":
+            from app.services.conversation_coach import converse
+
+            return await converse(request, self.writer)
         cards = evidence_cards(request.analysis)
         if not cards or request.analysis.provenance.kind == "placeholder":
             return await FallbackCoach().respond(request)
@@ -134,4 +143,6 @@ def get_coach_service(settings: Settings) -> CoachService:
             "OpenAI was requested but no API key is configured;"
             " showing deterministic local coaching."
         )
-    return OpenAICoach(OpenAISelector(settings))
+    from app.services.conversation_coach import OpenAIConversation
+
+    return OpenAICoach(OpenAISelector(settings), OpenAIConversation(settings))

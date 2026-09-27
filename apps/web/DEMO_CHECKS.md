@@ -16,9 +16,10 @@ Run the frontend on localhost or HTTPS. Use the configured API; keep provider ke
 
 ## Coach
 
-- [ ] Request a local summary and next-set guidance; see provider, evidence paths and limitations.
-- [ ] Ask about a measured rep with optional OpenAI enabled on the backend. Verify the selected evidence.
-- [ ] With local coaching, QA must explain that questions are unsupported, not invent an answer.
+- [ ] Request a local summary and next-set guidance; see a short reply and expand its measurements/limitations.
+- [ ] Ask about a measured rep with optional OpenAI enabled on the backend. Verify the wording against its evidence, then ask a follow-up about the same rep.
+- [ ] Local free-form QA explains AI is unavailable. Missed-count troubleshooting still works locally.
+- [ ] Tell the coach a count was missed, then mention a hold. It must not invent why it happened.
 - [ ] Check partial and insufficient-data results; missing scores must stay unavailable.
 - [ ] Cancel an explanation and request again; there should be no automatic retry or duplicate request.
 
@@ -28,7 +29,10 @@ Run the frontend on localhost or HTTPS. Use the configured API; keep provider ke
 - [ ] Compare completed cycles with a human count. This validates the demo set, not general accuracy.
 - [ ] Leave/re-enter the frame briefly. Tracking gaps must not become fabricated continuous motion.
 - [ ] Finish, inspect final results, then start a new set. Previous counts must not carry over.
-- [ ] Stop camera during a set; capture ends and tracks are released. Restart the camera.
+- [ ] Finish set; camera tracks are released. Start a new set without carrying over counts/history.
+- [ ] Perform five reps, including a comfortable bottom pause if desired. Compare with a human.
+- [ ] Open “Count look wrong?” and download troubleshooting data before starting another set.
+      Save privately under ignored artifacts and replay the exact capture; do not commit it.
 - [ ] Hide the page during capture; the set ends. Returning does not silently resume it.
 - [ ] Change exercise or navigate away during a request; camera and obsolete requests stop.
 - [ ] Stop the backend mid-set; capture pauses and manual retry finalizes the frozen observations.

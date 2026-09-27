@@ -1,6 +1,22 @@
 # Computer A / Computer B integration checkpoint
 
-## Current integration checkpoint — 2026-09-26
+## Latest follow-up: live rehearsal and chat flow
+
+PR #5 is merged at main `7f44566`; A owns the frontend after B's handoff.
+The physical rehearsal failed: five human-counted push-ups, two detected; the fourth included
+an approximately seven-second hold. The exact raw samples were not retained by that version.
+A stale browser display path could emit a false missing-pose observation. Display gaps now
+clear only the overlay; genuine missing poses and timestamp gaps still reach the analyzer.
+No rep thresholds changed. New final-set downloads retain exact sampled poses for private replay.
+
+The updated UI has one active-set control group, hides setup after finishing, releases the
+camera, and shows summary → short coach chat → charts → expandable details. Coach requests
+add `responseStyle: conversation` and at most 12 history messages; update both apps together.
+Read [LIVE_REHEARSAL_FIX.md](LIVE_REHEARSAL_FIX.md) for checks and the next manual test.
+Previous checkpoint sections below are historical and do not override this failed rehearsal.
+
+
+## Previous integration checkpoint — 2026-09-26
 
 Frontend PR #4 (`60c47bb`) is merged into main as `767a98b`. Computer A merged that main
 into backend-cv as `ae959a1` without conflicts. The combined backend and frontend passed

@@ -230,6 +230,19 @@ export interface CoachRequest {
   analysis: AnalysisResponse;
   mode: "summary" | "next_set" | "qa";
   question?: string | null;
+  responseStyle?: "evidence" | "conversation";
+  /**
+   * @maxItems 12
+   */
+  history?: CoachTurn[];
+}
+/**
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "CoachTurn".
+ */
+export interface CoachTurn {
+  role: "user" | "assistant";
+  content: string;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema

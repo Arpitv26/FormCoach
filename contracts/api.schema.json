@@ -177,6 +177,23 @@
           ],
           "default": null,
           "title": "Question"
+        },
+        "responseStyle": {
+          "default": "evidence",
+          "enum": [
+            "evidence",
+            "conversation"
+          ],
+          "title": "Responsestyle",
+          "type": "string"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/$defs/CoachTurn"
+          },
+          "maxItems": 12,
+          "title": "History",
+          "type": "array"
         }
       },
       "required": [
@@ -244,6 +261,31 @@
         "limitations"
       ],
       "title": "CoachResponse",
+      "type": "object"
+    },
+    "CoachTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "user",
+            "assistant"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "content": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "CoachTurn",
       "type": "object"
     },
     "ErrorDetail": {

@@ -372,6 +372,8 @@ type CoachRequest = {
   analysis: AnalysisResponse;
   mode: "summary" | "next_set" | "qa";
   question?: string | null; // required, nonblank for qa; max 1000 characters
+  responseStyle?: "evidence" | "conversation"; // default evidence
+  history?: { role: "user" | "assistant"; content: string }[]; // max 12, 1–2000 chars each
 };
 ```
 
@@ -383,7 +385,14 @@ labeled and unknown scores stay unknown. Local free-form QA is unsupported.
 Optional `COACH_PROVIDER=openai` plus a backend key and SDK enables bounded evidence
 selection; the backend renders reviewed wording. Provider failures fall back honestly.
 `evidence` uses zero-based array dot paths; display `limitations` alongside `message`.
-No contract fields changed. See AI_COACH.md and apps/api/COACH_SETUP.md.
+Conversation style is an additive request extension: the model writes short replies using
+reviewed evidence plus bounded history. Recognized count disputes use local guidance;
+unknown causes must not become invented explanations. The response shape stays unchanged.
+The server stores no conversation; the caller supplies recent messages on each request.
+The current UI uses conversation style, shows short replies and keeps evidence/limitations
+in expandable details. Omitted fields retain legacy behavior. **Update backend and frontend
+together:** older strict validators reject these new fields with 422.
+See AI_COACH.md, `contracts/examples/coach-conversation-request.json`, and apps/api/COACH_SETUP.md.
 
 ## Errors and frontend behavior
 

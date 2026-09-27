@@ -122,6 +122,13 @@ export class LiveSession {
     }
   }
 
+  /** Explicit local export for replay; contains landmarks, never video or credentials. */
+  snapshot(): LiveBatchRequest | null {
+    if (!this.state.sessionId || this.state.phase === "capturing" || this.state.phase === "finishing") return null;
+    return { contractVersion: "1.0", sessionId: this.state.sessionId, exerciseHint: "push-up",
+      ...this.dimensions, isFinal: true, frames: this.frames.map((frame) => ({ ...frame, landmarks: frame.landmarks.map((point) => ({ ...point })) })) };
+  }
+
   reset() {
     this.generation++;
     this.controller?.abort();

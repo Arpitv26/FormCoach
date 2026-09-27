@@ -37,7 +37,9 @@ Keep the legacy squat fixture for compatibility, not as the intended presentatio
 - Stateless cumulative HTTP batches first. No database or WebSocket requirement.
 - AI explains measured evidence. It cannot invent detections, diagnose, or predict injury.
 - Coaching defaults to local. OpenAI requires explicit provider opt-in plus a backend key;
-  it selects evidence IDs and the server renders wording. Read docs/AI_COACH.md. Mock JSON is synthetic.
+  the UI now requests short conversational replies with bounded history. Legacy evidence style
+  still selects IDs/server wording. Read docs/AI_COACH.md; citations do not prove prose accuracy.
+  Recognized missed-count disputes use local guidance; do not invent their cause. Mock JSON is synthetic.
 
 ## Ownership
 
@@ -55,7 +57,8 @@ relying on the change; do not send external messages on the human's behalf witho
 **Current human agreement (2026-09-26):** B handed off PR #4 with coach interactions, rep
 comparisons and live counting. It is reviewed, merged into main (`767a98b`) and integrated
 into backend-cv (`ae959a1`). A now owns the next frontend visual overhaul on this computer.
-B should coordinate further screen edits. Physical webcam rehearsal is still pending.
+B should coordinate further screen edits. PR #5 is merged at `7f44566`. A physical rehearsal
+failed: human 5 reps, detected 2. Read docs/LIVE_REHEARSAL_FIX.md before further counting work.
 
 If a contract must change:
 
@@ -81,7 +84,13 @@ If a contract must change:
 
 ## Current capabilities
 
-**Current integration:** PR #4 merged; 399 backend and 49 frontend tests, contracts, lint,
+**Latest correction:** live five-rep rehearsal failed (2 detected). A browser stale-display bug
+could emit a false missing-pose sample before a valid frame. Fixed display/input separation;
+no thresholds changed. New private capture download enables actual replay. Short conversational
+coaching and simpler results replace the verbose panel. A fresh physical count is still required.
+See docs/LIVE_REHEARSAL_FIX.md for the checks and remaining evidence.
+
+**Previous integration:** PR #4 merged; 399 backend and 49 frontend tests, contracts, lint,
 types and production build pass. Actual IMG_6942 browser upload/coaching/flag seeking pass;
 simulated camera → actual API count/final/reset/stop pass. Physical webcam rehearsal and
 independent timing validation remain open. Read docs/INTEGRATION_STATUS.md and NEXT_STEPS.md.

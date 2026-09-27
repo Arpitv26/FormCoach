@@ -1,7 +1,7 @@
 # Remaining work — after backend and overlay integration
 
-Updated 2026-09-26. Main `767a98b` includes PRs #1–#4; backend-cv `ae959a1` combines
-that frontend with the newer backend follow-ups. Those follow-ups still need their PR into main.
+Updated 2026-09-26. Main `7f44566` includes PRs #1–#5. The next checkpoint fixes a failed
+physical rehearsal and the confusing coach/results flow. Read LIVE_REHEARSAL_FIX.md first.
 This is the current work order. Keep the longer product vision in PRODUCT_SCOPE.md;
 do not try to finish every stretch feature before the demo.
 
@@ -10,8 +10,8 @@ do not try to finish every stretch feature before the demo.
 - **Computer B:** feature handoff complete in merged PR #4. Coordinate any further screen edits.
 - **Computer A:** owns integration, backend and the upcoming frontend visual overhaul.
   Preserve tested upload/pose pairing, raw live input, request lifecycle and evidence behavior.
-- **Next order:** publish the integrated backend follow-up PR; rehearse physical camera and
-  separate footage; then redesign the UI in small screen-by-screen commits. No redesign yet.
+- **Next order:** retest five live reps with the new downloadable capture, investigate any
+  mismatch using those exact samples, then continue the visual overhaul in small commits.
 
 ## What the code actually does today
 
@@ -22,7 +22,7 @@ do not try to finish every stretch feature before the demo.
 | Rep timestamps and elbow measurements | Implemented | Duration, min/max, excursion, time around minimum angle; 2D observations |
 | Rep comparisons | Timing policy v2 implemented | Change must exceed a margin against both preceding durations; 6942 rep 3 now flags as a development regression. Separate validation still needed |
 | Tracking coverage / missing-joint feedback | Implemented | Sample counts and actionable joint reasons; no readiness or quality score |
-| Live analysis API | Implemented | Browser cumulative snapshots, final/reset/stop verified against actual API using simulated media; physical rehearsal pending |
+| Live analysis API | Implemented | Physical rehearsal failed 5 → 2; false missing-pose emission fixed, new capture/replay needed |
 | Live / uploaded skeleton | Implemented | Browser and portrait/landscape playback checks; actual webcam smoothness needs recheck |
 | Coach API | Implemented | Integrated panel; actual local summary/next-set/evidence links verified; optional OpenAI configured separately |
 | Form score and five quality metric scores | **Missing** | `analysis/scoring.py` is a placeholder; real scores remain null |
@@ -32,9 +32,10 @@ do not try to finish every stretch feature before the demo.
 | Worst-form rep ranking | **Missing** | No quality score exists; a flagged change can be reviewed without calling it the worst rep |
 | Other gym exercises / automatic recognition | **Missing** | Registered profiles and UI choices do not establish analysis support |
 
-The coach selects reviewed statements from supplied numbers. It does not independently
-watch video, generate new findings, or maintain conversation history. Local fallback QA
-is explicitly unsupported. The UI can show multiple interactions, but each API call is independent.
+The current coach UI requests short generated replies grounded in numeric evidence and sends
+the last six exchanges for follow-ups. The server remains stateless and never watches video.
+Recognized missed-count questions use local troubleshooting guidance. Legacy evidence selection
+remains available. Read AI_COACH.md for limits and the distinction between the two modes.
 
 ## Computer A: small checkpoints in order
 

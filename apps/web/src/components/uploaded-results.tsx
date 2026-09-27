@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useRef } from "react";
 import { CoachPanel } from "./coach-panel";
 import { RepOverview } from "./rep-overview";
 import { referenceComparisons } from "@/lib/results/measurements";
@@ -14,7 +14,7 @@ function angle(value: number | null | undefined) {
   return value == null ? "Unavailable" : `${value.toFixed(1)}°`;
 }
 const statuses = {
-  complete: "Analysis complete", partial: "Analysis complete · partial evidence",
+  complete: "Analysis complete", partial: "Some movement may be missing",
   insufficient_data: "Not enough visible movement", not_implemented: "Analysis unavailable",
 };
 
@@ -22,33 +22,35 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
   analysis: AnalysisResponse; canSeek: boolean; onSeek: (timestampMs: number) => void;
 }) {
   const id = useId();
+  const repDetails = useRef<HTMLDetailsElement>(null);
   const live = analysis.source.type === "live";
   const measured = analysis.provenance.kind === "measured";
   const seekEnabled = canSeek && measured && analysis.source.type === "upload";
   return (
     <section className={styles.results} aria-labelledby={`${id}-heading`}>
-      <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{statuses[analysis.status]}</h2></div><span className="outline-tag">{analysis.provenance.label}</span></div>
+      <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{statuses[analysis.status]}</h2></div></div>
       {!measured && <p className={styles.notice}>This response is {analysis.provenance.kind} data, not verified measurements from your movement. Timestamp playback is disabled.</p>}
-      <p>{analysis.summary.headline}</p>
+      <p>{analysis.summary.totalReps == null ? "We couldn’t reliably count this set." : `We detected ${analysis.summary.totalReps} completed push-ups.`}</p>
       <dl className={styles.summary}>
         <div><dt>Counted reps</dt><dd>{analysis.summary.totalReps ?? "Unavailable"}</dd></div>
-        <div><dt>{live ? "Sample coverage" : "Video duration"}</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>
+        <div><dt>{live ? "Set length" : "Video duration"}</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>
         {analysis.summary.overallScore != null && <div><dt>Form score</dt><dd>{analysis.summary.overallScore}/100</dd></div>}
       </dl>
-      {analysis.summary.overallScore == null && <p className="muted small">No form score was returned. Elbow measurements describe observed movement; they are not a quality rating.</p>}
-      {analysis.status === "partial" && <p className={styles.notice}>This is the final response for this set. Some evidence or a rep may be incomplete; check the limitations below.</p>}
+      {analysis.status === "partial" && <p className={styles.notice}>Some movement could not be fully counted. The detected count may be lower than the number you performed.</p>}
       {analysis.reps.length === 0 && <p className={styles.notice}>No complete rep details were returned. Try a short side-view set with your full body visible.</p>}
-      <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} />
+      <CoachPanel key={analysis.sessionId} analysis={analysis} onSeek={seekEnabled ? onSeek : undefined} />
+      <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} onShowDetails={() => { if (repDetails.current) repDetails.current.open = true; }} />
       <section className={styles.changes} aria-labelledby={`${id}-changes`}>
         <div className="section-heading"><h3 id={`${id}-changes`}>Changes to review</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>
-        {analysis.issues.length === 0 ? <p className="muted small">No changes were flagged. Comparisons need two preceding reps and usable tracking; eligibility depends on the measurement. No flags does not establish good form.</p> : analysis.issues.map((issue) => (
+        {analysis.issues.length === 0 ? <p className="muted small">{analysis.reps.length < 3 ? "We need at least three well-tracked reps to compare changes." : "No substantial changes were flagged in the reps we could compare."} This isn’t a form rating.</p> : analysis.issues.map((issue) => (
           <article key={issue.id} className={styles.changeCard}>
-            <h4>{issue.title}</h4><p>{issue.explanation}</p><p className="small">{issue.shortCue}</p>
-            <p className="muted small">Review priority: {issue.severity} · Confidence: {issue.confidence == null ? "Unknown" : `${Math.round(issue.confidence * 100)}%`}</p>
+            <h4>{issue.title}</h4><p className="small">{issue.shortCue}</p>
             {seekEnabled && <button type="button" className={styles.secondary} onClick={() => onSeek(issue.startMs)}>Review at {seconds(issue.startMs)} ↗</button>}
+            <details><summary>Why this was flagged</summary><p className="small">{issue.explanation}</p><p className="muted small">Review priority: {issue.severity} · Confidence: {issue.confidence == null ? "Unknown" : `${Math.round(issue.confidence * 100)}%`}</p></details>
           </article>
         ))}
       </section>
+      <details ref={repDetails} className={styles.evidence}><summary>Explore each rep’s measurements</summary>
       {analysis.reps.map((rep) => (
         <article className={styles.rep} key={rep.repNumber} id={`${id}-rep-${rep.repNumber}`}>
           <div className={styles.repHeading}><h3>Rep {rep.repNumber}</h3>{!live && <button type="button" disabled={!seekEnabled} onClick={() => onSeek(rep.startMs)}>View at {seconds(rep.startMs)} <span aria-hidden="true">↗</span></button>}</div>
@@ -64,16 +66,16 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
 
         </article>
       ))}
+      </details>
+      <details className={styles.evidence}><summary>About these measurements</summary>
       <p className="muted small">Angles are smoothed 2D observations and depend on the camera view. Timing can include pauses and rep confirmation; it does not identify lifting or lowering phases.</p>
       <p className="muted small">Only visible, sufficiently tracked joints are measured. Full-body visibility and camera angle are not verified.</p>
-      <details className={styles.evidence}>
-        <summary>How these measurements work · visibility &amp; limitations</summary>
+
         <p>Full body visible: {analysis.cameraQuality.fullBodyVisible === null ? "Unknown" : analysis.cameraQuality.fullBodyVisible ? "Yes" : "No"}. Camera quality: {analysis.cameraQuality.score ?? "Unavailable"}.</p>
         <p className="muted small">Push-ups are your selected exercise. Selection alone does not confirm exercise detection.</p>
         {[...analysis.cameraQuality.issues, ...analysis.limitations].length > 0 && <ul>{[...analysis.cameraQuality.issues, ...analysis.limitations].map((item, index) => <li key={index}>{item}</li>)}</ul>}
 
       </details>
-      <CoachPanel key={analysis.sessionId} analysis={analysis} onSeek={seekEnabled ? onSeek : undefined} />
     </section>
   );
 }

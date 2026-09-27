@@ -64,3 +64,13 @@
 .liveSession button:disabled { opacity: .5; cursor: not-allowed; }
 .liveError { padding: 12px; background: #39252c; color: #ffbfc4; border-radius: 8px; font-size: .85rem; }
 @media(max-width: 520px) { .liveSession { padding: 20px; } .liveStats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .liveStats > div:last-child { grid-column: 1 / -1; } }
+.finishedLayout { max-width: 960px; margin: 0 auto; }
+.resultActions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 24px; }
+.resultActions > button { margin: 0; }
+.resultActions details { max-width: 420px; font-size: .85rem; color: var(--muted); }
+.resultActions summary { padding: 12px 0; cursor: pointer; }
+.resultActions p { margin-bottom: 12px; }
+.cameraPanel[hidden], .controls[hidden], .guidance[hidden] { display: none; }
+.status { min-height: 0; }
+.liveSession { padding: 20px 24px; }
+.liveStats { margin: 16px 0; }
