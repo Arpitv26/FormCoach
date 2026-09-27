@@ -65,7 +65,11 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
               <div key={`${side}-${joint}`}><dt>{side} {joint.toLowerCase()} · min / max</dt><dd>{angle(rep.measurements[`minSmoothed${side}${joint}AngleDeg`])} / {angle(rep.measurements[`maxSmoothed${side}${joint}AngleDeg`])}</dd><dt>Observed angle range</dt><dd>{angle(rep.measurements[`smoothed${side}${joint}ExcursionDeg`])}</dd></div>
             )))}
             <div><dt>Time to minimum angle</dt><dd>{seconds(rep.measurements.timeToMinElbowAngleMs ?? rep.measurements.timeToMinShoulderAngleMs)}</dd><dt>Time after minimum angle</dt><dd>{seconds(rep.measurements.timeFromMinElbowAngleMs ?? rep.measurements.timeFromMinShoulderAngleMs)}</dd></div>
+            {(["Left", "Right"] as const).filter((side) => `min${side}TorsoTiltDeg` in rep.measurements).map((side) => (
+              <div key={`${side}-torso`}><dt>Torso tilt · min / max</dt><dd>{angle(rep.measurements[`min${side}TorsoTiltDeg`])} / {angle(rep.measurements[`max${side}TorsoTiltDeg`])}</dd><dt>Observed torso angle range</dt><dd>{angle(rep.measurements[`${side.toLowerCase()}TorsoTiltRangeDeg`])}</dd></div>
+            ))}
           </dl>
+          {rep.measurements.torsoSampleCount != null && <p className="muted small">Torso tilt measures the shoulder–hip line against vertical in the video. It doesn’t assess rotation, momentum or form quality.</p>}
           {referenceComparisons(rep).map((item) => <p key={item.label} className={styles.comparison}><strong>{item.label}: {item.current}</strong><span>Reference median ({item.reference}): {item.baseline} · Change: {item.change}</span></p>)}
           {!live && <div className={styles.moments}>{rep.keyMoments.map((moment, index) => <button type="button" key={`${moment.type}-${index}`} disabled={!seekEnabled} onClick={() => onSeek(moment.timestampMs)}>{moment.label} · {seconds(moment.timestampMs)}</button>)}</div>}
 

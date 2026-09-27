@@ -84,6 +84,19 @@ If a contract must change:
 
 ## Current capabilities
 
+**Gym upload checkpoint (2026-09-27):** A implemented lat pulldown, incline dumbbell bench
+press and cable lateral raise end to end; triceps is removed from the frontend lineup.
+Read apps/api/GYM_EXERCISES.md for exact selected 1080p exports, counter semantics and known
+bad-form/back-view count failures. Selected demo counts are 6/7/7. Lat/lateral reps also report
+raw 2D torso tilt ranges and peak playback markers when the entire interval is visible.
+This is descriptive geometry, not swing/rotation/bad-form classification; incline dumbbell
+contact/elbow tuck remain unassessed. No model training or schema fields were added.
+523 backend / 54 frontend tests and build/type/lint/contract checks pass. Saved push-up
+counts, rep measurements, flags and body-line observations match the previous checkpoint.
+Browser automation could not start; manual gym upload/playback/switching and a physical live
+push-up rehearsal remain open. Significant visual redesign is deferred until that rehearsal.
+Older priorities/checkpoints below are historical where they conflict with this update.
+
 **Independent movement feedback implemented:** read apps/api/MOVEMENT_OBSERVATIONS.md.
 Additive `movementObservations` now describes sustained visible 2D body-line bends outside
 completed reps. Five reviewed intervals on badpushups; original clip counts retained. Results

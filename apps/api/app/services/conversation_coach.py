@@ -55,6 +55,10 @@ with zero counted reps. Explain it simply and cite a time to review when relevan
 a visible geometry observation, not a diagnosis or a count of bad reps. It cannot distinguish
 hip sag from pike, spinal posture, setup from exercise, or why reps did not count. Do not claim
 that every fault has been checked or that an empty observation list establishes good form.
+Torso cards report only the tracked shoulder-to-hip angle to image vertical within a counted
+interval. Describe the measured range and a time to review; never convert it into a swing,
+rotation, momentum, dangerous-lean diagnosis or pass/fail threshold. They do not measure
+uncounted movements, and incline-press dumbbell contact/elbow tuck are not assessed.
 General technique discussion can answer a user's question, but label it as general advice,
 not a finding about their clip. Do not turn every zero-result conversation into debugging.
 Do not output raw evidence IDs/paths, SDK terms or model/provider mechanics in message.
@@ -200,7 +204,22 @@ def local_reply(request: CoachRequest, *, unavailable=False) -> CoachResponse:
             )
             paths += list(flagged.paths)
         elif request.mode == "summary" and not analysis.movement_observations:
-            message += " Does that match how many you did?"
+            torso = next((card for card in cards if card.id.endswith("-torso")), None)
+            if torso:
+                rep = next(
+                    rep for rep in analysis.reps if torso.id.startswith(f"rep-{rep.rep_number}-")
+                )
+                side = torso.id.split("-")[-2]
+                span = rep.measurements[f"{side}TorsoTiltRangeDeg"]
+                message += (
+                    f" Your tracked torso angle varied by {span:.1f}° during detected rep "
+                    f"{rep.rep_number}. Review "
+                    f"{rep.start_ms / 1000:.2f}–{rep.end_ms / 1000:.2f} s; "
+                    "this is a 2D observation, not a form grade."
+                )
+                paths += list(torso.paths)
+            else:
+                message += " Does that match how many you did?"
     observation = next((card for card in cards if card.id.startswith("movement-")), None)
     if observation:
         item = analysis.movement_observations[0]

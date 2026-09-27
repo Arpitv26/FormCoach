@@ -6,8 +6,10 @@ The demo is **live push-ups plus uploaded incline dumbbell bench press, cable la
 and lat pulldown**; triceps is removed. A owns both apps. Fourteen private gym clips are now
 available. All three upload checkpoints are implemented. The selected 1080p exports count
 6 pulldowns, 7 presses and 7 lateral raises; several bad-form/back-view clips still undercount.
-See [gym exercise evidence](../apps/api/GYM_EXERCISES.md). Browser rehearsal and descriptive
-torso-movement review precede the deferred visual overhaul.
+See [gym exercise evidence](../apps/api/GYM_EXERCISES.md). Descriptive torso measurements are
+implemented for lat pulldown/lateral raise. Browser rehearsal and a fresh physical push-up
+set precede the deferred visual overhaul. Investigate failed views from actual poses without
+equating missing counts with bad form; do not promise equipment/rotation detection.
 The earlier plan below is historical where it conflicts with this direction.
 
 

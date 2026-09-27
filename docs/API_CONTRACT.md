@@ -27,6 +27,17 @@ Intervals cover the low run through confirmed raised position; `raised_position`
 completion. Lowering only rearms. These additive dictionary keys need no schema change;
 unknown keys remain safe for older clients, which may not display them.
 
+Lat-pulldown/lateral-raise rep dictionaries also contain `torsoSampleCount`,
+`torsoUsableSampleCount`, `min{Left|Right}TorsoTiltDeg`, `max{Left|Right}TorsoTiltDeg`,
+and `{left|right}TorsoTiltRangeDeg`. Only the counter's selected side is emitted.
+The angle is the raw unsigned shoulder-to-hip line against upward image vertical (0°
+upright, 90° horizontal). Angles/range are null unless every sample in `[startMs,endMs]`
+is usable, both boundaries exist, at least 3 samples exist and no gap exceeds 300 ms.
+No interpolation/smoothing; range is max minus min, not total angular travel. Camera tilt
+and projection affect it; it cannot establish axial rotation, momentum, a quality target
+or a missed-rep cause. `maximum_torso_tilt` marks the first maximum sample when available.
+It adds no issue, score or threshold. Incline press and push-up measurements are unchanged.
+
 ## Additive movement observations (2026-09-26)
 
 `AnalysisResponse.movementObservations` is a new list, defaulting to `[]` when an older

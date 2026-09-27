@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
 from app.analysis.exercises.cable_lateral_raise import segment_cable_lateral_raises
+from app.analysis.exercises.gym_torso import add_torso_measurements
 from app.analysis.exercises.incline_press import segment_incline_presses
 from app.analysis.exercises.lat_pulldown import segment_lat_pulldowns
 from app.analysis.exercises.pushup_body_line import add_body_line_measurements
@@ -179,6 +180,15 @@ class RuleBasedAnalyzer:
         reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
         comparison_limitations = []
         observations = []
+        if profile.id in {"lat-pulldown", "cable-lateral-raise"} and side:
+            reps = add_torso_measurements(
+                reps,
+                frames,
+                side=side,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+            )
         if profile.id == "push-up" and side:
             observations = observe_body_line(
                 frames,

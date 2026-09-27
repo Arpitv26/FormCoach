@@ -154,3 +154,65 @@ Shoulder min/max/excursion and time-to/from-minimum keys use the existing numeri
 Results and coaching render these with shoulder labels; elbow-only push-up behavior remains.
 Checks: **502 backend / 54 frontend tests**, lint, formatting, TypeScript, schema/type checks,
 and production build pass. Browser upload/playback/switching still need manual verification.
+
+## Fourth milestone: descriptive torso feedback
+
+Lat pulldown and lateral raise now add raw 2D shoulder-to-hip tilt relative to upward image
+vertical to each counted rep: minimum, maximum, range and sample counts. The first maximum
+has a playback marker. Results and both local/OpenAI coach evidence can describe the range.
+The whole counted interval must have usable selected-side shoulder/hip landmarks, at least
+three samples, both endpoints and no gap >300 ms. Otherwise angles are null. These measurements
+never alter counts. There is no smoothing, interpolation, swing threshold or form classification.
+Unsigned range is not total angular travel and cannot establish direction/rotation/momentum.
+
+Development comparison on the side-view exports:
+
+| Clip annotation | Counted intervals | Torso angle range within each interval |
+| --- | --- | --- |
+| Lateral raise GoodForm | 7 | 13.0°, 2.8°, 4.0°, 7.4°, 6.0°, 6.5°, 3.2° |
+| Lateral raise BadForm | 7 / human 7 | 23.0°, 31.7°, 36.8°, 45.1°, 42.5°, 38.3°, 33.8° |
+| Lat pulldown GoodForm | 6 | 5.9°, 5.8°, 8.4°, 7.5°, 6.8°, 6.5° |
+| Lat pulldown BadForm | 3 / human 6 | 11.0°, 20.4°, 16.6° |
+
+Numbers apply only to detected intervals, not matching human rep ordinals when counts differ.
+Raw extrema can be sensitive to pose noise. Eight minimum/maximum video overlays reviewed:
+rep 4 of each lateral side-view clip and detected rep 1 of each lat clip. Visible shoulder/hip
+lines support the descriptive geometry; no independently calibrated ground-truth angles exist.
+Do not use these two same-session recordings to establish a universal good/bad threshold.
+
+Final checks: **523 backend / 54 frontend tests**; lint, formatting, types, schema/type checks
+and production build pass. Eight saved push-up/blank captures preserve summary, reps,
+measurements, timeline, issues, camera feedback, status and movement observations relative
+to `e6693fd` (counts 3/1/1/2/4/19/0/unknown). IMG_6938 already has one body-line observation;
+badpushups retains five. Existing three gym demo rep objects remain unchanged apart from
+new torso fields/markers. New tests cover known angles, portrait/landscape/mirroring,
+missing/low/unknown/out-of-frame/degenerate points, interval gaps/boundaries, cumulative
+stability and inconsistent coach metadata.
+
+Fresh native BadForm lateral side-view upload after torso additions returns complete, 7 reps.
+Detected rep 4 has 1.680°–46.743° torso tilt (45.063° range), peak marker 7.482 s. A real
+OpenAI question about that rep returned approximately 45°, 1.7°–46.7°, and the correct
+6.75–8.40 s interval with matching evidence paths. This verifies one answer, not general
+form-advice accuracy; the model's optional offer of stabilization tips is not a finding.
+
+## Rehearsal files and remaining manual checks
+
+Start both apps using README commands, then open `http://localhost:3000/upload` and select
+the exercise. In the file picker use Command+Shift+G and paste:
+
+```text
+/Users/arpit/Developer/helloHacks/helloHacks/apps/api/artifacts/gym-review
+```
+
+| Exercise | Private export | Expected development result |
+| --- | --- | --- |
+| Lat pulldown | `latPulldownGoodFormSideView-1080p.mov` | 6, complete |
+| Incline dumbbell bench press | `inclinedDumbellChestPressGoodFormAngledView2-1080p.mov` | 7, complete |
+| Cable lateral raise | `cableLateralRaisesGoodFormSideView-1080p.mov` | 7, partial tracking |
+
+Verify skeleton alignment, seek a rep/torso marker, ask the coach about that rep, then switch
+exercises and check that the old clip/results disappear. Do a fresh physical live push-up set.
+The computer-use service failed to start in this session, so these browser/manual checks
+are explicitly pending. Native uploads of all three selected exports passed before torso
+additions; pose replay and HTTP coverage exercise the same analyzer. The significant UI
+redesign is deferred; current changes only make exercise selection/results work.

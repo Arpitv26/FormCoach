@@ -62,6 +62,51 @@ def body_line_card(analysis: AnalysisResponse, index: int, side: str) -> Evidenc
     )
 
 
+def torso_card(analysis: AnalysisResponse, index: int, side: str) -> EvidenceCard | None:
+    if analysis.exercise is None or analysis.exercise.id not in {
+        "lat-pulldown",
+        "cable-lateral-raise",
+    }:
+        return None
+    rep = analysis.reps[index]
+    keys = [f"min{side}TorsoTiltDeg", f"max{side}TorsoTiltDeg", f"{side.lower()}TorsoTiltRangeDeg"]
+    low, high, span = [rep.measurements.get(key) for key in keys]
+    total = rep.measurements.get("torsoSampleCount")
+    usable = rep.measurements.get("torsoUsableSampleCount")
+    if (
+        low is None
+        or high is None
+        or span is None
+        or not 0 <= low <= high <= 180
+        or not isclose(high - low, span, abs_tol=0.01)
+        or total is None
+        or not 3 <= total <= 1800
+        or total != int(total)
+        or usable != total
+    ):
+        return None
+    path = f"reps.{index}"
+    return EvidenceCard(
+        f"rep-{rep.rep_number}-{side.lower()}-torso",
+        f"During detected rep {rep.rep_number} "
+        f"({rep.start_ms / 1000:.2f}–{rep.end_ms / 1000:.2f} s), "
+        f"the tracked {side.lower()} shoulder-to-hip line tilted {low:.1f}° to {high:.1f}° "
+        f"from image vertical, a {span:.1f}° range across {int(total)} samples. "
+        "This is unsigned 2D image geometry, not a diagnosis of swinging, rotation, momentum "
+        "or bad form. Camera tilt/projection and tracking affect it. No acceptable target "
+        "or reason for missing reps is established; range is not total angular travel.",
+        (
+            f"{path}.repNumber",
+            f"{path}.startMs",
+            f"{path}.endMs",
+            *(
+                f"{path}.measurements.{key}"
+                for key in [*keys, "torsoSampleCount", "torsoUsableSampleCount"]
+            ),
+        ),
+    )
+
+
 def comparison(
     analysis: AnalysisResponse, index: int, key: str, current: float
 ) -> tuple[str, tuple[str, ...]]:
@@ -240,6 +285,9 @@ def evidence_cards(
             body_line = body_line_card(analysis, index, side) if joint == "Elbow" else None
             if body_line is not None:
                 cards.append(body_line)
+            torso = torso_card(analysis, index, side)
+            if torso is not None:
+                cards.append(torso)
     return cards
 
 

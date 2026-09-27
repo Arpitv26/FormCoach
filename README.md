@@ -2,11 +2,13 @@
 
 UBC BizTech HelloHacks 2026 · A camera-based movement coach grounded in measured evidence.
 
-**FormCoach is in development.** The frontend/backend foundation, shared data formats,
-legacy mock squat results, and tested push-up counting from supplied poses are ready.
-Local video pose extraction and evidence-based coaching are available; browser skeleton tracking and uploaded-video overlays are available. Live rep counting
-and form scoring remain unfinished. Coaching works locally; optional OpenAI evidence selection
-has mocked API tests and one successful live timing-question check. See [video setup](apps/api/VIDEO_SETUP.md)
+**FormCoach is in development.** Live/uploaded push-up counting, skeleton playback and
+conversational coaching are implemented. Uploads also support lat pulldown, incline dumbbell
+bench press and cable lateral raise, with measured joint angles, timing and selected torso
+geometry. Selected demo exports count 6/7/7; several other views still undercount. See the
+[gym recording checks and limits](apps/api/GYM_EXERCISES.md). No calibrated form score or
+general bad-form classifier is implemented. Coaching works locally or with optional OpenAI.
+See [video setup](apps/api/VIDEO_SETUP.md)
 and [coach setup](apps/api/COACH_SETUP.md).
 No API key, database, Docker, or GPU is needed to run this foundation.
 
@@ -14,8 +16,8 @@ No API key, database, Docker, or GPU is needed to run this foundation.
 
 Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,
 and FormCoach will count repetitions, measure how they move, and explain their results.
-Our demo priority is **push-ups in prerecorded gym video**. Backend video pose extraction
-works locally and through HTTP upload; the live browser skeleton now works, with live counting still to connect. This diagram shows the complete vision:
+Our demo priority is **live push-ups plus one uploaded set of each of the three gym exercises**.
+Browser and backend pose extraction feed the same measurement interfaces. This diagram shows the complete vision:
 
 ```text
        LIVE WEBCAM                      UPLOADED VIDEO
