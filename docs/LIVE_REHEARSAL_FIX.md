@@ -44,7 +44,7 @@ The temporary synthetic preview route is removed before committing.
 
 ## Checks and limits
 
-411 backend tests and 52 frontend tests pass; lint, format and generated contracts pass.
+412 backend tests and 52 frontend tests pass; lint, format and generated contracts pass.
 
 - Backend and frontend unit tests cover the stale-display regression, exact/deep-copied
   export, five synthetic cycles with a seven-second fourth-rep hold, conversation history,

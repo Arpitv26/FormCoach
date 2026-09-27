@@ -64,8 +64,9 @@ def is_count_review(request: CoachRequest) -> bool:
         return False
     question = (request.question or "").lower()
     discrepancy = (
-        r"\bmiss(?:ed|ing)?\b|\bonly\s+(?:count|detect|\d+|one|two|three|four|five)"
-        r"|\b(?:wrong|incorrect)\s+count|\binstead of\b"
+        r"\bmiss(?:ed|ing)?\b|\bonly\s+(?:count|detect)|\b(?:wrong|incorrect)\s+count"
+        r"|\bonly\s+(?:\d+|one|two|three|four|five)(?:\s+(?:reps?|push-ups?))?\s*[?.!]*$"
+        r"|\b\d+\s+instead of\s+\d+\b"
     )
     prior_dispute = any(
         turn.role == "user" and re.search(discrepancy, turn.content.lower())

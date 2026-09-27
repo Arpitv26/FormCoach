@@ -81,7 +81,15 @@ def test_timeout_does_not_expose_provider_details(request_data):
     assert "secret" not in result.model_dump_json()
 
 
-def test_general_followup_can_answer_without_fabricating_a_measurement(request_data):
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Can I film from the side instead of the front?",
+        "Should I keep only one person in frame?",
+    ],
+)
+def test_general_followup_can_answer_without_fabricating_a_measurement(request_data, question):
+    request_data.question = question
     reply = ConversationReply(
         message="For a clearer capture, keep the camera beside you and your elbow visible.",
         kind="general",
