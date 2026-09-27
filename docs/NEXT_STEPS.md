@@ -2,6 +2,42 @@
 
 Updated 2026-09-26. Main `7f44566` includes PRs #1–#5. The next checkpoint fixes a failed
 physical rehearsal and the confusing coach/results flow. Read LIVE_REHEARSAL_FIX.md first.
+
+## Current priority: useful feedback when no complete reps count
+
+The latest human rehearsal reports that the long upload now works and live counted 19;
+a brief pause at the top helps live counting. This is human feedback, not a new captured
+live accuracy benchmark. Keep the existing counting policy while investigating new evidence.
+
+`badpushups.MOV` demonstrates the next product gap: the human deliberately moved the torso/
+hips for about 4–5 attempts. Fresh extraction returns zero completed cycles despite 187/188
+usable selected-elbow samples. Only one raw sample reaches the current bend zone; a sustained
+bend is required. This result is not a bad-form classification. Read
+[BAD_MOVEMENT_REVIEW.md](../apps/api/BAD_MOVEMENT_REVIEW.md) for the measured evidence.
+
+Next implementation checkpoint:
+
+1. Analyze reliably visible movement intervals independently of completed rep segmentation.
+   Keep attempted movement separate from the completed-rep count; do not force this clip to
+   count 4 or 5 or infer that every uncounted movement is an incorrect push-up.
+2. Start with one descriptive elbow/body-line observation and timestamps. Review matching
+   normal and deliberately changed footage before assigning any specific form label.
+   The present unsigned body-line angle cannot distinguish hip sag from pike.
+3. Expose that evidence in results and conversational coaching, including zero-count results.
+   Any additive contract requires matching documentation, examples, types and tests.
+4. Test normal recordings, static holds, partial movements, fast turns and tracking gaps;
+   preserve the working counts. Use a separate clip for validation after tuning.
+5. Then continue the visual overhaul: show a short useful explanation and one next action;
+   keep diagnostic detail expandable. Do not present developer troubleshooting as coaching.
+
+Conversation fix completed in this checkpoint: requested rep numbers and follow-up context
+now take priority over generic six-rep highlights. A real OpenAI request correctly answered
+rep 12's duration; 428 backend tests pass. Specific form findings remain unimplemented.
+More labeled videos help us develop and test the analysis rules; adding files does not train
+MediaPipe or OpenAI. No model training is planned for this checkpoint.
+
+## Earlier counting checkpoint
+
 **Latest counting correction:** read [COUNTING.md](../apps/api/COUNTING.md). The new live
 capture reproduced 4 and now returns 5; IMG_6943 reproduced 5 and now returns 19 distinct
 cycles. The human reported 20; a twentieth cycle is not established by the video review.
@@ -16,8 +52,8 @@ do not try to finish every stretch feature before the demo.
 - **Computer B:** feature handoff complete in merged PR #4. Coordinate any further screen edits.
 - **Computer A:** owns integration, backend and the upcoming frontend visual overhaul.
   Preserve tested upload/pose pairing, raw live input, request lifecycle and evidence behavior.
-- **Next order:** retest five live reps with the new downloadable capture, investigate any
-  mismatch using those exact samples, then continue the visual overhaul in small commits.
+- **Next order:** implement the bounded movement-feedback checkpoint above, preserve counting
+  regressions, capture any new live mismatch, then continue the visual overhaul in small commits.
 
 ## What the code actually does today
 

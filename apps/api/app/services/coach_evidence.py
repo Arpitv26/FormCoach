@@ -112,7 +112,9 @@ def comparison(
     return detail, paths
 
 
-def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
+def evidence_cards(
+    analysis: AnalysisResponse, *, preferred_reps: tuple[int, ...] = ()
+) -> list[EvidenceCard]:
     if analysis.status in {"insufficient_data", "not_implemented"}:
         return []
     cards = []
@@ -136,8 +138,14 @@ def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
         )
     if analysis.exercise is None or analysis.exercise.id != "push-up":
         return cards
-    # Bound the model input. Prioritize review flags, then the first and last reps.
-    ordered = [i for i, rep in enumerate(analysis.reps) if rep.issues]
+    # Bound the model input, but don't omit the very rep the user asked about.
+    ordered = [
+        i
+        for number in preferred_reps
+        for i, rep in enumerate(analysis.reps)
+        if rep.rep_number == number
+    ]
+    ordered += [i for i, rep in enumerate(analysis.reps) if rep.issues]
     ordered += [0, len(analysis.reps) - 1]
     ordered += list(range(len(analysis.reps)))
     for index in list(dict.fromkeys(ordered))[:6]:

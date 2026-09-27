@@ -43,6 +43,17 @@ concern and suggest appropriate professional help; do not prescribe treatment.
 For summary: mention the detected count, then one useful observation or tracking uncertainty.
 For next_set: offer one practical next step supported by evidence or labeled general guidance.
 For QA: respond naturally; missing evidence calls for a brief clarification, not boilerplate.
+Answer greetings and general questions directly. Do not repeat the set summary or ask for a
+new recording on every turn. Use the latest question to choose the subject of the reply.
+CURRENT CAPABILITY LIMIT: This analyzer counts elbow movement and reports descriptive
+measurements/comparisons. It has no validated bad-form detector. If asked what was wrong with
+form, say that specific form faults were not assessed; do not imply a detector found none.
+Zero counted reps does not mean no movement, bad form, or a camera failure. A zero-rep summary
+should plainly explain that distinction. Do not claim that uploading more clips trains us.
+Body-line evidence currently exists only within counted reps. With no counted reps, it is
+unavailable even when a skeleton is visible. Do not promise missing form findings in the reply.
+General technique discussion can answer a user's question, but label it as general advice,
+not a finding about their clip. Do not turn every zero-result conversation into debugging.
 Do not output raw evidence IDs/paths, SDK terms or model/provider mechanics in message.
 Return message, kind (session/general/clarification/unsupported), and evidence_ids containing
 only IDs supporting the reply. Session claims require evidence IDs. Other kinds may have none.
@@ -56,6 +67,21 @@ class ConversationReply(BaseModel):
     message: str = Field(min_length=1, max_length=1600)
     kind: Literal["session", "general", "clarification", "unsupported"]
     evidence_ids: list[str] = Field(max_length=6)
+
+
+def conversation_evidence(request: CoachRequest) -> list[EvidenceCard]:
+    """Retrieve requested reps before generic highlights within the existing six-rep budget."""
+    prompts = [request.question or ""]
+    prompts += [turn.content for turn in reversed(request.history) if turn.role == "user"]
+    numbers = []
+    for prompt in prompts:
+        for match in re.finditer(
+            r"\breps?\s*#?\s*(\d{1,4}(?:\s*(?:,|and|&|versus|vs\.?)\s*#?\s*\d{1,4})*)\b",
+            prompt,
+            re.IGNORECASE,
+        ):
+            numbers.extend(int(number) for number in re.findall(r"\d+", match[1]))
+    return evidence_cards(request.analysis, preferred_reps=tuple(dict.fromkeys(numbers)))
 
 
 def is_count_review(request: CoachRequest) -> bool:
@@ -211,7 +237,7 @@ async def converse(request: CoachRequest, writer) -> CoachResponse:
         return count_review_reply(request)
     if writer is None or request.analysis.provenance.kind == "placeholder":
         return local_reply(request)
-    cards = evidence_cards(request.analysis)
+    cards = conversation_evidence(request)
     try:
         async with asyncio.timeout(10):
             reply = await writer.write(request, cards)

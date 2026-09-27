@@ -15,6 +15,7 @@ from app.services.conversation_coach import (
     INSTRUCTIONS,
     ConversationReply,
     OpenAIConversation,
+    conversation_evidence,
     converse,
     local_reply,
 )
@@ -181,3 +182,59 @@ def test_sdk_sends_history_and_reviewed_evidence_not_arbitrary_analysis_prose(
     assert request_data.analysis.session_id not in payload["input"]
     assert "NOT a video" in INSTRUCTIONS
     assert "user reports, never measured facts" in INSTRUCTIONS
+
+
+def test_question_and_followup_retrieve_later_reps_before_generic_highlights(request_data):
+    original = request_data.analysis.reps[0]
+    request_data.analysis.reps = [
+        original.model_copy(
+            update={
+                "rep_number": number,
+                "start_ms": number * 3000,
+                "end_ms": number * 3000 + 1000 + number * 10,
+                "issues": [],
+            }
+        )
+        for number in range(1, 21)
+    ]
+    request_data.question = "Compare reps 12 and 13."
+    cards = conversation_evidence(request_data)
+    assert [c.id for c in cards if c.id.endswith("-time")][:2] == ["rep-12-time", "rep-13-time"]
+    assert len([c for c in cards if c.id.endswith("-time")]) == 6
+    assert "1.12 s" in next(c.text for c in cards if c.id == "rep-12-time")
+    request_data.history = [CoachTurn(role="user", content=request_data.question)]
+    request_data.question = "Which was faster?"
+    assert [c.id for c in conversation_evidence(request_data) if c.id.endswith("-time")][:2] == [
+        "rep-12-time",
+        "rep-13-time",
+    ]
+    request_data.question = "Now explain rep 16."
+    assert (
+        next(c.id for c in conversation_evidence(request_data) if c.id.endswith("-time"))
+        == "rep-16-time"
+    )
+
+
+def test_nonexistent_requested_rep_cannot_create_evidence(request_data):
+    request_data.question = "Tell me about rep 999 and rep 0."
+    cards = conversation_evidence(request_data)
+    assert cards == evidence_cards(request_data.analysis)
+
+
+def test_greeting_with_zero_detected_reps_reaches_conversational_model(request_data):
+    request_data.analysis.reps = []
+    request_data.analysis.issues = []
+    request_data.analysis.summary.total_reps = 0
+    request_data.analysis.status = "partial"
+    request_data.question = "hello"
+    writer = SimpleNamespace(
+        write=AsyncMock(
+            return_value=ConversationReply(
+                message="Hi! What would you like to work on?", kind="general", evidence_ids=[]
+            )
+        )
+    )
+    result = asyncio.run(converse(request_data, writer))
+    assert result.provider == "openai"
+    assert "Hi!" in result.message
+    writer.write.assert_awaited_once()

@@ -84,6 +84,14 @@ If a contract must change:
 
 ## Current capabilities
 
+**Latest feedback checkpoint:** the human reports improved upload/live counting but zero
+completed reps for deliberately changed torso/hip movement. See apps/api/BAD_MOVEMENT_REVIEW.md:
+187/188 elbow samples usable, only one sample reaches the bend zone, so no sustained bend
+qualifies. This is not bad-form recognition. Next priority in docs/NEXT_STEPS.md is descriptive
+movement feedback outside completed reps. Do not force attempts into the completed-rep count.
+Conversation evidence now prioritizes explicit requested rep numbers and recent user context;
+an actual OpenAI request answered rep 12 correctly. Specific form assessment remains missing.
+
 **Newest counting correction:** read apps/api/COUNTING.md. New live JSON reproduced 4 reps
 and IMG_6943 upload 5. Counter v2 uses a 150° return zone and 60 ms raw dwell plus median
 confirmation, collecting overlapping phase evidence together. Outputs: live JSON 5, IMG_6943

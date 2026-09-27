@@ -16,6 +16,14 @@ set or reload clears them; no database or OpenAI conversation object is created.
 
 - Usually 2–4 sentences, under 100 words; over-120-word output is rejected.
 - Answers can explain measured differences or offer clearly general camera/pacing guidance.
+- Conversation evidence prioritizes rep numbers in the current question, then recent user
+  questions, before generic highlights. This keeps later reps (for example rep 12 of 19)
+  available for direct questions and follow-ups within the six-rep input budget. Explicit
+  numeric references such as `rep 12` or `reps 12 and 13` are supported; this is not full
+  natural-language retrieval. Requests about more than six reps still have partial evidence.
+- Greetings should get a natural greeting, not another set summary. Zero counted reps means
+  no completed cycles met the counting rules; it does not establish no movement, bad form,
+  or camera failure. Specific form faults are not assessed by the current analyzer.
 - User-reported reps and holds remain reports. The model has measurements, not the video.
 - No invented form findings, scores, fatigue diagnosis, injury prediction or treatment.
 - Structured output validates shape; known evidence IDs validate references. **Neither proves
@@ -110,6 +118,15 @@ statements, mode, and (for QA) the user's question are sent; no session ID, anal
 video, or landmarks. Questions themselves may contain user-entered personal information.
 
 ## Validation checkpoint
+
+- Conversation retrieval follow-up (2026-09-26): 428 backend tests pass. Requested later reps,
+  follow-up context, nonexistent rep references and a zero-result greeting have regression
+  tests. One actual HTTP request using the saved IMG_6943 analysis asked for rep 12's duration:
+  `provider: openai`, reply “Rep 12 took 1.14 seconds from start to finish, including pauses.”
+  Returned evidence references the matching rep's numeric fields. This verifies the configured
+  provider and that one answer; it does not prove general conversational or form accuracy.
+  Prompt instructions now explicitly distinguish unassessed form from absent faults and
+  avoid turning every zero-result reply into a request for another recording.
 
 - Timing v2: local next-set feedback for IMG_6942 prioritizes the new rep-3 review issue and
   explains 3.07 s versus the preceding median 1.57 s (+1.50 s). Evidence paths resolve to
