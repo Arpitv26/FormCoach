@@ -1,5 +1,13 @@
 # Frontend handoff — Computer A after B’s PR #4
 
+## Latest: charcoal / lime + integrated motion
+
+Read [UI_MOTION_REDESIGN.md](UI_MOTION_REDESIGN.md). The user explicitly changed the visual
+direction. React Bits and Magic UI sources are now integrated, with licenses and a shared
+Motion engine, responsive activity charts and reduced-motion support. Playwright use was
+approved and browser validation now works. Earlier light-theme and browser-blocker notes
+below are historical.
+
 ## September 27: Dashboard / Upload / Live implementation
 
 Read [UI_IMPLEMENTATION.md](UI_IMPLEMENTATION.md) for the new shared design, tabbed review,

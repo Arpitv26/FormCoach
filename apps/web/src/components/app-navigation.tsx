@@ -1,24 +1,27 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import { LayoutDashboard, Upload, Video, ArrowUpRight, Activity, Pause, Play } from "lucide-react";
+import { motion } from "motion/react";
+import { useDesignMotion } from "./design/motion-provider";
 export function AppIcon({ name }: { name: "dashboard" | "upload" | "live" | "arrow" }) {
-  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {name === "dashboard" ? <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></> : name === "upload" ? <><path d="M12 16V3m-5 5 5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" /></> : name === "live" ? <><rect x="3" y="6" width="12" height="12" rx="3" /><path d="m15 10 6-3v10l-6-3" /></> : <path d="M5 12h14m-6-6 6 6-6 6" />}
-  </svg>;
+  const Icon = { dashboard: LayoutDashboard, upload: Upload, live: Video, arrow: ArrowUpRight }[name];
+  return <Icon size={21} strokeWidth={1.7} aria-hidden="true" />;
 }
-
 export function AppNavigation() {
   const path = usePathname();
-  return <>
-    <a className="skip-link" href="#main-content">Skip to content</a>
-    <header className="site-header">
-      <Link className="brand" href="/" aria-label="FormCoach dashboard"><span className="brand-mark" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M5 17V7h6M5 12h5m4-5h5m-5 0v10h5" /></svg></span>FormCoach<span className="brand-dot">.</span></Link>
-      <nav className="app-nav" aria-label="Main navigation">
-        {([{ href: "/", label: "Dashboard", icon: "dashboard" }, { href: "/upload", label: "Upload", icon: "upload" }, { href: "/camera?exercise=push-up", label: "Live", icon: "live" }] as const).map((item) => <Link key={item.label} href={item.href} aria-current={(item.href === "/" ? path === "/" || path.startsWith("/sets/") : path === item.href.split("?")[0]) ? "page" : undefined}><AppIcon name={item.icon} /><span>{item.label}</span></Link>)}
-      </nav>
-      <span className="header-caption">A little more intention.</span>
-    </header>
-  </>;
+  const { enabled, locked, toggle } = useDesignMotion();
+  return <><a className="skip-link" href="#main-content">Skip to content</a><header className="site-header">
+    <Link className="brand" href="/" aria-label="FormCoach dashboard"><span className="brand-mark"><Activity size={27} aria-hidden="true" /></span>FormCoach<span className="brand-dot">.</span></Link>
+    <nav className="app-nav" aria-label="Main navigation">
+      {([{ href: "/", label: "Dashboard", icon: "dashboard" }, { href: "/upload", label: "Upload", icon: "upload" }, { href: "/camera?exercise=push-up", label: "Live", icon: "live" }] as const).map(item => {
+        const active = item.href === "/" ? path === "/" || path.startsWith("/sets/") : path === item.href.split("?")[0];
+        return <Link key={item.label} href={item.href} aria-current={active ? "page" : undefined}>
+          {active && <motion.span className="nav-active-pill" layoutId="navigation-pill" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
+          <AppIcon name={item.icon} /><span>{item.label}</span>
+        </Link>;
+      })}
+    </nav>
+    <button className="motion-toggle" disabled={locked} onClick={toggle} aria-label={locked ? "Motion disabled for reduced motion or live camera" : enabled ? "Pause decorative motion" : "Enable decorative motion"} aria-pressed={!enabled} title={enabled ? "Pause motion" : "Enable motion"}>{enabled ? <Pause size={16} /> : <Play size={16} />}<span>Motion {enabled ? "on" : "off"}</span></button>
+  </header></>;
 }

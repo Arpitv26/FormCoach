@@ -2,22 +2,22 @@
 .intro h1 { margin: 10px 0 12px; }
 .layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px; align-items: start; }
 .reviewColumn { min-width: 0; }
-.cameraPanel { border: 1px solid var(--line); border-radius: 16px; background: white; overflow: hidden; }
+.cameraPanel { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
 .panelHeader { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 24px; }
-.viewport { position: relative; aspect-ratio: 16 / 10; background: #20251f; color: #f7f8f5; }
+.viewport { position: relative; aspect-ratio: 16 / 10; background: #111310; color: #f2f3ec; }
 .video { width: 100%; height: 100%; display: block; object-fit: contain; transform: scaleX(-1); }
 .hiddenVideo { opacity: 0; }
 .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; gap: 12px; }
 .placeholder svg { width: 54px; height: 54px; stroke: #b9cbb2; stroke-width: 1.5; margin-bottom: 6px; }
 .placeholder p { color: #c2cbbd; font-size: .875rem; max-width: 280px; }
-.previewLabel { position: absolute; top: 12px; left: 12px; padding: 6px 10px; background: #20251fe6; color: white; font-size: .875rem; border-radius: 8px; }
+.previewLabel { position: absolute; top: 12px; left: 12px; padding: 6px 10px; background: #111310e6; color: #f2f3ec; font-size: .875rem; border-radius: 8px; }
 .controls { padding: 24px; }
 .status p:last-child { color: var(--muted); font-size: .875rem; margin-top: 6px; }
 .statusTitle { font-size: 1rem; font-weight: 600; }
-.errorTitle { color: #813d2d; font-weight: 600; }
+.errorTitle { color: #ffb8a5; font-weight: 600; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
-.secondaryButton { background: white; border: 1px solid #889387; color: var(--accent); padding: 12px 18px; min-height: 44px; border-radius: 10px; font-size: .9375rem; }
-.secondaryButton:hover { background: #edf1e9; }
+.secondaryButton { background: var(--surface); border: 1px solid #535b49; color: var(--accent); padding: 12px 18px; min-height: 44px; border-radius: 10px; font-size: .9375rem; }
+.secondaryButton:hover { background: var(--surface-raised); }
 .privacyNote { margin-top: 18px; color: var(--muted); font-size: .875rem; }
 .guidance h2 { margin: 10px 0 16px; }
 .setupCue { color: var(--muted); }
@@ -29,7 +29,7 @@
 .liveStats dd { color: var(--accent); font-size: 2rem; margin-top: 6px; font-variant-numeric: tabular-nums; }
 .liveStats > div:first-child dd { font-size: 3.5rem; line-height: 1.1; }
 .liveStats .analysisState { font-size: .9375rem; color: var(--muted); }
-.liveError { padding: 12px; background: #f9e9e3; color: #813d2d; border-radius: 10px; font-size: .875rem; }
+.liveError { padding: 12px; background: #36221f; color: #ffb8a5; border-radius: 10px; font-size: .875rem; }
 .finishedLayout { max-width: 960px; margin: 0 auto; }
 .resultActions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 24px; }
 .resultActions details { max-width: 420px; font-size: .875rem; color: var(--muted); }

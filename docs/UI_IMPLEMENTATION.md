@@ -1,5 +1,12 @@
 # Dashboard, upload and live UI checkpoint
 
+**Current visual direction (later September 27):** The user replaced the light/sage direction
+with a charcoal/lime fitness-dashboard reference and explicitly requested actual React Bits
+and Magic UI components. See [UI_MOTION_REDESIGN.md](UI_MOTION_REDESIGN.md) for the new
+components, motion controls, activity chart and Playwright validation. The earlier light
+palette, Anime.js dependency and browser-access blocker below are historical.
+
+
 September 27, 2026. Implementation on `backend-cv`, following the locally supplied
 `UI_REDESIGN_PLAN.md` and `NEW_SESSION_PROMPT.md`. Main was not merged or modified.
 The pre-existing planning edits and temporary session prompt remain outside these commits.

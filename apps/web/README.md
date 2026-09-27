@@ -1,7 +1,8 @@
 # FormCoach web — Computer B
 
 **Current UI checkpoint:** Computer A has implemented Dashboard / Upload / Live with a
-shared light theme, tabbed review and explicit device-local saved sets. See
+charcoal/lime theme, integrated React Bits / Magic UI motion, tabbed review and explicit device-local saved sets.
+See [UI_MOTION_REDESIGN.md](../../docs/UI_MOTION_REDESIGN.md) for the latest browser-checked redesign. See
 [UI_IMPLEMENTATION.md](../../docs/UI_IMPLEMENTATION.md) for current behavior, persistence,
 tests and pending browser checks. Run `npm ci` for the updated dependencies. The older
 feature descriptions below are historical where they conflict with that checkpoint.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { DesignMotionProvider } from "@/components/design/motion-provider";
 import { AppNavigation } from "@/components/app-navigation";
 
 export const metadata: Metadata = {
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><AppNavigation />{children}</body></html>;
+  return <html lang="en"><body><DesignMotionProvider><AppNavigation />{children}</DesignMotionProvider></body></html>;
 }

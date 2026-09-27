@@ -84,7 +84,14 @@ If a contract must change:
 
 ## Current capabilities
 
-**September 27 UI implementation:** Dashboard / Upload / Live now share a light sage design.
+**September 27 dark UI follow-up:** The user superseded the light palette with a charcoal /
+electric-lime reference. Actual adapted React Bits SpotlightCard, StarBorder, ShinyText and
+Magic UI BlurFade / BorderBeam are now integrated. Motion replaces Anime.js; Lucide provides
+icons. The dashboard adds interactive 7/28-day saved-set activity (no invented metrics).
+Playwright browser checks are authorized and working; see docs/UI_MOTION_REDESIGN.md and
+design-qa.md. User planning files remain untouched.
+
+**Earlier September 27 UI implementation:** Dashboard / Upload / Live shared a light sage design.
 Uploads and finalized live sets can explicitly save summaries to a versioned device-local
 workout log; saved reviews have no video/pose track and clearly disable playback. Review uses
 Overview / Reps / Coach tabs and retains set-scoped chat. Read docs/UI_IMPLEMENTATION.md
