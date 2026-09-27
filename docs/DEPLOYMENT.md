@@ -11,7 +11,9 @@ Vercel Function. The existing 250 MiB / two-minute video limits still apply.
 The Mac must stay awake, connected to the internet, with the API and ngrok running.
 Closing the lid, restarting, or stopping either process interrupts analysis and
 chat; Vercel will still serve the interface. A `caffeinate` process keeps this
-session idle-awake, but does not make a closed laptop an always-on server.
+session idle-awake, but does not make a closed laptop an always-on server. The
+ngrok process now runs as a per-user Mac LaunchAgent (`ca.formcoach.ngrok-demo`)
+with automatic restart while this Mac user session is active.
 
 The current deployment was created from the CLI, not connected to GitHub for
 automatic deployments. New Git commits do not automatically update the site.
@@ -37,7 +39,7 @@ The initial deployment tools are temporary local files under
 `/private/tmp/formcoach-deploy-tools`. The token is stored in the repository's
 ignored `.env.ngrok`, with owner-only file permissions. Do not commit it.
 
-If the current processes have stopped, open two Terminal tabs:
+If the API has stopped, open a Terminal tab:
 
 ```sh
 # Tab 1: backend
@@ -45,18 +47,22 @@ cd /Users/arpit/Developer/helloHacks/helloHacks/apps/api
 CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://formcoach-hellohacks.vercel.app caffeinate -i .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
+The ngrok LaunchAgent should restart its own process if it exits. Check it with
+`launchctl print gui/$(id -u)/ca.formcoach.ngrok-demo` and test
+`curl -H 'ngrok-skip-browser-warning: 1' https://pavilion-art-moistness.ngrok-free.dev/api/v1/health`. If the service is
+missing after a restart and the temporary files still exist, run:
+
 ```sh
-# Tab 2: existing ngrok launcher
-node /private/tmp/formcoach-deploy-tools/tunnel.cjs
+launchctl bootstrap gui/$(id -u) /private/tmp/formcoach-deploy-tools/ca.formcoach.ngrok-demo.plist
 ```
 
-Do not start duplicate processes while the existing demo is running. The launcher
-prints its public URL. If that URL changes, update `NEXT_PUBLIC_API_BASE_URL` in
-Vercel and redeploy; the variable is embedded at build time.
+Do not start a duplicate tunnel while the service is running. If its URL changes,
+update `NEXT_PUBLIC_API_BASE_URL` in Vercel and redeploy; the variable is
+embedded at build time.
 
 Temporary files may be removed by macOS. For a durable restart setup, install the
 [official ngrok agent](https://ngrok.com/docs/getting-started/), configure your
-token locally, and run `ngrok http http://127.0.0.1:8001` instead of Tab 2. Use the
+token locally, and run `ngrok http http://127.0.0.1:8001` in place of the temporary service. Use the
 URL it prints in Vercel. A different frontend domain must also be added to the
 backend's `CORS_ORIGINS` before restarting the API.
 
