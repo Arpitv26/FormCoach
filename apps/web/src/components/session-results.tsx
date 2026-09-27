@@ -3,7 +3,7 @@ import type { AnalysisResponse } from "@/lib/api/types";
 
 const statusLabels: Record<AnalysisResponse["status"], string> = {
   complete: "Session complete",
-  partial: "Set in progress · completed reps only",
+  partial: "Partial evidence · completed reps only",
   insufficient_data: "Not enough information to analyze this set",
   not_implemented: "Movement analysis is not available yet",
 };

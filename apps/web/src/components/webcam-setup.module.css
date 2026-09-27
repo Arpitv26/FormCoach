@@ -53,3 +53,14 @@
   .placeholder { padding: 18px; }
   .actions button { flex: 1; justify-content: center; }
 }
+.reviewColumn { min-width: 0; }
+.liveSession { padding: 24px; border-top: 1px solid var(--line); background: linear-gradient(135deg, #142a37, #0e1622); }
+.liveSession > p { margin-top: 14px; }
+.liveStats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 22px 0; }
+.liveStats > div { padding: 14px; background: #0a1420; border-radius: 10px; }
+.liveStats dt { color: var(--muted); font-size: .75rem; }
+.liveStats dd { color: var(--lime); font-size: 2rem; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.liveStats .analysisState { font-size: .85rem; color: #e0e8f4; }
+.liveSession button:disabled { opacity: .5; cursor: not-allowed; }
+.liveError { padding: 12px; background: #39252c; color: #ffbfc4; border-radius: 8px; font-size: .85rem; }
+@media(max-width: 520px) { .liveSession { padding: 20px; } .liveStats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .liveStats > div:last-child { grid-column: 1 / -1; } }

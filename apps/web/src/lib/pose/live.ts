@@ -27,10 +27,10 @@ export async function loadPoseDetector(): Promise<PoseDetector> {
   });
 }
 
-/** Preview only. Coordinates remain unmirrored; the video and canvas are mirrored together in CSS. */
+/** Coordinates remain unmirrored; the video and canvas are mirrored together in CSS. */
 export function startLivePose(
   video: HTMLVideoElement,
-  onFrame: (frame: PoseFrame | null) => void,
+  onFrame: (frame: PoseFrame | null, capturedAt?: number) => void,
   onStatus: (status: TrackingStatus) => void,
   load: () => Promise<PoseDetector> = loadPoseDetector,
 ) {
@@ -53,7 +53,7 @@ export function startLivePose(
         const result = detector.detectForVideo(video, now);
         lastVideoTime = video.currentTime; lastInference = now;
         const frame = mapBrowserPose(result.landmarks, frameIndex++, Math.round(now - start));
-        onFrame(frame);
+        onFrame(frame, now);
         status(result.landmarks.length > 1 ? "multiple-people" : frame.landmarks.length ? "tracking" : "no-person");
       } catch {
         status("error"); stop(); return;

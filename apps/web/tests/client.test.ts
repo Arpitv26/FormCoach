@@ -66,3 +66,25 @@ test("deadline covers reading the response body", async (t) => {
   await assert.rejects(api.analyzeVideo(new File(["video"], "clip.mp4"), "push-up"),
     (error: unknown) => error instanceof ApiError && error.code === "REQUEST_TIMEOUT");
 });
+
+test("coach and live JSON requests keep their short timeout and caller abort signal", async (t) => {
+  const durations: number[] = [];
+  t.mock.method(AbortSignal, "timeout", (ms: number) => { durations.push(ms); return new AbortController().signal; });
+  const bodies: unknown[] = [];
+  const signals: AbortSignal[] = [];
+  const api = createApiClient("http://localhost:8000", async (_input, init) => {
+    assert.equal((init?.headers as Record<string, string>)["Content-Type"], "application/json");
+    bodies.push(JSON.parse(init!.body as string));
+    signals.push(init!.signal!);
+    return Response.json({ contractVersion: "1.0" });
+  });
+  const controller = new AbortController();
+  const { getMockAnalysis } = await import("../src/lib/api/mock");
+  const analysis = getMockAnalysis();
+  await api.coach({ analysis, mode: "summary" }, controller.signal);
+  await api.analyzeLiveBatch({ sessionId: "test", exerciseHint: "push-up", frames: [], imageWidth: 640, imageHeight: 480, isFinal: true }, controller.signal);
+  assert.deepEqual(durations, [15_000, 15_000]);
+  assert.equal(bodies.length, 2);
+  controller.abort();
+  assert.ok(signals.every((signal) => signal.aborted));
+});

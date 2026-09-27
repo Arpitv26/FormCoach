@@ -1,81 +1,111 @@
 # FormCoach web — Computer B
 
-Read [AGENTS.md](../../AGENTS.md), [frontend handoff](../../docs/FRONTEND_HANDOFF.md), and
-[beginner setup](../../docs/BEGINNER_SETUP.md). Use Node 24.
+Read [AGENTS.md](../../AGENTS.md), [frontend handoff](../../docs/FRONTEND_HANDOFF.md),
+[API contract](../../docs/API_CONTRACT.md), and [beginner setup](../../docs/BEGINNER_SETUP.md).
+Use Node 24. Frontend feature work stays in `apps/web`; the backend owns rep math.
 
-From this folder (`apps/web`):
+## Run the frontend
+
+From the repository root:
 
 ```bash
+cd apps/web
 npm ci
-cp .env.example .env.local
+```
+
+If `.env.local` does not exist, copy `.env.example` to it once. Preserve existing settings.
+Then run:
+
+```bash
+npm run pose:setup
 npm run dev
 ```
 
-Open http://localhost:3000. Success is an exercise selection page with push-ups as the
-video analysis focus, plus incline dumbbell bench press, cable lateral raises, lat pulldowns,
-and triceps pushdowns for gym sessions. Squats are out of the current demo scope.
-Control+C stops the server. Copy settings once; later runs only need `npm run dev`.
-The backend is optional until integration. No API key or Python is needed for camera preview.
+Expect `Browser pose assets ready`, then a localhost URL. Open http://localhost:3000.
+The model download is needed once for browser skeletons; `dev` and `build` copy the pinned
+runtime locally. Stop the server with **Control+C**. Later starts only need `npm run dev`.
+See [pose setup and limitations](../../docs/POSE_OVERLAY.md).
 
-## Push-up video analysis
+The browser can preview a camera and track a skeleton without a backend. **Upload analysis,
+live rep counting, and coaching require the backend.** Set `NEXT_PUBLIC_API_BASE_URL` in
+`.env.local` (normally `http://localhost:8000`). `localhost` refers to this computer; use a
+reachable address and coordinate CORS if the backend runs on your teammate's computer.
+Restart dev or rebuild after changing the URL. Never put keys in `NEXT_PUBLIC_` settings.
 
-Choose **Analyze a push-up video** on the home page, or open `/upload`.
-Record a short side-view set of 3–5 push-ups with the whole body visible, transfer
-it from your phone to this computer, and choose the clip. Preview stays local until
-**Analyze push-ups** sends multipart `file` and `exerciseHint=push-up` to the API.
-Supported file extensions: MP4, MOV, WebM; maximum 250 MiB, 120 seconds, 4K total
-pixels and 4096 pixels on either axis. The server validates the actual video.
+The updated backend and overlays are integrated into this branch. For a same-machine API,
+follow `apps/api/README.md`; upload processing additionally needs `apps/api/VIDEO_SETUP.md`.
+There is no root npm workspace: run npm commands in `apps/web`.
 
-Real analysis requires Computer A's updated `backend-cv` server with video dependencies
-and its pose model installed. Ask A to follow `apps/api/VIDEO_SETUP.md` and
-`apps/api/HTTP_UPLOAD.md` on that branch. The bootstrap API on this frontend branch
-still returns 501; the UI explains that analysis is unavailable, with no demo fallback.
-No backend or shared-contract changes are included in this frontend increment.
-Set `NEXT_PUBLIC_API_BASE_URL` in `.env.local` to that server (normally
-`http://localhost:8000`), allow the frontend origin in backend CORS, then restart
-`npm run dev` from `apps/web`. The public URL must be reachable by the browser.
+## Push-up uploads and review
 
-Uploads have a 240-second client timeout; other requests retain 15 seconds.
-There is no automatic retry. **Stop waiting**, changing clips, and leaving the route
-abort the client request; native server processing may continue. Wait before retrying.
-The UI reports setup-required, busy, timeout, invalid-video, network, and legacy errors.
+Open `/upload`, or choose **Analyze a push-up video** on the homepage. Record a clear side-view
+set of 3–5 push-ups, transfer it to your computer, and choose the original clip. Preview stays
+local until **Analyze push-ups** uploads it. MP4/MOV/WebM are accepted, up to 250 MiB,
+120 seconds, 4K total pixels, and 4096 pixels on either axis. The backend validates decoding.
 
-Expected success: a final response with counted reps, timing, observed elbow angles,
-and visibility limitations. Partial means incomplete evidence, not ongoing processing.
-Null scores stay unavailable. **View at …** and key-moment buttons seek within the same
-local clip, only for measured upload responses. If the browser cannot play a phone codec,
-analysis can still be attempted, but seeking is disabled. For playback, export H.264 MP4
-and analyze that exact export so timestamps match. No skeleton overlay is fabricated.
-Local video URLs are released on replacement, removal, or leaving the route.
+The UI calls `/api/v1/videos/analyze-with-pose` with multipart `file` and `exerciseHint=push-up`.
+Its response pairs measured analysis and the exact pose track with the selected file.
+Skeletons follow inline video playback and can be toggled off. Native fullscreen and
+Picture-in-Picture show video without the sibling overlay.
 
-Before the integration PR, verify a real push-up clip against A's configured server,
-including rep timestamps and a clip with insufficient visible evidence. Frontend tests
-use controlled responses; they do not verify pose estimation or counting accuracy.
-Never commit clips, `.env.local`, or generated build output.
+Results include counts, per-rep timing and elbow movement, switchable measurement charts,
+reference comparisons, and **Changes to review** with supplied explanations and uncertainty.
+Chart bars are descriptive values, not scores or rankings. Review buttons seek only within
+the matching measured upload. Missing values stay unknown; absent comparisons are not zero.
+A final `partial` result can indicate incomplete evidence, not ongoing recording.
 
-## Camera and exercise setup
+Uploads use a 240-second timeout. Other calls retain 15 seconds. Stop waiting, removal,
+replacement, and route navigation abort client requests and release obsolete local video URLs.
+Native backend extraction may continue; wait before retrying. No automatic retry or mock
+fallback is used. Codec errors suggest exporting H.264 MP4 and analyzing that exact export.
 
-Choose **Use camera**, or **Preview framing** on a gym exercise. `/camera` defaults
-to push-ups; `/camera?exercise=lat-pulldown` is an example of a specific selection.
-Click **Enable camera** and allow access. The mirrored preview uses no microphone,
-recording, or upload. **Stop camera**, leaving the page, and changing exercises release
-the camera tracks. Permission granted after cancellation is immediately released too.
-Open the app on localhost or HTTPS for browser camera access.
+## Coach
 
-The camera screen is preview-only: it does not detect pose readiness, count reps, or score movement.
-Push-ups use the existing `push-up` backend hint. The four gym slugs in
-`src/lib/exercises.ts` are frontend routing identifiers and have `backendHint: null`.
-Do not send them to the API until Computer A registers their agreed exercise IDs and
-coordinates supported views and response examples. Push-ups replace squats as the
-first analysis target; gym views still require validation.
+After an upload or finalized live set, **Explain my set**, **Next set**, and **Ask coach** send
+only the current `AnalysisResponse`, mode, and optional question to `/api/v1/coach`.
+The frontend never sends video or pose tracks to the coach. Requests start only on user action.
 
-The existing results component is retained for integration. The canonical synthetic squat
-fixture is still used by contract tests; it is not displayed or relabeled as another exercise.
+The panel displays the message, actual provider, supporting evidence (including dot paths),
+and limitations. Evidence links can jump to a rep in a matching upload. The local fallback
+supports summaries and next-set guidance without a key. Free-form questions require the
+optional backend OpenAI provider; local QA returns an honest unsupported response.
+Questions must be nonblank and at most 1,000 characters. The backend may send the question
+and numeric statements to OpenAI when configured; keys remain backend-only.
 
-Start with `src/app/page.tsx`. Fetch methods are in `src/lib/api/client.ts`; use
-`getMockAnalysis()` in `src/lib/api/mock.ts` to access the canonical shared example.
-`src/lib/api/types.ts` is generated; contract changes must be coordinated with A.
-Tailwind is installed; the starting CSS is intentionally small and replaceable.
+Cancel, new clips, new analyses, and leaving the route discard obsolete answers. Network
+errors stay visible, with explicit retry controls; there is no browser-generated advice.
+See [coach behavior](../../docs/AI_COACH.md) and `apps/api/COACH_SETUP.md` for backend setup.
+
+## Webcam and live counting
+
+Open `/camera?exercise=push-up`, select **Enable camera**, and allow access. Once the local
+pose model loads, **Start set** begins sampling raw, unmirrored coordinates and sending them
+to the backend. The preview and skeleton are mirrored together for display. Display smoothing
+never modifies analysis poses. No microphone, camera video upload, or recording is used.
+
+- Each set has a new session ID and time zero, fixed image dimensions, and the `push-up` hint.
+- Up to 10 samples/second; cumulative snapshots about once/second; one request in flight.
+- Counts replace the previous backend result. A dash is unknown; zero is a known count.
+- Missing poses remain empty frames. No interpolation across tracking gaps.
+- **Finish set** freezes capture and sends `isFinal: true` after any pending update completes.
+- **Stop camera**, lost camera/model, hidden page, changed dimensions, and the two-minute limit
+  end capture. Navigating away or resetting aborts and discards obsolete requests.
+- **Reset set** clears poses/results; **New set** resets after completion. Neither retains history.
+- API errors pause capture with the last successful result labeled as such. **Retry final analysis**
+  sends the frozen cumulative snapshot; there are no automatic retries.
+- Backend rules decide which cycles count. The UI does not infer readiness from a skeleton,
+  force-complete unfinished reps, or compute scores.
+
+A real physical-camera set still needs comparison against a human count on the demo machine.
+Browser tests use a simulated camera and controlled API responses, not a counting-accuracy benchmark.
+
+Gym choices (incline dumbbell bench, cable lateral raise, lat pulldown, triceps pushdown)
+remain skeleton/framing previews with `backendHint: null`. Changing exercises stops the camera
+and clears any live set. Do not send those routing slugs to analysis until A implements agreed IDs.
+
+## Verification and files
+
+From `apps/web`:
 
 ```bash
 npm run contracts:check
@@ -85,15 +115,23 @@ npm test
 npm run build
 ```
 
-For a production preview after a successful build, run `npm start` and open port 3000.
-`NEXT_PUBLIC_API_BASE_URL` is read into the frontend build; restart dev or rebuild after changing it.
-Never put secrets in a `NEXT_PUBLIC_` variable or this app's source.
+After a build, `npm start` serves a production preview. Use [DEMO_CHECKS.md](DEMO_CHECKS.md)
+for the physical-camera and real-backend rehearsal before merging.
 
-ESLint is temporarily pinned to 9.39.5 because the Next.js React plugin failed with 10.11.0
-during bootstrap verification. npm may print a support warning. See DECISIONS.md before
-upgrading the linter independently of its plugins.
+- `src/lib/api/client.ts`: typed HTTP boundary, abort signals, version checks and timeouts.
+- `src/lib/coach/`: one-analysis request lifecycle and safe evidence lookup.
+- `src/lib/live/session.ts`: cumulative capture, finalization and stale-response protection.
+- `src/lib/results/measurements.ts`: presentation of supplied values/reference differences.
+- `src/components/uploaded-results.tsx`: upload and finalized live results, charts and coach.
+- `src/components/live-overlay.tsx`: raw poses to analysis; smoothed poses to drawing only.
+- `src/lib/api/types.ts`: generated. Coordinate changes; never edit manually.
 
-The browser client validates HTTP errors and contractVersion, not every response field at
-runtime. Pydantic validates server responses, and frontend tests validate the fixture against
-the shared JSON Schema. Add a browser runtime schema validator if a future untrusted external
-service makes that necessary; keep it centralized in the API boundary.
+Tests exercise camera/upload cleanup, coach modes and stale responses, cumulative live
+requests/limits/finalization/errors, evidence paths, measurement rendering and shared contracts.
+The canonical fixtures are synthetic and have no matching video. No fixtures are substituted
+for failed real requests. Legacy squat data is used only in tests and the older result component.
+
+Do not commit keys, `.env` files, recordings, pose captures, model/runtime binaries, or build output.
+ESLint is temporarily pinned to 9.39.5 for Next.js plugin compatibility; see DECISIONS.md.
+The browser boundary checks HTTP errors and contract version; backend Pydantic validates the
+full shape. Any future untrusted external response source needs a coordinated validation decision.

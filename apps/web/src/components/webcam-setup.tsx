@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { exercises, type ExerciseOption } from "@/lib/exercises";
 import { CameraPreview, initialCameraState, type CameraState } from "@/lib/camera/preview";
+import { api } from "@/lib/api/client";
+import type { PoseFrame } from "@/lib/api/types";
+import type { TrackingStatus } from "@/lib/pose/live";
+import { LiveSession, initialLiveState } from "@/lib/live/session";
+import { LiveSessionPanel } from "./live-session-panel";
+import { UploadedResults } from "./uploaded-results";
 import { LiveOverlay } from "./live-overlay";
 import styles from "./webcam-setup.module.css";
 
@@ -22,18 +28,41 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const previewRef = useRef<CameraPreview | null>(null);
   const [state, setState] = useState(initialCameraState);
+  const [liveState, setLiveState] = useState(initialLiveState);
+  const [tracking, setTracking] = useState<TrackingStatus>("loading");
+  const counterRef = useRef<LiveSession | null>(null);
+  const handlePose = useCallback((frame: PoseFrame | null, width: number, height: number, capturedAt: number) => {
+    counterRef.current?.capture(frame, width, height, capturedAt);
+  }, []);
+  const handleTracking = useCallback((status: TrackingStatus) => {
+    setTracking(status);
+    if (status === "error") counterRef.current?.finish("Skeleton tracking stopped. Review the final available observations before starting again.");
+  }, []);
 
   useEffect(() => {
     if (!videoRef.current) return;
+    const counter = new LiveSession((batch, signal) => api.analyzeLiveBatch(batch, signal), setLiveState);
+    counterRef.current = counter;
+    const pulse = window.setInterval(() => counter.pulse(), 250);
+    const onVisibility = () => { if (document.hidden) counter.finish("The page became hidden. This set ended with the available observations."); };
+    document.addEventListener("visibilitychange", onVisibility);
     const preview = new CameraPreview(videoRef.current, () => navigator.mediaDevices.getUserMedia({
       audio: false,
       video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-    }), setState);
+    }), (next) => {
+      setState(next);
+      if (next.phase !== "live") setTracking("loading");
+      if (next.phase === "stopped" || next.phase === "error") counter.finish("The camera stopped. This set ended with the available observations.");
+    });
     previewRef.current = preview;
-    const onPageHide = () => preview.stop();
+    const onPageHide = () => { counter.reset(); preview.stop(); };
     window.addEventListener("pagehide", onPageHide);
     return () => {
       window.removeEventListener("pagehide", onPageHide);
+      window.clearInterval(pulse);
+      document.removeEventListener("visibilitychange", onVisibility);
+      counter.dispose();
+      counterRef.current = null;
       preview.dispose();
       previewRef.current = null;
     };
@@ -55,12 +84,14 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
   const live = state.phase === "live";
 
   function changeExercise(slug: string) {
+    counterRef.current?.reset();
     previewRef.current?.stop();
     router.push(`/camera?exercise=${slug}`);
   }
 
   return (
     <div className={styles.layout}>
+      <div className={styles.reviewColumn}>
       <section className={styles.cameraPanel} aria-labelledby="preview-heading">
         <header className={styles.panelHeader}>
           <h2 id="preview-heading">{exercise.name}</h2>
@@ -68,7 +99,7 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
         </header>
         <div className={styles.viewport}>
           <video ref={videoRef} autoPlay muted playsInline aria-label="Mirrored live camera preview" className={live ? styles.video : `${styles.video} ${styles.hiddenVideo}`} />
-          {live && <LiveOverlay video={videoRef} />}
+          {live && <LiveOverlay video={videoRef} onFrame={handlePose} onStatus={handleTracking} />}
           {!live && (
             <div className={styles.placeholder}>
               <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="7" y="13" width="26" height="23" rx="6" /><path d="m33 20 9-5v19l-9-5" /><path d="M17 24h6m-3-3v6" /></svg>
@@ -89,9 +120,14 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
             </button>
             {(busy || live) && <button className={styles.secondaryButton} onClick={() => previewRef.current?.stop()}>{busy ? "Cancel" : "Stop camera"}</button>}
           </div>
-          <p className={styles.privacyNote}>Skeleton tracking runs in this browser. This screen does not record, upload camera frames, or use your microphone.</p>
+          <p className={styles.privacyNote}>Skeleton tracking runs in this browser. Starting a push-up set sends joint coordinates for analysis. No video recording or microphone is used.</p>
         </div>
+        {exercise.backendHint === "push-up" && <LiveSessionPanel state={liveState} canStart={live && tracking !== "loading" && tracking !== "error"}
+          onStart={() => { if (videoRef.current) counterRef.current?.start(videoRef.current.videoWidth, videoRef.current.videoHeight); }}
+          onFinish={() => counterRef.current?.finish()} onReset={() => counterRef.current?.reset()} onRetry={() => counterRef.current?.retryFinal()} />}
       </section>
+      {liveState.phase === "finished" && liveState.result && <UploadedResults analysis={liveState.result} canSeek={false} onSeek={() => {}} />}
+      </div>
 
       <aside className={styles.guidance} aria-labelledby="framing-heading">
         <section className={`panel ${styles.selection}`} aria-labelledby="exercise-heading">
@@ -115,7 +151,7 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
         <section className={`${styles.nextStep} panel`} aria-labelledby="next-heading">
           <p className="eyebrow">One step at a time</p>
           <h2 id="next-heading">See how you move.</h2>
-          <p>{exercise.group === "live" ? "For push-up analysis, upload a recorded video. Live skeleton tracking is available here; live rep counting is the next integration." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} The skeleton shows estimated joint positions, not an assessment of form. Camera angle and full-body visibility are not automatically verified.</p>
+          <p>{exercise.group === "live" ? "Start a push-up set to count completed reps with the connected backend. For playback and timestamp review, upload a recorded video." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} The skeleton shows estimated joint positions, not an assessment of form. Camera angle and full-body visibility are not automatically verified.</p>
           {exercise.group === "live" && <Link href="/upload">Analyze a push-up video →</Link>}
           <Link href="/" className={styles.demoLink}>Choose another exercise <span aria-hidden="true">↗</span></Link>
         </section>
