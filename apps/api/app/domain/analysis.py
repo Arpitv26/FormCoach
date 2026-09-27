@@ -106,6 +106,29 @@ class ScoringInfo(ContractModel):
     weights: dict[str, Confidence]
 
 
+class MovementObservation(ContractModel):
+    """A descriptive interval independent of completed reps; policy v1, not a grade."""
+
+    code: Literal["PUSHUP_BODY_LINE_BEND"]
+    rule_version: Literal["1.0"]
+    side: Literal["left", "right"]
+    start_ms: Milliseconds
+    end_ms: Milliseconds
+    sample_count: int = Field(ge=3, le=1800)
+    min_angle_deg: float = Field(ge=0, lt=150)
+    median_angle_deg: float = Field(ge=0, lt=150)
+    max_angle_deg: float = Field(ge=0, lt=150)
+    threshold_angle_deg: Literal[150]
+
+    @model_validator(mode="after")
+    def validate_evidence(self) -> Self:
+        if self.end_ms - self.start_ms < 500:
+            raise ValueError("Movement observation needs at least 500 ms")
+        if not self.min_angle_deg <= self.median_angle_deg <= self.max_angle_deg:
+            raise ValueError("Movement observation angles must be ordered")
+        return self
+
+
 class AnalysisResponse(ContractModel):
     contract_version: Literal["1.0"]
     session_id: str = Field(min_length=1, max_length=100)
@@ -121,6 +144,7 @@ class AnalysisResponse(ContractModel):
     timeline: list[TimelineEvent]
     limitations: list[str]
     scoring: ScoringInfo | None
+    movement_observations: list[MovementObservation] = Field(default_factory=list, max_length=240)
 
     @model_validator(mode="after")
     def validate_consistency(self) -> Self:
@@ -148,7 +172,15 @@ class AnalysisResponse(ContractModel):
             if event.issue_id is not None and event.issue_id not in issue_by_id:
                 raise ValueError("Timeline references an unknown issue")
         duration = self.source.duration_ms
+        for previous, current in zip(
+            self.movement_observations, self.movement_observations[1:], strict=False
+        ):
+            if current.start_ms <= previous.end_ms:
+                raise ValueError("Movement observations must be chronological and non-overlapping")
+        if self.movement_observations and (self.exercise is None or self.exercise.id != "push-up"):
+            raise ValueError("Body-line observations currently support push-up only")
         endpoints = [rep.end_ms for rep in self.reps] + [issue.end_ms for issue in self.issues]
+        endpoints += [item.end_ms for item in self.movement_observations]
         endpoints += [event.timestamp_ms for event in self.timeline]
         if duration is not None and any(point > duration for point in endpoints):
             raise ValueError("Analysis timestamps must fit inside source.durationMs")

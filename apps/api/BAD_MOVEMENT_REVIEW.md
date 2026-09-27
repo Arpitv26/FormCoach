@@ -1,5 +1,10 @@
 # Deliberately changed movement: badpushups.MOV
 
+**Follow-up implemented:** independent body-line observations now identify review moments
+even though this recording has zero completed reps. See MOVEMENT_OBSERVATIONS.md. The
+original counting diagnosis below is unchanged; its missing-evidence discussion describes
+the state before this addition.
+
 Reviewed 2026-09-26 on push-up counter v2. The private recording is not committed.
 The human describes about 4–5 attempts with torso/hip movement and little elbow bending;
 the exact attempt count is uncertain. Treat that as a human annotation, not ground truth

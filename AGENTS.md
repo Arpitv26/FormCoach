@@ -84,6 +84,13 @@ If a contract must change:
 
 ## Current capabilities
 
+**Independent movement feedback implemented:** read apps/api/MOVEMENT_OBSERVATIONS.md.
+Additive `movementObservations` now describes sustained visible 2D body-line bends outside
+completed reps. Five reviewed intervals on badpushups; original clip counts retained. Results
+show time links and coach cards even with zero reps. These intervals can include setup, are
+not attempt counts, and cannot label hip sag/pike or spinal posture. Both apps/schemas/types
+must be updated together; older strict coach validators reject the additive field.
+
 **Latest feedback checkpoint:** the human reports improved upload/live counting but zero
 completed reps for deliberately changed torso/hip movement. See apps/api/BAD_MOVEMENT_REVIEW.md:
 187/188 elbow samples usable, only one sample reaches the bend zone, so no sustained bend

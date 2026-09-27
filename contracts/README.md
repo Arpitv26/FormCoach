@@ -2,6 +2,12 @@
 
 Both computers depend on this directory. `contractVersion` is **1.0**.
 
+Latest additive field: `AnalysisResponse.movementObservations`; old responses default to an
+empty list. Update API and generated types together before posting new responses to coaching.
+These independent intervals are not rep counts or scores. See API_CONTRACT.md.
+
+- `examples/pushup-movement-observation.json`: synthetic zero-rep response with an authored
+  sustained body-line bend. Useful for zero-count results and coaching UI; no matching video.
 - `examples/pushup-comparison-analysis.json`: explicitly synthetic three-rep example with two evidence-backed review flags; no video or scores.
 - `examples/pushup-analysis.json`: explicitly synthetic one-rep elbow/timing and body-line angle fixture; null scores, no matching video. Body-line semantics: apps/api/BODY_LINE.md.
 - `examples/squat-analysis.json`: explicitly synthetic six-rep UI fixture. Not a CV result.

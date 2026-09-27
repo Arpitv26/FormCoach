@@ -31,6 +31,10 @@ export interface AnalysisResponse {
   timeline: TimelineEvent[];
   limitations: string[];
   scoring: ScoringInfo | null;
+  /**
+   * @maxItems 240
+   */
+  movementObservations?: MovementObservation[];
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema
@@ -159,6 +163,24 @@ export interface ScoringInfo {
   weights: {
     [k: string]: number;
   };
+}
+/**
+ * A descriptive interval independent of completed reps; policy v1, not a grade.
+ *
+ * This interface was referenced by `ApiContract`'s JSON-Schema
+ * via the `definition` "MovementObservation".
+ */
+export interface MovementObservation {
+  code: "PUSHUP_BODY_LINE_BEND";
+  ruleVersion: "1.0";
+  side: "left" | "right";
+  startMs: number;
+  endMs: number;
+  sampleCount: number;
+  minAngleDeg: number;
+  medianAngleDeg: number;
+  maxAngleDeg: number;
+  thresholdAngleDeg: 150;
 }
 /**
  * This interface was referenced by `ApiContract`'s JSON-Schema

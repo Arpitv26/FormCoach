@@ -86,6 +86,14 @@
               "type": "null"
             }
           ]
+        },
+        "movementObservations": {
+          "items": {
+            "$ref": "#/$defs/MovementObservation"
+          },
+          "maxItems": 240,
+          "title": "Movementobservations",
+          "type": "array"
         }
       },
       "required": [
@@ -538,6 +546,83 @@
         "imageHeight"
       ],
       "title": "LiveBatchRequest",
+      "type": "object"
+    },
+    "MovementObservation": {
+      "additionalProperties": false,
+      "description": "A descriptive interval independent of completed reps; policy v1, not a grade.",
+      "properties": {
+        "code": {
+          "const": "PUSHUP_BODY_LINE_BEND",
+          "title": "Code",
+          "type": "string"
+        },
+        "ruleVersion": {
+          "const": "1.0",
+          "title": "Ruleversion",
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "startMs": {
+          "minimum": 0,
+          "title": "Startms",
+          "type": "integer"
+        },
+        "endMs": {
+          "minimum": 0,
+          "title": "Endms",
+          "type": "integer"
+        },
+        "sampleCount": {
+          "maximum": 1800,
+          "minimum": 3,
+          "title": "Samplecount",
+          "type": "integer"
+        },
+        "minAngleDeg": {
+          "exclusiveMaximum": 150,
+          "minimum": 0,
+          "title": "Minangledeg",
+          "type": "number"
+        },
+        "medianAngleDeg": {
+          "exclusiveMaximum": 150,
+          "minimum": 0,
+          "title": "Medianangledeg",
+          "type": "number"
+        },
+        "maxAngleDeg": {
+          "exclusiveMaximum": 150,
+          "minimum": 0,
+          "title": "Maxangledeg",
+          "type": "number"
+        },
+        "thresholdAngleDeg": {
+          "const": 150,
+          "title": "Thresholdangledeg",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "code",
+        "ruleVersion",
+        "side",
+        "startMs",
+        "endMs",
+        "sampleCount",
+        "minAngleDeg",
+        "medianAngleDeg",
+        "maxAngleDeg",
+        "thresholdAngleDeg"
+      ],
+      "title": "MovementObservation",
       "type": "object"
     },
     "PoseFrame": {

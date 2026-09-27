@@ -3,6 +3,7 @@
 import { useId, useRef } from "react";
 import { CoachPanel } from "./coach-panel";
 import { RepOverview } from "./rep-overview";
+import { MovementObservations } from "./movement-observations";
 import { referenceComparisons } from "@/lib/results/measurements";
 import type { AnalysisResponse } from "@/lib/api/types";
 import styles from "./video-upload.module.css";
@@ -26,9 +27,10 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
   const live = analysis.source.type === "live";
   const measured = analysis.provenance.kind === "measured";
   const seekEnabled = canSeek && measured && analysis.source.type === "upload";
+  const heading = analysis.reps.length === 0 && analysis.movementObservations?.length ? "Movement reviewed" : statuses[analysis.status];
   return (
     <section className={styles.results} aria-labelledby={`${id}-heading`}>
-      <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{statuses[analysis.status]}</h2></div></div>
+      <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{heading}</h2></div></div>
       {!measured && <p className={styles.notice}>This response is {analysis.provenance.kind} data, not verified measurements from your movement. Timestamp playback is disabled.</p>}
       <p>{analysis.summary.totalReps == null ? "We couldn’t reliably count this set." : `We detected ${analysis.summary.totalReps} completed push-ups.`}</p>
       <dl className={styles.summary}>
@@ -36,12 +38,13 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
         <div><dt>{live ? "Set length" : "Video duration"}</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>
         {analysis.summary.overallScore != null && <div><dt>Form score</dt><dd>{analysis.summary.overallScore}/100</dd></div>}
       </dl>
-      {analysis.status === "partial" && <p className={styles.notice}>Some movement could not be fully counted. The detected count may be lower than the number you performed.</p>}
-      {analysis.reps.length === 0 && <p className={styles.notice}>No complete rep details were returned. Try a short side-view set with your full body visible.</p>}
+      {analysis.status === "partial" && analysis.reps.length > 0 && <p className={styles.notice}>Some movement could not be fully counted. The detected count may be lower than the number you performed.</p>}
+      {analysis.reps.length === 0 && <p className={styles.notice}>{analysis.summary.totalReps === 0 ? "No complete bend-and-return cycles met the counting rules. That doesn’t mean no movement happened." : "There wasn’t enough information to count completed reps reliably."}</p>}
+      <MovementObservations observations={analysis.movementObservations} onSeek={seekEnabled ? onSeek : undefined} />
       <CoachPanel key={analysis.sessionId} analysis={analysis} onSeek={seekEnabled ? onSeek : undefined} />
       <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} onShowDetails={() => { if (repDetails.current) repDetails.current.open = true; }} />
-      <section className={styles.changes} aria-labelledby={`${id}-changes`}>
-        <div className="section-heading"><h3 id={`${id}-changes`}>Changes to review</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>
+      {(analysis.reps.length > 0 || analysis.issues.length > 0) && <section className={styles.changes} aria-labelledby={`${id}-changes`}>
+        <div className="section-heading"><h3 id={`${id}-changes`}>Rep-to-rep changes</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>
         {analysis.issues.length === 0 ? <p className="muted small">{analysis.reps.length < 3 ? "We need at least three well-tracked reps to compare changes." : "No substantial changes were flagged in the reps we could compare."} This isn’t a form rating.</p> : analysis.issues.map((issue) => (
           <article key={issue.id} className={styles.changeCard}>
             <h4>{issue.title}</h4><p className="small">{issue.shortCue}</p>
@@ -49,8 +52,8 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
             <details><summary>Why this was flagged</summary><p className="small">{issue.explanation}</p><p className="muted small">Review priority: {issue.severity} · Confidence: {issue.confidence == null ? "Unknown" : `${Math.round(issue.confidence * 100)}%`}</p></details>
           </article>
         ))}
-      </section>
-      <details ref={repDetails} className={styles.evidence}><summary>Explore each rep’s measurements</summary>
+      </section>}
+      {analysis.reps.length > 0 && <details ref={repDetails} className={styles.evidence}><summary>Explore each rep’s measurements</summary>
       {analysis.reps.map((rep) => (
         <article className={styles.rep} key={rep.repNumber} id={`${id}-rep-${rep.repNumber}`}>
           <div className={styles.repHeading}><h3>Rep {rep.repNumber}</h3>{!live && <button type="button" disabled={!seekEnabled} onClick={() => onSeek(rep.startMs)}>View at {seconds(rep.startMs)} <span aria-hidden="true">↗</span></button>}</div>
@@ -66,7 +69,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
 
         </article>
       ))}
-      </details>
+      </details>}
       <details className={styles.evidence}><summary>About these measurements</summary>
       <p className="muted small">Angles are smoothed 2D observations and depend on the camera view. Timing can include pauses and rep confirmation; it does not identify lifting or lowering phases.</p>
       <p className="muted small">Only visible, sufficiently tracked joints are measured. Full-body visibility and camera angle are not verified.</p>

@@ -7,6 +7,7 @@ from app.analysis.exercises.base import ExerciseProfile
 from app.analysis.exercises.pushup_body_line import add_body_line_measurements
 from app.analysis.exercises.pushup_comparisons import compare_pushup_reps
 from app.analysis.exercises.pushup_measurements import pushup_measurements
+from app.analysis.exercises.pushup_observations import observe_body_line
 from app.analysis.exercises.pushup_segmentation import segment_pushups
 from app.analysis.exercises.squat_segmentation import segment_squats
 from app.analysis.geometry import AngleMeasurement, measure_joint_angle
@@ -158,7 +159,16 @@ class RuleBasedAnalyzer:
         result = movement.segment(samples)
         reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
         comparison_limitations = []
+        observations = []
         if profile.id == "push-up" and side:
+            observations = observe_body_line(
+                frames,
+                side=side,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+                is_final=is_final,
+            )
             reps = add_body_line_measurements(
                 reps,
                 frames,
@@ -202,6 +212,14 @@ class RuleBasedAnalyzer:
                 "Three-sample median smoothing and phase confirmation delay event timestamps."
             )
         if profile.id == "push-up":
+            limitations.append(
+                "Movement observations review sustained 2D shoulder-hip-ankle bends below "
+                "150 degrees for at least 500 ms, with no gaps over 300 ms and a mostly "
+                "horizontal shoulder-to-ankle direction. This uncalibrated rule is independent "
+                "of counted reps; it cannot distinguish hip sag from pike, measure spinal "
+                "posture, identify attempts or confirm correct form. Empty observations do "
+                "not establish a straight body line. Live intervals appear after they close."
+            )
             limitations.append(
                 "Push-up counter v2 uses a 150-degree return zone and 100-degree bend zone, "
                 "with 60 ms of consecutive observations plus median confirmation. "
@@ -302,4 +320,5 @@ class RuleBasedAnalyzer:
             timeline=timeline,
             limitations=limitations,
             scoring=None,
+            movement_observations=observations,
         )

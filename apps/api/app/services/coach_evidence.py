@@ -115,9 +115,38 @@ def comparison(
 def evidence_cards(
     analysis: AnalysisResponse, *, preferred_reps: tuple[int, ...] = ()
 ) -> list[EvidenceCard]:
-    if analysis.status in {"insufficient_data", "not_implemented"}:
+    if analysis.status == "not_implemented" or analysis.provenance.kind == "placeholder":
         return []
     cards = []
+    for index, observation in enumerate(analysis.movement_observations[:6]):
+        path = f"movementObservations.{index}"
+        cards.append(
+            EvidenceCard(
+                f"movement-{index + 1}-body-line",
+                f"From {observation.start_ms / 1000:.2f} to "
+                f"{observation.end_ms / 1000:.2f} s, the tracked {observation.side} "
+                "shoulder, hip and ankle formed a sustained bend in the image. "
+                f"The median angle was {observation.median_angle_deg:.1f}°, across "
+                f"{observation.sample_count} samples, all below the provisional "
+                "150° review threshold (180° would be a straight line). "
+                "This can be reviewed even with zero counted reps. It does not identify "
+                "hip sag versus pike, spinal posture, an attempt count or the reason reps "
+                "did not count. Setup and other movements can trigger it; review the video.",
+                tuple(
+                    f"{path}.{key}"
+                    for key in (
+                        "startMs",
+                        "endMs",
+                        "side",
+                        "medianAngleDeg",
+                        "sampleCount",
+                        "thresholdAngleDeg",
+                    )
+                ),
+            )
+        )
+    if analysis.status == "insufficient_data":
+        return cards
     score = analysis.summary.overall_score
     if score is not None:
         cards.append(

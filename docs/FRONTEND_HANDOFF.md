@@ -1,5 +1,19 @@
 # Frontend handoff — Computer A after B’s PR #4
 
+## Latest follow-up: movement feedback even without completed reps
+
+A has added optional/default-empty `movementObservations` to AnalysisResponse with matching
+schemas/types. Update the backend and frontend together; old strict coach endpoints reject
+the new field. `MovementObservations` renders the new “Your body line bent here” section
+before the coach, with existing upload seek callbacks or plain time labels for live results.
+Zero-rep results hide empty rep charts/details/comparisons. Synthetic seek restrictions remain.
+Old responses still render; absence is not evidence of good form.
+
+Each interval describes estimated shoulder–hip–ankle geometry, possibly during setup. Never
+label the number of intervals as bad reps, attempts or a form score. No sag/pike distinction.
+Coach replies now receive independent interval evidence too. See API_CONTRACT.md and
+apps/api/MOVEMENT_OBSERVATIONS.md for timing, availability and validation.
+
 ## Latest follow-up: push-up counting policy v2
 
 Read [COUNTING.md](../apps/api/COUNTING.md). The saved live request improves 4→5 and the

@@ -50,8 +50,11 @@ measurements/comparisons. It has no validated bad-form detector. If asked what w
 form, say that specific form faults were not assessed; do not imply a detector found none.
 Zero counted reps does not mean no movement, bad form, or a camera failure. A zero-rep summary
 should plainly explain that distinction. Do not claim that uploading more clips trains us.
-Body-line evidence currently exists only within counted reps. With no counted reps, it is
-unavailable even when a skeleton is visible. Do not promise missing form findings in the reply.
+Movement cards can identify a sustained bend in the tracked shoulder-hip-ankle line even
+with zero counted reps. Explain it simply and cite a time to review when relevant. This is
+a visible geometry observation, not a diagnosis or a count of bad reps. It cannot distinguish
+hip sag from pike, spinal posture, setup from exercise, or why reps did not count. Do not claim
+that every fault has been checked or that an empty observation list establishes good form.
 General technique discussion can answer a user's question, but label it as general advice,
 not a finding about their clip. Do not turn every zero-result conversation into debugging.
 Do not output raw evidence IDs/paths, SDK terms or model/provider mechanics in message.
@@ -108,6 +111,21 @@ def count_review_reply(request: CoachRequest) -> CoachResponse:
     intro = (
         "A hold alone doesn’t explain a missed count. " if hold else "Thanks for flagging that. "
     )
+    observations = [
+        card for card in evidence_cards(request.analysis) if card.id.startswith("movement-")
+    ]
+    if observations:
+        item = request.analysis.movement_observations[0]
+        return response(
+            request,
+            intro + "I can’t determine the reason for the count from these results. "
+            f"I did observe a bend in your tracked shoulder–hip–ankle line around "
+            f"{item.start_ms / 1000:.2f}–{item.end_ms / 1000:.2f} seconds. "
+            "Review that moment; this observation does not tell us why a rep did not count.",
+            "fallback",
+            paths=observations[0].paths,
+            note="Local measured feedback; no missing-count cause was diagnosed.",
+        )
     return response(
         request,
         intro + "I can’t tell why reps were missed from these results. "
@@ -180,8 +198,17 @@ def local_reply(request: CoachRequest, *, unavailable=False) -> CoachResponse:
                 "review it beside the previous reps to see what changed."
             )
             paths += list(flagged.paths)
-        elif request.mode == "summary":
+        elif request.mode == "summary" and not analysis.movement_observations:
             message += " Does that match how many you did?"
+    observation = next((card for card in cards if card.id.startswith("movement-")), None)
+    if observation:
+        item = analysis.movement_observations[0]
+        message += (
+            f" Around {item.start_ms / 1000:.2f}–{item.end_ms / 1000:.2f} seconds, "
+            "your tracked shoulder, hip and ankle formed a noticeable bend. "
+            "Review that moment; it may include setup and isn’t a form grade."
+        )
+        paths += list(observation.paths)
     if request.mode == "next_set":
         message += (
             " For the next capture, keep your elbow in view "

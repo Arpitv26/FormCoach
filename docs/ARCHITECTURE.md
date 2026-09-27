@@ -23,8 +23,11 @@ Contracts, interfaces, profiles, geometry, visibility checks, and push-up/squat 
 the live route are implemented. Local backend video pose extraction is available through an optional MediaPipe adapter.
 HTTP upload now calls that adapter. Push-up timing/range comparisons emit descriptive review
 flags with supporting evidence. Browser extraction now renders a live skeleton locally. Sending live poses to the analyzer,
-biomechanical form assessment, and scoring remain future work. Coaching uses a local fallback
-with optional OpenAI evidence selection. See POSE_OVERLAY.md for the current overlay checkpoint.
+live counting, and conversational coaching are integrated. Independent body-line observations
+now provide timestamped geometry feedback outside completed reps, including zero-rep results.
+Comprehensive biomechanical form assessment and scoring remain future work. Coaching uses
+a local fallback or optional OpenAI conversation grounded in structured evidence. See
+apps/api/MOVEMENT_OBSERVATIONS.md and docs/AI_COACH.md for current boundaries.
 
 ## Application boundaries
 

@@ -14,11 +14,12 @@ export function evidenceValue(analysis: AnalysisResponse, path: string): unknown
 export function describeEvidence(analysis: AnalysisResponse, path: string) {
   const match = /^reps\.(\d+)\./.exec(path);
   const rep = match ? analysis.reps[Number(match[1])] : undefined;
+  const movement = /^movementObservations\.(\d+)\./.exec(path);
   const key = path.split(".").at(-1) ?? path;
   const label = key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/Ms$/, " (seconds)").replace(/Deg$/, " (degrees)");
   const value = evidenceValue(analysis, path);
   let text = "Unavailable";
   if (typeof value === "number" && Number.isFinite(value)) text = key.endsWith("Ms") ? `${(value / 1000).toFixed(2)} s` : key.endsWith("Deg") ? `${value.toFixed(1)}°` : `${value}`;
   else if (typeof value === "string" || typeof value === "boolean") text = String(value);
-  return { label: `${rep ? `Rep ${rep.repNumber} · ` : ""}${label}`, text, rep };
+  return { label: `${rep ? `Rep ${rep.repNumber} · ` : movement ? `Movement moment ${Number(movement[1]) + 1} · ` : ""}${label}`, text, rep };
 }

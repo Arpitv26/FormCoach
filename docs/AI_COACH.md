@@ -6,6 +6,16 @@ The current UI requests `responseStyle: "conversation"` and sends bounded recent
 Omitting that field preserves the original `evidence` behavior described below.
 No raw video or pose frames go to OpenAI. Computer A owns the implementation.
 
+**Latest addition:** independent `movementObservations` now supplies up to six timestamped
+body-line bend cards, including zero-count and count-unavailable results. The model may explain
+the observed shoulder–hip–ankle bend, not infer sag/pike, spinal posture, attempt count or the
+reason reps failed to count. These may include setup. Local summaries and count-dispute replies
+also mention an available interval. The full list remains visible in results. Existing
+per-rep body-line medians retain their stricter rep-window availability rules.
+
+One actual OpenAI HTTP check on the new badpushups analysis described a bend around 4.87–5.60 s
+and cited that interval's measurements. This is one reviewed reply, not general QA validation.
+
 ## Conversation style (current UI)
 
 The user asked for a friendly chatbot that explains their set and understands follow-ups.

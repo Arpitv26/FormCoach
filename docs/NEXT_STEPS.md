@@ -5,6 +5,12 @@ physical rehearsal and the confusing coach/results flow. Read LIVE_REHEARSAL_FIX
 
 ## Current priority: useful feedback when no complete reps count
 
+**First observation implemented:** see apps/api/MOVEMENT_OBSERVATIONS.md. A separate geometry
+pass now supplies timestamped body-line bends to results and coach even with zero reps.
+badpushups has five intervals; these are not five classified attempts. Existing clip counts
+are unchanged. The remaining work below is broader interpretation/independent validation,
+not a claim that this narrow observation fully assesses form.
+
 The latest human rehearsal reports that the long upload now works and live counted 19;
 a brief pause at the top helps live counting. This is human feedback, not a new captured
 live accuracy benchmark. Keep the existing counting policy while investigating new evidence.

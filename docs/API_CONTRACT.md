@@ -9,6 +9,31 @@ Canonical sources: `apps/api/app/domain/` models, generated `contracts/*.schema.
 generated `apps/web/src/lib/api/types.ts`, and fixtures under `contracts/examples/`.
 Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated files.
 
+## Additive movement observations (2026-09-26)
+
+`AnalysisResponse.movementObservations` is a new list, defaulting to `[]` when an older
+response omits it. New servers emit it. Version stays `1.0`; update the server and generated
+client types together: older strict backend validators reject this field on coach requests.
+It exists because per-rep measurements cannot explain movement when no complete rep counts.
+
+Current item: `code: "PUSHUP_BODY_LINE_BEND"`, `ruleVersion: "1.0"`, `side: "left" | "right"`,
+`startMs`, `endMs`, `sampleCount`, `minAngleDeg`, `medianAngleDeg`, `maxAngleDeg`,
+`thresholdAngleDeg: 150`. Intervals are chronological/non-overlapping, at least 500 ms,
+inside source duration when known. At least three samples; `0 <= min <= median <= max < 150`.
+No confidence or score is invented. Item count is **not** attempted or completed rep count.
+
+The analyzer uses the selected elbow side, checks shoulder/hip/ankle visibility and geometry,
+and requires predominantly horizontal shoulder-to-ankle direction in image pixels. Runs
+stop at an unavailable sample, angle >=150°, ineligible direction, or gap >300 ms. Median
+is sample-weighted. Non-final live responses include only closed intervals; finalization can
+close the last run. No interpolation or side switching. See apps/api/MOVEMENT_OBSERVATIONS.md.
+
+Observations may coexist with zero or unknown counts and `insufficient_data` for counting.
+An empty/omitted list does not establish good form or complete evaluation. They are descriptive
+geometry review moments, potentially including setup, not hip-sag/pike diagnoses or a reason
+for missed reps. The coach references numeric `movementObservations.N.*` evidence paths.
+Fixture: `contracts/examples/pushup-movement-observation.json` (synthetic, no video).
+
 ## Ground rules
 
 - Scores are 0–100; confidence, visibility, and camera quality are 0–1.
