@@ -29,8 +29,14 @@ class AngleCycleConfig:
     maximum_gap_ms: int = 300
     smoothing_window: int = 3
     independent_phase_confirmation: bool = False
+    maximum_missing_ms: int = 0
 
     def __post_init__(self) -> None:
+        if (
+            type(self.maximum_missing_ms) is not int
+            or not 0 <= self.maximum_missing_ms <= self.maximum_gap_ms
+        ):
+            raise ValueError("Missing-data grace must be within the maximum gap")
         angles = (self.flexed_angle_deg, self.extended_angle_deg, self.hysteresis_deg)
         if not all(isfinite(value) for value in angles) or not (
             0
@@ -69,6 +75,7 @@ class _AngleCycleCounter:
         self.window: deque[float] = deque(maxlen=config.smoothing_window)
         self.last_angle: float | None = None
         self.previous_timestamp: int | None = None
+        self.last_usable_timestamp: int | None = None
         self.tracking_breaks = 0
         self.candidate: MovementPhase | None = None
         self.candidate_since = 0
@@ -89,9 +96,25 @@ class _AngleCycleCounter:
 
     def update(self, sample: AngleSample) -> None:
         timestamp = sample.timestamp_ms
+        grace = self.config.maximum_missing_ms
+        missing_gap = (
+            self.last_usable_timestamp is not None
+            and timestamp - self.last_usable_timestamp > grace
+        )
+        if sample.angle_deg is None and grace and not missing_gap:
+            if self.window:
+                self.tracking_breaks += 1
+            self.window.clear()
+            self.zone_since.clear()
+            self.candidate = None
+            self.last_angle = None
+            self.previous_timestamp = timestamp
+            return
         gap = self.previous_timestamp is not None and (
             timestamp - self.previous_timestamp > self.config.maximum_gap_ms
         )
+        if grace and not self.window and self.last_usable_timestamp is not None and missing_gap:
+            gap = True
         if gap:
             if self.window:
                 self.tracking_breaks += 1
@@ -102,6 +125,7 @@ class _AngleCycleCounter:
                 self.tracking_breaks += 1
             self._reset()
             return
+        self.last_usable_timestamp = timestamp
 
         if self.start_ms is not None and timestamp - self.start_ms > self.config.maximum_rep_ms:
             self._reset()
@@ -215,8 +239,9 @@ def segment_angle_cycles(
 ) -> SegmentationResult:
     """Replay a whole cumulative set. Return completed reps; never finalize a partial rep.
 
-    Use one anatomical side throughout the set. Any unavailable angle resets readiness
-    and the unfinished rep. A gap over maximum_gap_ms does the same. After either, stable
+    Use one anatomical side throughout the set. An unavailable angle resets readiness
+    unless the profile enables bounded grace; grace never fills median/dwell evidence.
+    A gap over maximum_gap_ms resets the unfinished rep. After a reset, stable
     extension must be observed again. Completed reps survive these resets.
 
     Start is the first observation in a confirmed descent zone; end confirms extension;

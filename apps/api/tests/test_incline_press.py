@@ -80,16 +80,16 @@ def test_tracking_loss_keeps_completed_presses_and_does_not_bridge_sides(client,
     right = press_request((READY + PRESS) * 2, side="right")
     for frame, other in zip(request["frames"], right["frames"], strict=True):
         frame["landmarks"] += other["landmarks"]
-    frame = request["frames"][20]
-    if failure == "missing":
-        frame["landmarks"] = frame["landmarks"][3:]
-    elif failure == "unknown":
-        frame["landmarks"][1]["visibility"] = None
-    elif failure == "low":
-        frame["landmarks"][1]["visibility"] = 0.69
-    elif failure == "outside":
-        frame["landmarks"][1]["x"] = -0.1
-    else:
+    for frame in request["frames"][20:23]:
+        if failure == "missing":
+            frame["landmarks"] = frame["landmarks"][3:]
+        elif failure == "unknown":
+            frame["landmarks"][1]["visibility"] = None
+        elif failure == "low":
+            frame["landmarks"][1]["visibility"] = 0.69
+        elif failure == "outside":
+            frame["landmarks"][1]["x"] = -0.1
+    if failure == "gap":
         for frame in request["frames"][20:]:
             frame["timestampMs"] += 301
     result = analyze(client, request)
@@ -104,3 +104,25 @@ def test_nonincreasing_timestamps_are_rejected():
 def test_expired_press_does_not_complete_without_new_readiness():
     angles = READY + [120] * 160 + [160] * 10
     assert not segment_incline_presses([AngleSample(i * 100, a) for i, a in enumerate(angles)]).reps
+
+
+def test_short_occlusion_preserves_press_but_requires_visible_completion(client):
+    request = press_request((READY + PRESS) * 2, final=True)
+    request["frames"][20]["landmarks"] = []
+    result = analyze(client, request)
+    assert result.summary.total_reps == 2 and result.status == "partial"
+    # Completion itself must be observed again; one top sample cannot finish after the gap.
+    request["frames"] = request["frames"][:23]
+    assert analyze(client, request).summary.total_reps == 1
+
+
+def test_rapid_false_recycle_does_not_add_a_second_press():
+    angles = READY + PRESS + [90] * 3 + [120] + [160] * 3 + [160] * 10 + READY + PRESS
+    result = segment_incline_presses([AngleSample(i * 100, a) for i, a in enumerate(angles)])
+    assert len(result.reps) == 2
+    assert result.reps[0].end_ms < 1500 and result.reps[1].start_ms > 2500
+
+
+def test_extension_zone_is_counting_tolerance_not_lockout_grade(client):
+    result = analyze(client, press_request(READY + [120] * 4 + [147] * 4, final=True))
+    assert result.summary.total_reps == 1 and result.reps[0].score is None

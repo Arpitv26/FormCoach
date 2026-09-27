@@ -18,8 +18,20 @@ class RisingConfig:
     minimum_rep_ms: int = 300
     maximum_rep_ms: int = 15000
     maximum_gap_ms: int = 300
+    maximum_missing_ms: int = 0
+    minimum_cycle_ms: int = 0
 
     def __post_init__(self):
+        if (
+            type(self.maximum_missing_ms) is not int
+            or not 0 <= self.maximum_missing_ms <= self.maximum_gap_ms
+        ):
+            raise ValueError("Missing-data grace must be within the maximum gap")
+        if (
+            type(self.minimum_cycle_ms) is not int
+            or not 0 <= self.minimum_cycle_ms <= self.maximum_rep_ms
+        ):
+            raise ValueError("Cycle interval must be within the maximum rep duration")
         if not all(
             isfinite(x) for x in (self.ready_angle_deg, self.target_angle_deg, self.hysteresis_deg)
         ) or not (
@@ -52,8 +64,9 @@ def segment_rising_angles(
 
     The interval starts at the first observation in the confirmed low run. Angle extrema
     begin at low-position confirmation. Median confirmation and raw dwell are both required.
-    After completion, lowering only rearms. A missing sample resets an unfinished rise;
-    completed intervals survive. Internal bottom/top names describe low/high signal zones.
+    After completion, lowering only rearms. Missing data resets an unfinished rise unless
+    the profile enables bounded grace; grace retains phase, never median/dwell evidence.
+    Completed intervals survive. Internal bottom/top names describe low/high signal zones.
     """
     for before, after in zip(samples, samples[1:], strict=False):
         if after.timestamp_ms <= before.timestamp_ms:
@@ -62,6 +75,7 @@ def segment_rising_angles(
     phase = "unknown"
     reps = []
     previous = None
+    last_usable = None
     last = None
     zones = {}
     start = None
@@ -69,7 +83,20 @@ def segment_rising_angles(
     breaks = 0
     for sample in samples:
         timestamp, raw = sample.timestamp_ms, sample.angle_deg
+        missing_gap = (
+            last_usable is not None and timestamp - last_usable > config.maximum_missing_ms
+        )
+        if raw is None and config.maximum_missing_ms and not missing_gap:
+            if window:
+                breaks += 1
+            window.clear()
+            zones.clear()
+            last = None
+            previous = timestamp
+            continue
         gap = previous is not None and timestamp - previous > config.maximum_gap_ms
+        if config.maximum_missing_ms and not window and last_usable is not None and missing_gap:
+            gap = True
         expired = start is not None and timestamp - start > config.maximum_rep_ms
         previous = timestamp
         if raw is None or gap or expired:
@@ -80,6 +107,7 @@ def segment_rising_angles(
             zones.clear()
             if raw is None:
                 continue
+        last_usable = timestamp
         window.append(raw)
         if len(window) < 3:
             continue
@@ -119,7 +147,9 @@ def segment_rising_angles(
                 minimum = maximum = last
                 continue
             if "target" in confirmed and last >= config.target_angle_deg:
-                if timestamp - start >= config.minimum_rep_ms:
+                if timestamp - start >= config.minimum_rep_ms and (
+                    not reps or timestamp - reps[-1].end_ms >= config.minimum_cycle_ms
+                ):
                     reps.append(
                         RepSegment(start, bottom_ms, timestamp, minimum, maximum, measurement_start)
                     )

@@ -30,5 +30,6 @@ def segment_lat_pulldowns(samples: Sequence[AngleSample]) -> SegmentationResult:
             flexed_angle_deg=LAT_PULLDOWN_PROFILE.thresholds["pulledElbowAngleDeg"],
             minimum_phase_ms=LAT_PULLDOWN_PROFILE.thresholds["minimumPhaseMs"],
             independent_phase_confirmation=True,
+            maximum_missing_ms=200,
         ),
     )

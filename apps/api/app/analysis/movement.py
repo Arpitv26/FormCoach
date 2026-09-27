@@ -289,24 +289,33 @@ class RuleBasedAnalyzer:
             limitations.extend(comparison_limitations)
         if profile.id == "lat-pulldown":
             limitations.append(
-                "Lat-pulldown counter v1 uses a 120-degree elbow return zone and "
+                "Lat-pulldown counter v2 uses a 120-degree elbow return zone and "
                 "70-degree pulled zone, with 100 ms of raw observations plus median "
                 "confirmation. One rep runs from a pull through the overhead return. "
                 "These are uncalibrated counting zones, not full-extension or depth targets. "
-                "Elbow excursion and timing describe the observed cycle. Equipment, torso "
-                "swing, bilateral symmetry and form quality are not assessed. "
+                "Elbow excursion and timing describe the observed cycle. Geometry alone does "
+                "not assess equipment, torso swing, bilateral symmetry or form quality. "
                 "Automatic rep comparison flags are not implemented for this exercise."
             )
         if profile.id == "incline-dumbbell-bench-press":
             limitations.append(
-                "Incline-press counter v1 confirms bent elbows <=100 degrees before each "
-                "press, starts timing on the confirmed bent run and completes at >=150 degrees, "
+                "Incline-press counter v2 confirms bent elbows <=100 degrees before each "
+                "press, starts timing on the confirmed bent run and completes at >=145 degrees, "
                 "with 100 ms raw dwell plus median confirmation. These are uncalibrated "
                 "counting zones, not form or lockout targets. Timing and elbow excursion "
                 "cover the bent-to-extended interval, including pauses/confirmation delay; "
                 "lowering rearms the counter but is not part of that interval. "
-                "Dumbbells, bench angle, bilateral symmetry and form are not evaluated. "
+                "Geometry alone does not evaluate dumbbells, bench angle, symmetry or form. "
                 "Automatic rep comparison flags are not implemented for this exercise."
+            )
+        if profile.id in {"lat-pulldown", "incline-dumbbell-bench-press"}:
+            limitations.append(
+                "Counter v2 can preserve phase across missing samples only when visible samples "
+                "are at most 200 ms apart; smoothing and dwell restart after each interruption. "
+                "No angles are filled in. Longer gaps discard the unfinished rep. "
+                "Press completions must be at least 1200 ms apart "
+                "to reject rapid duplicate cycles. "
+                "Raw torso measurements still require uninterrupted visibility."
             )
         if profile.id == "cable-lateral-raise":
             limitations.append(
@@ -317,7 +326,8 @@ class RuleBasedAnalyzer:
                 "lowering before the low zone is excluded. These uncalibrated zones count visible "
                 "lifts, not correct lateral raises or anatomical shoulder abduction. "
                 "A side view strongly changes projected angles. Back-view footage has not "
-                "produced reliable counts. Body rotation, cable path and form are not assessed. "
+                "produced reliable counts. Geometry alone does not assess rotation, cable path "
+                "or form. "
                 "Automatic rep comparison flags are not implemented for this exercise."
             )
         if not side:

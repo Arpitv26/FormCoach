@@ -19,7 +19,7 @@ INCLINE_PRESS_PROFILE = ExerciseProfile(
     coaching_cues=(),
     thresholds={
         "bentElbowAngleDeg": 100,
-        "extendedElbowAngleDeg": 150,
+        "extendedElbowAngleDeg": 145,
         "hysteresisDeg": 10,
         "minimumPhaseMs": 100,
         "minimumPressMs": 300,
@@ -34,9 +34,10 @@ def segment_incline_presses(samples: Sequence[AngleSample]) -> SegmentationResul
     """Count the visible press on extension; lowering rearms but never counts by itself.
 
     The time window starts at the first <=100° sample of confirmed bent arms, and
-    ends on confirmed >=150° extension. Extrema begin at bent-position confirmation.
+    ends on confirmed >=145° extension. Extrema begin at bent-position confirmation.
     These are bent-to-extended intervals (including pauses), not full cycle times.
-    Missing data/gaps reset the unfinished press. Never switch arms to complete it.
+    Missing data retains phase for at most 200 ms since the last usable angle, without
+    filling observations. Longer loss resets it. Never switch arms to complete a press.
     """
     t = INCLINE_PRESS_PROFILE.thresholds
     return segment_rising_angles(
@@ -49,5 +50,7 @@ def segment_incline_presses(samples: Sequence[AngleSample]) -> SegmentationResul
             minimum_rep_ms=t["minimumPressMs"],
             maximum_rep_ms=t["maximumPressMs"],
             maximum_gap_ms=t["maximumGapMs"],
+            maximum_missing_ms=200,
+            minimum_cycle_ms=1200,
         ),
     )

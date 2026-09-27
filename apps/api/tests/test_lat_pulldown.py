@@ -68,14 +68,14 @@ def test_tracking_loss_discards_unfinished_rep_without_switching_sides(client, f
     right = lat_request(READY + CYCLE * 2, side="right")
     for frame, other in zip(request["frames"], right["frames"], strict=True):
         frame["landmarks"] += other["landmarks"]
-    broken = request["frames"][33]
-    if failure == "missing":
-        broken["landmarks"] = broken["landmarks"][3:]
-    elif failure == "visibility":
-        broken["landmarks"][1]["visibility"] = None
-    elif failure == "outside":
-        broken["landmarks"][1]["x"] = 1.1
-    else:
+    for broken in request["frames"][33:36]:
+        if failure == "missing":
+            broken["landmarks"] = broken["landmarks"][3:]
+        elif failure == "visibility":
+            broken["landmarks"][1]["visibility"] = None
+        elif failure == "outside":
+            broken["landmarks"][1]["x"] = 1.1
+    if failure == "gap":
         for frame in request["frames"][33:]:
             frame["timestampMs"] += 301
     result = analyze(client, request)
@@ -153,3 +153,11 @@ def test_multipart_lat_upload_returns_matching_pose_track_and_coach(client):
         assert "push-up" not in coach.json()["message"]
     finally:
         client.app.dependency_overrides.pop(get_video_processor)
+
+
+def test_short_gap_preserves_observed_phases_without_filling_missing_extrema(client):
+    request = lat_request(READY + CYCLE * 2, final=True)
+    request["frames"][33]["landmarks"] = []
+    result = analyze(client, request)
+    assert result.summary.total_reps == 2 and result.status == "partial"
+    assert result.reps[1].measurements["maxSmoothedLeftElbowAngleDeg"] == pytest.approx(150)
