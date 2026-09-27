@@ -2,6 +2,30 @@
 
 final result: passed
 
+## Review simplification — September 27
+
+User screenshots showed repetitive observation cards, prominent diagnostics, ambiguous rep
+expansion, and extra coach labels. Overview now groups concise source cues into Keep it up /
+Try next set, with neutral observations only when supplied. No positive or corrective findings
+are fabricated. Setup/finish labels remain explicit. Full findings, evidence timestamps,
+tracking limits and partial status are retained in a collapsed About this analysis footer
+outside the review workspace (upload, saved review, finalized live).
+
+Expanded reps have a chevron, outlined/open state and inset breakdown, without repeating the
+rep number or time range. Trainer heading matches the requested wording; badge and subtitle
+are removed. Fixed the upload progress strip's existing 320px overflow.
+
+Validation: 77 frontend tests pass, lint/typecheck and production build pass. Controlled
+Playwright upload used the original local pulldown clip and its previously captured API
+response; this was UI verification, not a fresh model analysis. Verified desktop 1440px and
+390/320px layouts, overview seeking, rep expansion/seeking, coach heading, initially collapsed
+footer and no horizontal overflow or page errors on both dev :3003 and rebuilt :3000.
+Screenshots: `/private/tmp/formcoach-clean-production-overview-desktop.png`,
+`/private/tmp/formcoach-clean-production-reps-desktop.png`,
+`/private/tmp/formcoach-clean-production-coach-desktop.png`, and matching `overview-390.png`
+/ `reps-320.png`. Shared DOM tests cover all four exercise IDs, neutral-only findings,
+phase labels, full footer evidence, synthetic seek guards and retained chat.
+
 ## Latest palette / cinematic hero pass
 
 Source: user palette image (sampled #0c0a0b, #464954, #f3eff5, #80af3c, #4f7c30)

@@ -29,8 +29,7 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
     if (mode === "qa" && prompt.trim()) setQuestion("");
   }
   return <section className={styles.panel} aria-labelledby={`${id}-heading`}>
-    <div className="section-heading"><h2 id={`${id}-heading`}>Chat with your coach</h2><span className="outline-tag">About this set</span></div>
-    <p className="muted small">Ask what changed, tell me how it felt, or plan your next set.</p>
+    <h2 id={`${id}-heading`}>Chat with your AI personal trainer</h2>
     {analysis.provenance.kind !== "measured" && <p className={styles.notice}>You’re reviewing {analysis.provenance.kind} data.</p>}
     <div className={styles.actions} aria-label="Suggested questions">
       <button type="button" disabled={state.busy} onClick={() => submit("summary")}>How did my set go?</button>
@@ -61,6 +60,5 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
     </form>
     <div className={styles.feedback}><p role="status" className="small">{state.busy ? "Coach is thinking…" : ""}</p>{state.busy && <button type="button" onClick={() => session.current?.cancel()}>Cancel</button>}</div>
     {state.error && <div className={styles.error}><p role="alert">{state.error}</p>{lastRequest && <button type="button" onClick={() => { const request = lastRequest; if (request) submit(request.mode, request.prompt); }}>Retry last question</button>}</div>}
-    <p className="muted small">{analysis.visualReview?.status === "complete" ? "Based on measured movement and an AI review of sampled video frames." : "Based on this set’s measurements; no completed AI visual review is attached."}</p>
   </section>;
 }

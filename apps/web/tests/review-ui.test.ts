@@ -21,7 +21,7 @@ function setup() {
   return { dom, container, root: createRoot(container) };
 }
 function button(container: Element, text: string) {
-  const found = [...container.querySelectorAll<HTMLButtonElement>("button")].find(item => item.textContent?.includes(text));
+  const found = [...container.querySelectorAll<HTMLButtonElement>("button")].find(item => (item.getAttribute("aria-label") ?? item.textContent)?.includes(text));
   assert.ok(found, `Button not found: ${text}`); return found;
 }
 function measured(source: AnalysisResponse = fixture as AnalysisResponse): AnalysisResponse {
@@ -50,7 +50,7 @@ test("review tabs support keyboard navigation, seeking, and retain the set conve
     assert.match(container.querySelector('[role="log"]')!.textContent!, /A retained test reply/);
     await act(async () => root.render(createElement(UploadedResults, { analysis: { ...analysis, sessionId: "new-set" }, canSeek: false, onSeek: ms => seeks.push(ms) })));
     assert.ok(!container.querySelector('[role="log"]')!.textContent!.includes("A retained test reply"));
-    assert.ok(![...container.querySelectorAll("button")].some(item => item.textContent?.includes("Watch moment")));
+    assert.ok(![...container.querySelectorAll("button")].some(item => item.getAttribute("aria-label")?.startsWith("Watch moment")));
   } finally { api.coach = oldCoach; await act(async () => root.unmount()); dom.window.close(); }
 });
 
@@ -63,7 +63,7 @@ test("zero reps keeps movement observations visible and synthetic responses neve
     assert.match(container.querySelector('[role="tabpanel"]')!.textContent!, /body line bent/);
     assert.match(container.textContent!, /synthetic data/);
     assert.equal(seeks.length, 0);
-    assert.ok(![...container.querySelectorAll("button")].some(item => item.textContent?.includes("Watch moment")));
+    assert.ok(![...container.querySelectorAll("button")].some(item => item.getAttribute("aria-label")?.startsWith("Watch moment")));
   } finally { await act(async () => root.unmount()); dom.window.close(); }
 });
 
@@ -123,11 +123,55 @@ test("saved summary has no player or seek actions, retains evidence, and deletes
     assert.match(container.textContent!, /Playback and skeleton seeking are unavailable/);
     assert.equal(container.querySelector("video"), null);
     assert.equal(container.querySelectorAll('button').length > 0, true);
-    assert.ok(![...container.querySelectorAll("button")].some(item => item.textContent?.includes("Watch moment")));
+    assert.ok(![...container.querySelectorAll("button")].some(item => item.getAttribute("aria-label")?.startsWith("Watch moment")));
     assert.ok(container.querySelector('a[href*="replace=saved"]'));
     assert.equal(container.querySelector("textarea")?.value, "A real note");
     await act(async () => button(container, "Delete saved set").click());
     assert.deepEqual(readLog(dom.window.localStorage.getItem(LOG_KEY)).sets.map(set => set.id), ["keep"]);
     assert.deepEqual(navigated, ["/"]);
+  } finally { await act(async () => root.unmount()); dom.window.close(); }
+});
+
+test("quick takeaways preserve kinds and phases across exercises; evidence stays in the footer", async () => {
+  const { dom, container, root } = setup();
+  const { UploadedResults } = await import("../src/components/uploaded-results");
+  const { AnalysisDetails } = await import("../src/components/analysis-details");
+  try {
+    for (const exercise of ["push-up", "lat-pulldown", "incline-dumbbell-bench-press", "cable-lateral-raise"]) {
+      const analysis = measured();
+      analysis.exercise = { id: exercise, name: exercise, confidence: null };
+      analysis.status = "partial";
+      analysis.visualReview!.findings = [
+        { kind: "positive", phase: "exercise", observation: "A steady position.", cue: "Keep that position.", evidenceTimestampsMs: [100, 200] },
+        { kind: "adjustment", phase: "setup", observation: "Setup observation.", cue: "Settle before starting.", evidenceTimestampsMs: [300, 400] },
+        { kind: "observation", phase: "finish", observation: "The set finishes here.", cue: "No adjustment established.", evidenceTimestampsMs: [500, 600] },
+      ];
+      await act(async () => root.render(createElement("div", null,
+        createElement(UploadedResults, { analysis, canSeek: true, onSeek: () => {} }),
+        createElement(AnalysisDetails, { analysis }))));
+      const overview = container.querySelector('[role="tabpanel"]')!;
+      assert.match(overview.querySelector('[aria-label="Keep it up"]')!.textContent!, /Keep that position/);
+      assert.match(overview.querySelector('[aria-label="Try next set"]')!.textContent!, /Setup · Settle before starting/);
+      assert.match(overview.querySelector('[aria-label="Worth noticing"]')!.textContent!, /After the set · The set finishes here/);
+      assert.doesNotMatch(overview.textContent!, /A steady position|Setup observation|All observations|Evidence timestamps/);
+      assert.equal(overview.querySelector("details"), null);
+      const footer = [...container.querySelectorAll("details")].find(item => item.querySelector("summary")?.textContent === "About this analysis")!;
+      assert.equal(footer.open, false);
+      assert.equal(footer.closest('[aria-labelledby$="-heading"]'), null);
+      assert.match(footer.textContent!, /Some movement may be uncounted/);
+      assert.match(footer.textContent!, /Setup observation/);
+      assert.match(footer.textContent!, /0.30 s · 0.40 s/);
+      const review = container.querySelector('section[aria-labelledby]')!;
+      assert.doesNotMatch(review.textContent!, /Some movement may be uncounted|About this set|Ask what changed/);
+      assert.match(review.textContent!, /Chat with your AI personal trainer/);
+      const rep = review.querySelector<HTMLDetailsElement>('details[id*="-rep-"]')!;
+      assert.equal((rep.textContent!.match(/Rep 1/g) ?? []).length, 1);
+      assert.ok(rep.querySelector("summary svg"));
+    }
+    const neutral = measured();
+    neutral.visualReview!.findings = [{ kind: "observation", observation: "No clear change established.", cue: "Review your clip.", evidenceTimestampsMs: [100, 200] }];
+    await act(async () => root.render(createElement(UploadedResults, { analysis: neutral, canSeek: false, onSeek: () => {} })));
+    assert.equal(container.querySelector('[aria-label="Keep it up"]'), null);
+    assert.equal(container.querySelector('[aria-label="Try next set"]'), null);
   } finally { await act(async () => root.unmount()); dom.window.close(); }
 });

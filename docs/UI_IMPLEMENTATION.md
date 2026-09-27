@@ -11,6 +11,15 @@ September 27, 2026. Implementation on `backend-cv`, following the locally suppli
 `UI_REDESIGN_PLAN.md` and `NEW_SESSION_PROMPT.md`. Main was not merged or modified.
 The pre-existing planning edits and temporary session prompt remain outside these commits.
 
+## Review cleanup (latest September 27)
+
+Overview now uses grouped quick cues instead of repeated AI cards or an All observations
+accordion. Detailed source observations, timestamps, limits and partial-count status live in
+one collapsed About this analysis footer on upload, saved and finalized live reviews. Rep
+accordions have distinct open states and no duplicate heading. Coach is titled “Chat with
+your AI personal trainer”; its badge/subtitle are removed. Analysis data and backend behavior
+are unchanged. See design-qa.md for the 77-test and desktop/mobile browser checks.
+
 ## Implemented
 
 - Shared warm off-white, charcoal and sage styling, native system typography and labeled

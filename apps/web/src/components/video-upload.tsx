@@ -10,6 +10,7 @@ import { api } from "@/lib/api/client";
 import { emptyUploadState, UploadSession } from "@/lib/video/upload-session";
 import { PlaybackOverlay } from "./playback-overlay";
 import { SaveSet } from "./save-set";
+import { AnalysisDetails } from "./analysis-details";
 import { UploadedResults } from "./uploaded-results";
 import styles from "./video-upload.module.css";
 
@@ -69,5 +70,6 @@ export function VideoUpload({ exercise, replaceId }: { exercise: Extract<Exercis
       </section>
       {state.result ? <div className={styles.reviewColumn}><UploadedResults key={state.result.sessionId} analysis={state.result} canSeek={state.preview === "ready"} onSeek={seek} /><SaveSet analysis={state.result} logId={logId} replacing={!!replaceId && logId === replaceId} onSaved={setLogId} /></div> : <aside className={styles.guide}><span className={styles.guideNumber}>01 — 03</span><h2>A little setup.<br />A useful perspective.</h2><ol><li><strong>Choose your exercise</strong><span>One workspace for your push-ups and supported gym sets.</span></li><li><strong>Analyze your clip</strong><span>Review counted reps and the movement we can observe.</span></li><li><strong>Make it yours</strong><span>Explore your reps, ask your coach, and save the set to your log.</span></li></ol></aside>}
     </div>
+    {state.result && <AnalysisDetails analysis={state.result} />}
   </>;
 }

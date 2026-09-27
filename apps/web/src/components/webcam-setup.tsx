@@ -10,6 +10,7 @@ import type { TrackingStatus } from "@/lib/pose/live";
 import { LiveSession, initialLiveState } from "@/lib/live/session";
 import { LiveSessionPanel } from "./live-session-panel";
 import { SaveSet } from "./save-set";
+import { AnalysisDetails } from "./analysis-details";
 import { UploadedResults } from "./uploaded-results";
 import { LiveOverlay } from "./live-overlay";
 import styles from "./webcam-setup.module.css";
@@ -140,6 +141,7 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
         </div>
         <UploadedResults key={liveState.result.sessionId} analysis={liveState.result} canSeek={false} onSeek={() => {}} />
         <SaveSet analysis={liveState.result} logId={liveState.result.sessionId} />
+        <AnalysisDetails analysis={liveState.result} />
       </>}
       </div>
 
