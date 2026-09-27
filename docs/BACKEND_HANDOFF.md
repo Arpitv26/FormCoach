@@ -4,6 +4,11 @@ Read AGENTS.md, ARCHITECTURE.md, API_CONTRACT.md, EXERCISE_SYSTEM.md, SCORING.md
 Your branch is `backend-cv`; your primary ownership is **apps/api/**. Follow BEGINNER_SETUP.md.
 Computer B builds the UI independently from the shared fixture. Preserve its contract.
 
+**Current plan:** read [NEXT_STEPS.md](NEXT_STEPS.md). B is finishing coach interactions,
+rep comparisons, results polish, live counting and demo verification. A owns backend work
+until that handoff, then takes over the frontend visual overhaul. PRs #2/#3 are merged into
+main `79f8da3`. Backend counting is implemented; whole-body form evaluation and scores are not.
+
 **User priority change:** prerecorded push-ups, no squat demo. The push-up elbow counter
 and local MediaPipe video adapter now match human counts on four real recordings (3, 1, 1, 2).
 Read apps/api/VALIDATION.md for the timing fix and limits. HTTP uploads are now implemented;
@@ -37,8 +42,10 @@ see apps/api/COACH_SETUP.md and docs/AI_COACH.md. Authored fixture angles are no
 | Completed | Causal timing/range comparison flags with thresholds, reference evidence, and replay tests | Changes to review, not quality scores |
 | Completed | Evidence-only local coach and optional OpenAI selector with simulated HTTP tests | Stable v1.0 shape |
 | Next for A | Real positive-case comparison validation | Requires suitable footage; scoring still deferred |
+| Next for A | Actionable measurement coverage, then one validated body-alignment measurement | Small independent checkpoints; see NEXT_STEPS.md |
 | Completed | Additive uploaded pose-track response and live browser skeleton (user-authorized A UI work) | See POSE_OVERLAY.md |
-| Later | Live counting integration, lunge/other exercises | Only after the recorded push-up demo works |
+| In progress on B | Live counting UI, coach interactions, comparison presentation | A reviews integrated behavior afterward |
+| Later | Lunge/other exercises | Only after the recorded push-up demo works |
 | Stretch | Automatic exercise detection, ghost comparison, custom ML, history | Only if demo is stable |
 
 Computer B owns browser camera extraction and playback. Computer A owns movement

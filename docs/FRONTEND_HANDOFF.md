@@ -6,17 +6,17 @@ The demo is **prerecorded push-ups**. Squat JSON is a legacy fixture, not the de
 
 ## Get all the work, in order
 
-1. Frontend PR #1 is already merged into main.
-2. Merge [backend PR #2](https://github.com/Arpitv26/helloHacks/pull/2) into main.
-3. Merge [overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3)
-   (`pose-overlay` → `main`) after its checks pass. It includes the upload
-   skeleton, live skeleton, UI cleanup, startup-log fix, display smoothing, and this handoff.
-4. Only after both feature PRs are merged, update Computer B using the commands below.
+PRs #1, [#2](https://github.com/Arpitv26/helloHacks/pull/2) and
+[#3](https://github.com/Arpitv26/helloHacks/pull/3) are merged into main `79f8da3`.
+This includes upload/live skeletons, UI cleanup, startup-log fix and display smoothing.
+Update Computer B using the commands below.
 
-**PR #2 alone does not include the overlays.** `pose-overlay` contains all backend commits
-plus the later overlay commits. Before #2 merges, the overlay PR also lists the backend
-changes; after a normal merge of #2, its diff narrows to the overlay/handoff work.
 Do not cherry-pick the individual fixes or overwrite the frontend directory with an old copy.
+
+**Confirmed assignment:** B is finishing coach panel/interactions, rep comparisons, results
+polish, live rep counting and demo verification. Commit, test and push these features, then
+open a PR. After A reviews and integrates it, hand frontend ownership back to A for the full
+visual overhaul. Do not both redesign the same screens. See [NEXT_STEPS.md](NEXT_STEPS.md).
 
 From your repository folder (the one containing `apps`), first run:
 

@@ -2,22 +2,24 @@
 
 **Updated user direction: prerecorded push-ups, no squat demo.** Reliability on the actual
 gym clip matters more than live camera tracking or implementing many exercises. Computer B
-is still building the frontend; Computer A owns video pose extraction and movement analysis.
+is finishing coach interactions, comparisons, live counting and verification. Computer A
+owns backend work, then the visual overhaul after B's handoff. See NEXT_STEPS.md.
 
 ## Main sequence — prerecorded gym video
 
 1. Select a consented short side-view push-up clip and explicitly select `push-up`.
-2. Extract poses using a pretrained model; show the skeleton once that UI is implemented.
+2. Extract poses using a pretrained model; show the synchronized skeleton on the video.
 3. Run the same movement analyzer used for live pose batches.
 4. Show completed-rep counts, elbow-angle measurements, and rep intervals.
 5. Seek to corresponding moments in that same clip. Compare against a human count.
 6. Add only genuinely implemented metrics/issues. Scores remain unavailable until grounded
    scoring exists; an empty issue list is not proof of good form.
-7. Explain one actual measurement, and later let the AI coach summarize that evidence.
+7. Explain one actual measurement; use the coach panel once B's integration is verified.
 
 Local backend video extraction and push-up counting match human counts across four supplied
-recordings (3, 1, 1, 2); see apps/api/VALIDATION.md. HTTP uploads are wired; UI playback
-validation and timeout integration are next (apps/api/HTTP_UPLOAD.md). No body-alignment or form-score accuracy is claimed yet.
+recordings (3, 1, 1, 2); see apps/api/VALIDATION.md. HTTP uploads, timeout handling and
+landscape/portrait skeleton playback are integrated. Real positive comparison validation
+and the full coach/live flow remain to rehearse. No body-alignment or form-score accuracy is claimed yet.
 The old six-rep squat fixture must not be relabeled as push-up results.
 
 ## Recording and acceptance
@@ -34,8 +36,8 @@ adding variation demonstrations or making accuracy claims.
 
 ## Later live option and fallback
 
-Browser tracking is later work on Computer B. It will send the same pose contract; it should
-not block the recorded demo. Rehearse the recorded flow twice on the presentation machine.
+Browser skeleton tracking works; B is connecting live counting through the same pose contract.
+It should not block the recorded demo. Rehearse the recorded flow twice on the presentation machine.
 Keep a successfully analyzed local clip and its matching measured results. If processing
 fails, label any synthetic walkthrough explicitly. The local coach fallback does not need a key.
 Freeze working dependencies/contracts before the pitch.
@@ -46,7 +48,7 @@ Freeze working dependencies/contracts before the pitch.
 | --- | --- |
 | Functionality — 35% | A repeatable camera-to-analysis flow, rep count, grounded issue, working fallback |
 | Pitch & communication — 25% | Clear problem, one user story, concise limitations, visible before/after value |
-| Technical complexity — 20% | Shared PoseFrame pipeline, custom phase/rep logic, measurement-derived scores, evidence-only AI |
+| Technical complexity — 20% | Shared PoseFrame pipeline, custom phase/rep logic, measured comparisons, evidence-only AI |
 | UX & design — 20% | Framing guidance, clear feedback, polished results, meaningful playback/graphs |
 
 Suggested pitch arc: ordinary camera → structured body landmarks → our measurement and

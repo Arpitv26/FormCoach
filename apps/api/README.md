@@ -168,6 +168,11 @@ instead of standing. Null/confidence/tracking-loss behavior follows checkpoint 3
 
 ## Remaining backend plan
 
+The current ordered plan is [NEXT_STEPS.md](../../docs/NEXT_STEPS.md). Backend and overlay
+PRs are merged. B is finishing coach/live-count/comparison UI; A owns backend validation,
+tracking feedback and future body-alignment measurements, then the frontend visual overhaul
+after B's handoff. Form scoring remains unfinished.
+
 Checkpoint 4 preparation now includes a [capture replay tool and step-by-step guide](examples/README.md).
 It tests saved poses against a running API, compares a human count, and checks cumulative
 response stability. A labeled synthetic example is included. Four actual MOV recordings
@@ -179,15 +184,17 @@ evidence, the short-clip timing fix, repeat commands, and limits of this check.
 3. Completed: connect measured poses and completed reps to the existing live API contract.
 4. Completed: push-up elbow counting and capture replay checker, tested with synthetic inputs.
 5. Completed: local video extraction and count/sequence review on four actual recordings.
-6. Completed: HTTP upload integration, cleanup/error tests. Next: frontend playback/timeout coordination.
+6. Completed: HTTP upload integration, cleanup/error tests, frontend playback/timeout coordination.
 7. Descriptive measurements and causal comparison flags implemented; see [MEASUREMENTS.md](MEASUREMENTS.md) and [COMPARISONS.md](COMPARISONS.md). Validate real positive cases before scoring.
 8. Completed: useful local coaching and optional OpenAI evidence selection with mocked SDK tests.
-   One live timing-question check passed; see COACH_SETUP.md and ../../docs/AI_COACH.md. Browser tracking follows when B is ready.
+   One live timing-question check passed; see COACH_SETUP.md and ../../docs/AI_COACH.md.
+   Browser skeleton tracking is implemented; B is connecting live counts and the coach panel.
 
 The local recorded-video adapter is now available: follow [VIDEO_SETUP.md](VIDEO_SETUP.md).
 It uses optional pinned MediaPipe/OpenCV packages, writes poses and upload analysis locally,
 and powers the HTTP upload route described in [HTTP_UPLOAD.md](HTTP_UPLOAD.md). Actual-footage
-counts are checked; UI seeking accuracy and broader counting reliability remain to be tested.
+counts and selected playback seeks are checked; broader counting reliability and real
+positive comparison flags remain to be validated.
 
 Keep each checkpoint small: implement, test, review, commit, and push `backend-cv`.
 

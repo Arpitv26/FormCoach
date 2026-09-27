@@ -24,6 +24,7 @@ Keep the legacy squat fixture for compatibility, not as the intended presentatio
 4. docs/PRODUCT_SCOPE.md, docs/TASKS.md, and docs/SAFETY.md.
 5. Backend measurement work: docs/EXERCISE_SYSTEM.md and docs/SCORING.md.
 6. Coaching work: docs/AI_COACH.md.
+7. Current remaining work and ownership transition: docs/NEXT_STEPS.md.
 
 ## Settled architecture
 
@@ -50,6 +51,11 @@ Avoid editing the other branch's directories. Shared changes should be rare, sma
 isolated. Generated `apps/web/src/lib/api/types.ts` is a coordinated exception: a shared
 contract change must include matching types. Communicate with the other human before
 relying on the change; do not send external messages on the human's behalf without authorization.
+
+**Current human agreement (2026-09-26):** B is finishing coach interactions, rep comparisons,
+results polish, live counting and demo verification. A continues backend work now. After B
+hands off a committed, reviewed and integrated PR, A owns the frontend visual overhaul on
+this computer. Do not start that overhaul while B is editing these screens.
 
 If a contract must change:
 
@@ -98,7 +104,8 @@ camera/upload code. Live skeleton works locally; live counting is not connected.
 AnalysisResponse is unchanged; additive VideoAnalysisResponse includes the exact pose track.
 The human reports physical-camera tracking works with some flicker. The `dde10e2` follow-up
 fixes false Next.js startup errors and adds display-only smoothing. FRONTEND_HANDOFF.md is
-refreshed for the complete checkpoint; B must integrate both backend and overlay PRs.
+refreshed for the complete checkpoint. Backend PR #2 and overlay PR #3 are merged into main
+at `79f8da3`; B is integrating that baseline before completing the features listed above.
 Next: physical webcam recheck after the fix, live counting integration, and real positive-case comparison validation. Recheck origin/frontend periodically and update
 docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.

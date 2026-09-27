@@ -77,6 +77,11 @@ experience, skeleton overlay, dashboard, and visual polish. Shared data formats 
 people work independently; the frontend can use clearly labeled mock results until real
 analysis is ready.
 
+**Current handoff:** B is finishing coach interactions, rep comparisons, results polish,
+live counting and demo verification. A continues backend work now, then takes over the
+frontend visual overhaul after B's PR is reviewed and integrated. See the
+[remaining work and checkpoint plan](docs/NEXT_STEPS.md).
+
 ## Live and recorded skeletons
 
 See joints move over your camera preview at `/camera?exercise=push-up`, or over your analyzed
@@ -115,19 +120,22 @@ Terminal 2 — frontend, starting from the repository root again:
 cd apps/web
 npm ci
 cp .env.example .env.local
+npm run pose:setup
 npm run dev
 ```
 
 Open [frontend](http://localhost:3000), [API health](http://localhost:8000/api/v1/health),
-or [interactive API docs](http://localhost:8000/docs). The homepage uses the shared mock
-JSON and works even when the backend is stopped. Click **Check backend health** to test
+or [interactive API docs](http://localhost:8000/docs). The landing page and local camera
+skeleton work without the backend; real upload analysis and coaching need it. Open
+**Connection tools**, then click **Check backend health** to test
 the connection. Stop each server with **Control+C** in its terminal.
+Create environments and copy example settings only on first setup; preserve existing env files.
 
 ## Repository map
 
 ```text
 apps/api/       Python API, domain types, replaceable analysis interfaces, tests [A]
-apps/web/       Next.js, TypeScript API client, generated types, mock page, tests [B]
+apps/web/       Next.js UI, TypeScript API client, generated types, tests         [B now]
 contracts/     JSON schemas and canonical examples                            [SHARED]
 docs/          Setup, architecture, API, handoffs, scoring, scope, demo         [SHARED]
 scripts/       Export/check Python models against shared JSON schemas         [SHARED]
