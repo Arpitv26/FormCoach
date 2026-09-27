@@ -1,10 +1,10 @@
 .panel { min-width: 0; overflow-wrap: anywhere; }
 .panel > p { margin-top: 12px; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
-.panel button { min-height: 44px; border: 1px solid #535b49; border-radius: 10px; padding: 10px 14px; background: var(--surface); color: var(--accent); font-size: .875rem; }
+.panel button { min-height: 44px; border: 1px solid #555865; border-radius: 10px; padding: 10px 14px; background: var(--surface); color: var(--accent); font-size: .875rem; }
 .panel button:global(.primary-action) { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .panel button:hover:not(:disabled) { background: var(--surface-raised); }
-.panel button:global(.primary-action):hover:not(:disabled) { background: #e2ff9b; }
+.panel button:global(.primary-action):hover:not(:disabled) { background: #97bf60; }
 .panel label { display: block; font-size: .875rem; margin-bottom: 10px; }
 .panel textarea { scroll-margin-bottom: 110px; min-height: 84px; }
 .answer { padding: 18px 0; }

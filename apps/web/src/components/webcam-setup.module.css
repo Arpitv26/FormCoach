@@ -4,19 +4,19 @@
 .reviewColumn { min-width: 0; }
 .cameraPanel { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
 .panelHeader { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 24px; }
-.viewport { position: relative; aspect-ratio: 16 / 10; background: #111310; color: #f2f3ec; }
+.viewport { position: relative; aspect-ratio: 16 / 10; background: #0c0a0b; color: #f3eff5; }
 .video { width: 100%; height: 100%; display: block; object-fit: contain; transform: scaleX(-1); }
 .hiddenVideo { opacity: 0; }
 .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; gap: 12px; }
-.placeholder svg { width: 54px; height: 54px; stroke: #b9cbb2; stroke-width: 1.5; margin-bottom: 6px; }
-.placeholder p { color: #c2cbbd; font-size: .875rem; max-width: 280px; }
-.previewLabel { position: absolute; top: 12px; left: 12px; padding: 6px 10px; background: #111310e6; color: #f2f3ec; font-size: .875rem; border-radius: 8px; }
+.placeholder svg { width: 54px; height: 54px; stroke: #f3eff5; stroke-width: 1.5; margin-bottom: 6px; }
+.placeholder p { color: #b6b5be; font-size: .875rem; max-width: 280px; }
+.previewLabel { position: absolute; top: 12px; left: 12px; padding: 6px 10px; background: #0c0a0be6; color: #f3eff5; font-size: .875rem; border-radius: 8px; }
 .controls { padding: 24px; }
 .status p:last-child { color: var(--muted); font-size: .875rem; margin-top: 6px; }
 .statusTitle { font-size: 1rem; font-weight: 600; }
 .errorTitle { color: #ffb8a5; font-weight: 600; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
-.secondaryButton { background: var(--surface); border: 1px solid #535b49; color: var(--accent); padding: 12px 18px; min-height: 44px; border-radius: 10px; font-size: .9375rem; }
+.secondaryButton { background: var(--surface); border: 1px solid #555865; color: var(--accent); padding: 12px 18px; min-height: 44px; border-radius: 10px; font-size: .9375rem; }
 .secondaryButton:hover { background: var(--surface-raised); }
 .privacyNote { margin-top: 18px; color: var(--muted); font-size: .875rem; }
 .guidance h2 { margin: 10px 0 16px; }

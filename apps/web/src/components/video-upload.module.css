@@ -15,18 +15,18 @@
 .guide li span { color: var(--muted); margin-top: 6px; font-size: .9375rem; }
 .fileLabel { display: block; font-size: .875rem; font-weight: 550; margin: 20px 0 8px; }
 .fileInput { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
-.emptyPreview { width: 100%; min-height: 260px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; border: 1px dashed #535b49; border-radius: 12px; margin: 20px 0 16px; padding: 24px; background: var(--canvas); }
+.emptyPreview { width: 100%; min-height: 260px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; border: 1px dashed #555865; border-radius: 12px; margin: 20px 0 16px; padding: 24px; background: var(--canvas); }
 .emptyPreview > span:first-child { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--soft); font-size: 2rem; color: var(--accent); }
 .emptyPreview > span:last-child { color: var(--muted); line-height: 1.6; font-size: .9375rem; }
 .emptyPreview:hover { background: var(--surface-raised); }
 .fileInfo { display: flex; justify-content: space-between; gap: 12px; margin: 18px 0 12px; font-size: .875rem; overflow-wrap: anywhere; }
 .fileInfo span:first-child { min-width: 0; }
 .fileInfo span:last-child { color: var(--muted); white-space: nowrap; }
-.playerStage { position: relative; border-radius: 12px; overflow: hidden; background: #111310; margin-bottom: 12px; }
-.player { object-fit: contain; display: block; width: 100%; max-height: min(58vh, 560px); background: #111310; }
+.playerStage { position: relative; border-radius: 12px; overflow: hidden; background: #0c0a0b; margin-bottom: 12px; }
+.player { object-fit: contain; display: block; width: 100%; max-height: min(58vh, 560px); background: #0c0a0b; }
 .overlayToggle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; font-size: .875rem; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 20px 0 16px; }
-.secondary, .rep button, .moments button { background: var(--surface); color: var(--accent); border: 1px solid #535b49; border-radius: 10px; min-height: 44px; padding: 10px 14px; font-size: .875rem; }
+.secondary, .rep button, .moments button { background: var(--surface); color: var(--accent); border: 1px solid #555865; border-radius: 10px; min-height: 44px; padding: 10px 14px; font-size: .875rem; }
 .secondary:hover:not(:disabled), .moments button:hover:not(:disabled) { background: var(--surface-raised); }
 .notice, .error { padding: 12px 14px; border-radius: 10px; line-height: 1.6; font-size: .875rem; overflow-wrap: anywhere; margin: 12px 0; }
 .notice { background: var(--surface-raised); }
@@ -65,31 +65,31 @@
 .overview > p, .changes > p { margin-top: 12px; }
 .changes .moments { margin-top: 16px; }
 .metricSwitch { display: flex; flex-wrap: wrap; gap: 8px; }
-.metricSwitch button { min-height: 44px; padding: 10px; font-size: .875rem; border: 1px solid #535b49; border-radius: 8px; background: var(--surface); }
+.metricSwitch button { min-height: 44px; padding: 10px; font-size: .875rem; border: 1px solid #555865; border-radius: 8px; background: var(--surface); }
 .metricSwitch button[aria-pressed="true"] { color: var(--accent); background: var(--soft); }
 .barList { display: grid; gap: 8px; margin-top: 20px; }
 .barRow { display: grid; grid-template-columns: 52px minmax(20px, 1fr) 92px; gap: 10px; align-items: center; width: 100%; padding: 12px 8px; min-height: 44px; text-align: left; font-size: .875rem; background: var(--canvas); border: 0; border-radius: 8px; }
 .barRow strong { text-align: right; font-weight: 500; }
-.barTrack { display: block; height: 8px; background: #343830; border-radius: 6px; overflow: hidden; }
-.barTrack > span { display: block; height: 100%; background: #d4fa71; border-radius: inherit; }
+.barTrack { display: block; height: 8px; background: #393b44; border-radius: 6px; overflow: hidden; }
+.barTrack > span { display: block; height: 100%; background: #80af3c; border-radius: inherit; }
 @media (max-width: 900px) { .workspace, .reviewWorkspace { grid-template-columns: minmax(0, 1fr); } .reviewWorkspace .uploadPanel { position: static; } .guide { display: none; } }
 @media (max-width: 520px) { .uploadPanel, .results { padding: 20px 16px; } .measurements { grid-template-columns: 1fr; gap: 10px; } .steps { gap: 20px; } .finding { padding: 16px; } .summary { gap: 24px; } .summary > div + div { padding-left: 24px; } .player { max-height: 48svh; } }
 
 .reviewColumn { min-width: 0; }
 
 .uploadPanel { position:relative; overflow:hidden; }
-.emptyPreview { min-height:290px; border-color:#596844; background:#1a1f15; transition:background .25s,border-color .25s; }
-.emptyPreview:hover { background:#252e1b; border-color:var(--accent); }
+.emptyPreview { min-height:290px; border-color:#464954; background:#15151a; transition:background .25s,border-color .25s; }
+.emptyPreview:hover { background:#252830; border-color:var(--accent); }
 .emptyPreview > span:first-child { width:66px; height:66px; border-radius:20px; margin-bottom:8px; transition:transform .3s; }
 .emptyPreview:hover > span:first-child { transform:translateY(-5px); }
 .guide { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:28px; }
 .guide h2 { color:var(--accent); letter-spacing:-.04em; }
 .steps { padding:12px 18px; border-radius:16px; background:var(--surface); border:1px solid var(--line); width:fit-content; }
-.steps li[aria-current] > span { box-shadow:0 0 20px #d4fa7120; }
-.tabs { padding:5px; background:#151812; border:1px solid var(--line); border-radius:14px; gap:5px; }
+.steps li[aria-current] > span { box-shadow:0 0 20px #80af3c20; }
+.tabs { padding:5px; background:#131216; border:1px solid var(--line); border-radius:14px; gap:5px; }
 .tabs button { border:0; border-radius:10px; transition:background .2s,color .2s; }
 .tabs button[aria-selected="true"] { background:var(--accent); color:var(--on-accent); }
-.finding { background:#252a1f; }
+.finding { background:#24262b; }
 .summary dd { color:var(--accent); font-size:2.3rem; }
 .barTrack > span { transition:width .45s ease; }
 .repRow { transition:background .2s; border-radius:8px; }

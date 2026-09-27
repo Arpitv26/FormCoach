@@ -11,7 +11,7 @@ export function AppIcon({ name }: { name: "dashboard" | "upload" | "live" | "arr
 export function AppNavigation() {
   const path = usePathname();
   const { enabled, locked, toggle } = useDesignMotion();
-  return <><a className="skip-link" href="#main-content">Skip to content</a><header className="site-header">
+  return <><a className="skip-link" href="#main-content">Skip to content</a><header className="site-header" data-home={path === "/"}>
     <Link className="brand" href="/" aria-label="FormCoach dashboard"><span className="brand-mark"><Activity size={27} aria-hidden="true" /></span>FormCoach<span className="brand-dot">.</span></Link>
     <nav className="app-nav" aria-label="Main navigation">
       {([{ href: "/", label: "Dashboard", icon: "dashboard" }, { href: "/upload", label: "Upload", icon: "upload" }, { href: "/camera?exercise=push-up", label: "Live", icon: "live" }] as const).map(item => {

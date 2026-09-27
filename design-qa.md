@@ -2,7 +2,32 @@
 
 final result: passed
 
-## Target and evidence
+## Latest palette / cinematic hero pass
+
+Source: user palette image (sampled #0c0a0b, #464954, #f3eff5, #80af3c, #4f7c30)
+and local `0d979198c2ece5a80d651d94dc62e6a0.mp4` at 1, 3 and 6 seconds.
+Reference video is 1920×1080; extracted review frames are 1280×720.
+Implementation: `/private/tmp/formcoach-video-hero-desktop.png` at 1440×1000,
+and `/private/tmp/formcoach-video-hero-mobile.png` at 390×844, device scale 1.
+Combined comparison: `/private/tmp/formcoach-hero-comparison.png`, both desktop views
+normalized to 960px width while preserving their different viewport aspect ratios.
+This is a typography/layout adaptation with the user's gym footage, not a car-site clone.
+
+- Typography: single centered off-white Archivo Black headline, no gradient/shimmer/split
+  slogan. Weight and rounded heavy letterforms follow the supplied title reference.
+- Layout: full-width video, floating pill header, top-centered copy/action, translucent lower
+  information strip. Mobile stacks the strip and preserves native page scrolling and dock.
+- Tokens: exact sampled palette with neutral surface tints; old yellow chart accent replaced.
+- Assets: user's existing gym clip converted to silent H.264, 1600×900, 14.76 sec / 1.22 MB.
+  Poster is a real frame from that clip. No synthetic asset substitutions.
+- Copy: concise FormCoach title and actual upload/live/log capabilities, without invented stats.
+- Fixed a P2 11px top gap in the initial hero capture; final bounds start at y=0 on desktop.
+- Browser confirms natural autoplay, looping back to ~0.4s after the end, pause/resume,
+  full-offscreen pause, and OS reduced-motion pause. No page errors in the final hero pass.
+
+No remaining P0/P1/P2 findings for this update. The earlier comparison below is historical.
+
+## Earlier target and evidence
 
 Scope: adapt the user's Kalo screenshot's charcoal/lime fitness-dashboard style to the
 existing FormCoach product. This is a style adaptation, not a calorie-tracking clone.

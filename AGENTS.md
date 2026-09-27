@@ -84,6 +84,13 @@ If a contract must change:
 
 ## Current capabilities
 
+**Latest visual follow-up:** The supplied five-color palette now uses #0c0a0b / #464954 /
+#f3eff5 / #80af3c / #4f7c30. A centered Archivo Black headline replaces the split/shimmer
+hero title. The explicitly requested optimized gym background video is tracked at
+apps/web/public/media/training-hero.mp4 (1.22 MB, silent loop); private gym recordings
+remain ignored. Pause, visibility and reduced-motion playback are browser-checked.
+See docs/UI_MOTION_REDESIGN.md for the newer reference and media provenance.
+
 **September 27 dark UI follow-up:** The user superseded the light palette with a charcoal /
 electric-lime reference. Actual adapted React Bits SpotlightCard, StarBorder, ShinyText and
 Magic UI BlurFade / BorderBeam are now integrated. Motion replaces Anime.js; Lucide provides
