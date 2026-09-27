@@ -2,6 +2,20 @@
 
 ## Current direction — September 27, 2026
 
+**Latest checkpoint: implemented redesign and PR preparation.** Dashboard / Upload / Live
+now share the supplied charcoal, slate, off-white and green palette, React Bits / Magic UI
+motion, and a local looping gym-video hero. Reviewed upload and live sets can be saved in a
+device-local workout log. Overview groups complete AI observations with clear keep/next-time
+cues; technical details live in a bottom disclosure. Rep expansion and trainer chat are
+simplified. Future visual reviews request plain language for beginners.
+
+See [UI_IMPLEMENTATION.md](UI_IMPLEMENTATION.md), [UI_MOTION_REDESIGN.md](UI_MOTION_REDESIGN.md)
+and [design-qa.md](../design-qa.md) for implementation and browser checks. The original
+[UI_REDESIGN_PLAN.md](UI_REDESIGN_PLAN.md) is retained as historical context; later user
+requests supersede its light palette, motion-library choices and review-card layout.
+Known counting and physical-rehearsal limitations below remain open; no form score or
+cross-version movement trend is implied by the redesign.
+
 **Latest user-rehearsal fix:** original incline side2 now counts 7 including the initial lift
 (human: 6 working reps excluding that lift), original normal pulldown 6, changed pulldown
 5/6. Optional GPT-5.4 sampled-image review now supplies timestamped technique observations
