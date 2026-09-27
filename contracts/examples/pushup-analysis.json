@@ -4,7 +4,7 @@
   "status": "complete",
   "provenance": {
     "kind": "synthetic",
-    "label": "SYNTHETIC DEMO DATA — authored elbow geometry, not a recording"
+    "label": "SYNTHETIC DEMO DATA — authored elbow and body-line geometry, not a recording"
   },
   "source": {
     "type": "live",
@@ -54,7 +54,10 @@
         "smoothedLeftElbowExcursionDeg": 80.0,
         "angleMeasurementStartMs": 800.0,
         "timeToMinElbowAngleMs": 500.0,
-        "timeFromMinElbowAngleMs": 1200.0
+        "timeFromMinElbowAngleMs": 1200.0,
+        "bodyLineSampleCount": 18.0,
+        "bodyLineUsableSampleCount": 18.0,
+        "medianLeftShoulderHipAnkleAngleDeg": 160.0
       },
       "issues": [],
       "keyMoments": [
@@ -92,6 +95,7 @@
   ],
   "limitations": [
     "Synthetic one-rep UI example generated from authored geometry. No matching video or camera measurement exists.",
+    "Body-line angle is the sample median of raw 2D shoulder-hip-ankle angles from rep start through completion. It is not a form score, cannot distinguish hip sag from pike, and can hide brief deviations. Camera orientation is not validated.",
     "2D elbow angles use supplied landmarks; their camera origin cannot be verified.",
     "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
     "Uncalibrated push-up rules count observed extension-flexion-extension cycles. Shallow, fast, or interrupted attempts may not count; this is not a form judgment.",

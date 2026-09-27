@@ -95,6 +95,12 @@ The older `SessionResults` component is not the current upload view. Its `partia
 
 ## API and rendering boundary
 
+**Additive backend follow-up:** push-up rep measurements now optionally include a median
+shoulder–hip–ankle angle and usable/received sample counts. See
+[BODY_LINE.md](../apps/api/BODY_LINE.md). Existing types and endpoints are unchanged; B can
+finish current features without rendering these keys. A can add the dedicated display in
+the later overhaul. Treat missing/null as unknown; no ideal-angle colour coding or form score.
+
 Read [API_CONTRACT.md](API_CONTRACT.md) and [POSE_OVERLAY.md](POSE_OVERLAY.md).
 Contract version is still **1.0**; `AnalysisResponse` is unchanged.
 

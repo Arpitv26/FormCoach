@@ -188,6 +188,17 @@ not a range-of-motion score. All `metrics` score fields remain null. See
 [measurement definitions](../apps/api/MEASUREMENTS.md) and the explicitly synthetic
 `contracts/examples/pushup-analysis.json` example. Missing keys mean unavailable, never zero.
 No body-alignment, depth-quality, or injury claim is implied by these provisional cycles.
+
+**Descriptive push-up body-line angle:** completed reps additionally include
+`medianLeftShoulderHipAnkleAngleDeg` or `medianRightShoulderHipAnkleAngleDeg`, plus
+`bodyLineSampleCount` and `bodyLineUsableSampleCount`. The median uses raw, aspect-corrected
+2D angles at the hip over the inclusive counted rep interval. It requires both boundaries,
+at least three samples, every angle usable, and no sample gap over 300 ms; otherwise null.
+The selected side matches elbow counting. These keys are additive in the existing numeric
+dictionary; old results may omit them. Neither a quality score nor a sag/pike classification
+is implied. Body-line failure does not remove counted reps. See [BODY_LINE.md](../apps/api/BODY_LINE.md)
+for exact semantics, limits, and the reviewed real-clip values.
+
 **Push-up comparison flags:** from rep 3 onward, compare with the immediately preceding two
 completed reps. Require continuous usable angles across that entire reference/current span,
 including between reps. Duration references must differ by at most 20% of their median;

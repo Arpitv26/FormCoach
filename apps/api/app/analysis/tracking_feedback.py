@@ -104,7 +104,7 @@ def tracking_feedback(
         messages.append(
             f"{side.capitalize()} shoulder, hip and ankle pass landmark visibility checks together "
             f"in {available} of {len(frames)} sampled frames. "
-            "Body alignment has not been evaluated."
+            "Visibility alone does not assess body alignment."
         )
         # Shoulder problems already appear in elbow feedback; do not repeat them.
         messages.extend(_joint_feedback(problems, names[1:], len(frames)))

@@ -170,8 +170,12 @@ instead of standing. Null/confidence/tracking-loss behavior follows checkpoint 3
 
 The current ordered plan is [NEXT_STEPS.md](../../docs/NEXT_STEPS.md). Backend and overlay
 PRs are merged. B is finishing coach/live-count/comparison UI; A owns backend validation,
-tracking feedback and future body-alignment measurements, then the frontend visual overhaul
+tracking feedback and body-alignment measurement validation, then the frontend visual overhaul
 after B's handoff. Form scoring remains unfinished.
+
+Descriptive body-line measurements are now implemented: read [BODY_LINE.md](BODY_LINE.md)
+for the per-rep shoulder–hip–ankle median, missing-data policy and seven real-frame checks.
+No corrective cue or form score is derived from it yet.
 
 Checkpoint 4 preparation now includes a [capture replay tool and step-by-step guide](examples/README.md).
 It tests saved poses against a running API, compares a human count, and checks cumulative

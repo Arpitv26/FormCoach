@@ -38,11 +38,17 @@ def test_only_locked_side_is_reported_and_body_visibility_does_not_gate_reps(cli
     assert request == before
     add_body_landmarks(request, side)
     with_body = analyze(client, request)
-    assert with_body.reps == result.reps
+    for key, value in result.reps[0].measurements.items():
+        if key not in {
+            "bodyLineUsableSampleCount",
+            f"median{side.title()}ShoulderHipAnkleAngleDeg",
+        }:
+            assert with_body.reps[0].measurements[key] == value
+    assert with_body.reps[0].key_moments == result.reps[0].key_moments
     assert with_body.summary == result.summary
     assert with_body.status == result.status == "complete"
     assert "pass landmark visibility checks together in 25 of 25" in messages(with_body)
-    assert "Body alignment has not been evaluated" in messages(with_body)
+    assert "Visibility alone does not assess body alignment" in messages(with_body)
     assert with_body.camera_quality.full_body_visible is None
     assert with_body.camera_quality.score is None
     assert with_body.summary.overall_score is None

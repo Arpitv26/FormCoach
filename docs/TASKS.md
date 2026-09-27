@@ -33,7 +33,8 @@ reviewed and integrated. PRs #1/#2/#3 are already merged into main `79f8da3`.
 - [x] [A] Causal within-set timing/range comparisons with traceable review flags and synthetic positive cases.
 - [ ] [A] Validate a real positive comparison case; do not infer positive-case accuracy from current unflagged clips.
 - [x] [A] Improve measured tracking coverage and actionable missing-joint feedback (apps/api/TRACKING_FEEDBACK.md; counts unchanged).
-- [ ] [A] Implement and validate one side-view body-alignment measurement before deriving a cue.
+- [x] [A] Implement descriptive 2D shoulder–hip–ankle median; synthetic tests, independent arithmetic and seven real-frame checks (apps/api/BODY_LINE.md).
+- [ ] [A] Validate a body-alignment interpretation/cue separately; current angle is not a form judgment.
 - [ ] [A] Justified score formulas only after evidence/view/calibration review.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.

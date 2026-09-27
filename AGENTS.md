@@ -114,5 +114,10 @@ Read apps/api/README.md for counting limits and apps/api/examples/README.md for 
 Tracking-feedback checkpoint: existing cameraQuality.issues now reports angle sample coverage,
 named blocked joints and push-up shoulder/hip/ankle visibility coverage. No schema or counting
 change; all scores/full-body visibility remain null. See apps/api/TRACKING_FEEDBACK.md:
-311 tests pass; saved-clip counts/rep details remain unchanged. Next independent backend
-feature is a validated body-alignment measurement; real positive comparison footage is pending.
+311 tests passed at that checkpoint; saved-clip counts/rep details remained unchanged.
+Real positive comparison footage is pending.
+The body-line checkpoint now adds median shoulder–hip–ankle angles and sample counts to the
+existing per-rep measurements dictionary. Read apps/api/BODY_LINE.md before interpreting them.
+Same side as elbow; full observed rep coverage required; no form cue or score. Seven real-frame
+overlays and independent arithmetic checked; existing counts/times/elbow measurements unchanged.
+Current checks: 335 backend tests, 35 frontend tests, lint/format/contracts/types and build pass.

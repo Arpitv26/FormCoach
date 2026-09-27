@@ -27,7 +27,8 @@ do not try to finish every stretch feature before the demo.
 | Live / uploaded skeleton | Implemented | Browser and portrait/landscape playback checks; actual webcam smoothness needs recheck |
 | Coach API | Implemented | Local summary and optional OpenAI evidence selection; B is building interactions |
 | Form score and five quality metric scores | **Missing** | `analysis/scoring.py` is a placeholder; real scores remain null |
-| Body alignment / depth-quality feedback | **Missing** | Current analyzer uses one elbow triplet; it does not assess whole-body technique |
+| Body-line geometry | Implemented | Median 2D shoulder–hip–ankle angle per rep; seven real-frame checks; not a form assessment |
+| Body alignment / depth-quality coaching | **Missing** | A reliable interpretation and corrective cue still need separate validation |
 | Full-body visibility / camera orientation | **Missing** | Required-joint visibility is checked, but these session-level judgments stay unknown |
 | Worst-form rep ranking | **Missing** | No quality score exists; a flagged change can be reviewed without calling it the worst rep |
 | Other gym exercises / automatic recognition | **Missing** | Registered profiles and UI choices do not establish analysis support |
@@ -71,6 +72,11 @@ and unchanged completed-rep counts. Recheck all four saved real pose captures. T
 proceed while waiting for a new recording or B's frontend PR.
 
 ### 3. Add one useful form-related measurement, then review its interpretation
+
+**Measurement completed:** [BODY_LINE.md](../apps/api/BODY_LINE.md) defines the per-rep
+median shoulder–hip–ankle angle. Synthetic tests, saved-clip regressions, independent
+arithmetic and seven actual-frame overlays were checked. No form cue/score is implemented.
+The next decision is validation of interpretation, alongside the pending real comparison clip.
 
 Candidate: side-view shoulder–hip–ankle alignment during a rep, only when those landmarks
 are reliably observed. First document geometry, units, measurement window, missing-data policy
@@ -118,9 +124,9 @@ the recorded push-up demo and integration are already reliable and time remains.
 
 ## Validation baseline
 
-Tracking-feedback checkpoint: **311 backend tests passed** on 2026-09-26. One existing Starlette TestClient
-deprecation warning remains. Latest overlay checkpoint: 35 frontend tests plus lint, types,
-contracts and production build passed; rerun those on B's new commits rather than treating
+Body-line checkpoint: **335 backend tests passed** on 2026-09-26. One existing Starlette TestClient
+deprecation warning remains. 35 frontend tests plus lint, types,
+contracts and production build passed again; rerun those on B's new commits rather than treating
 this earlier result as coverage of work still in progress.
 
 For each checkpoint: implement → focused tests → saved-clip regression where relevant →

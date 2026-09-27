@@ -2,6 +2,14 @@
 
 ## New overlay checkpoint — 2026-09-26
 
+**Body-line follow-up:** completed push-ups now include a descriptive median 2D
+shoulder–hip–ankle angle and usable/received sample counts in the existing measurement
+dictionary. No schema or frontend source change. Read apps/api/BODY_LINE.md for sample
+requirements, reviewed values and limits; these are not form scores or corrective cues.
+335 backend and 35 frontend tests, lint/format/contracts/types and production build pass.
+All four saved-pose replays preserve counts and earlier metrics; seven actual-frame overlays
+were visually reviewed. The latest fetch still shows B at `5dd6bb4`; their work is ongoing.
+
 **Backend follow-up:** tracking coverage and missing-joint feedback now use the existing
 `cameraQuality.issues` strings. No frontend code or schema change. 311 backend tests,
 lint/format/schema checks pass; four saved real-pose replays retain identical reps,
