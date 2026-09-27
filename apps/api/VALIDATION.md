@@ -1,5 +1,9 @@
 # Recorded push-up validation — September 26, 2026
 
+**Latest fifth clip:** [IMG_6942 review](REVIEW_6942.md): 4/4 counted, slow-third/fast-fourth
+pattern visible, but the expected timing flag was withheld by reference-stability gating.
+The original four-clip checks below remain historical baseline evidence.
+
 ## Result
 
 All four supplied recordings decode on Computer A without conversion. They are HEVC

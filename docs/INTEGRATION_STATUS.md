@@ -2,6 +2,12 @@
 
 ## New overlay checkpoint — 2026-09-26
 
+**Latest recording:** IMG_6942 counts 4/4 with observed durations 1.735/1.400/3.068/1.068 s.
+Video/rep-moment overlays reviewed, live-route cumulative replay stable, local coach evidence
+valid. Expected rep-3 timing flag is absent due to 21.37% reference spread exceeding the 20%
+gate; see apps/api/REVIEW_6942.md. This is a recorded failure case, not successful flag validation.
+B's published frontend remains `5dd6bb4`. Browser verification of this clip is pending.
+
 **Current native backend rehearsal (`4b87e35`):** four fresh real-video extractions through
 TestClient multipart handling return 3/1/1/2 reps, exact matching pose-track analysis, and
 local body-line coaching. Blank-video and corrupt-video/recovery checks pass. No browser

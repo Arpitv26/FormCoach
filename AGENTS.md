@@ -81,6 +81,14 @@ If a contract must change:
 
 ## Current capabilities
 
+**Latest review (supersedes footage-pending notes below):** IMG_6942.MOV is now available,
+human count 4 (normal/normal/slow/fast). Extraction/replay counts 4; sampled video and twelve
+rep-moment overlays agree. Expected rep-3 timing flag is missing: reference spread 21.37%
+exceeds the existing 20% gate. Read apps/api/REVIEW_6942.md. No thresholds/code changed.
+Next: explain skipped comparisons and review timing-reference policy using all five clips;
+do not claim positive detection passed or ask to refilm just to fit the gate. B's published
+branch remains `5dd6bb4`; frontend handoff/redesign is still pending.
+
 Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
 hint remain `not_implemented`. Scores stay null. Upload runs the optional local CV pipeline; coach defaults to a useful local fallback with an optional OpenAI evidence selector.

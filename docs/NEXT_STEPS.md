@@ -41,6 +41,14 @@ is explicitly unsupported. The UI can show multiple interactions, but each API c
 
 ### 1. Validate a real comparison flag
 
+**New result:** IMG_6942 was supplied and reviewed: four counted reps with durations
+1.735 / 1.400 / 3.068 / 1.068 s. Video review agrees with the slow-third/fast-fourth annotation.
+The expected timing flag is missing because the first two durations have 21.37% spread,
+just above the current 20% reference gate. Replay correctly reports `comparison_mismatch`.
+See [REVIEW_6942.md](../apps/api/REVIEW_6942.md). Footage is now available; the next backend
+task is to explain skipped comparisons and review the reference policy, with thresholds
+unchanged during this validation. Positive detection remains unverified. B's PR is still pending.
+
 Use a fixed side-view recording with two similar-paced comfortable reps, followed by a
 noticeably slower third rep. Include a brief straight-arm pause before and after the set.
 Record the human count and identify which rep changed pace. Keep the original file private.

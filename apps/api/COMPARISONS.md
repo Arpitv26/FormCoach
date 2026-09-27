@@ -79,6 +79,11 @@ one-rep push-up fixture and legacy squat fixture remain available. No frontend c
 
 ## Validation and next checkpoint
 
+**New real failure case:** [IMG_6942](REVIEW_6942.md) counts 4/4 and measures the slower third
+rep, but its first two reference durations differ by 21.37%, exceeding the 20% stability gate.
+No timing flag is produced. This recording now supports investigation of missed pace changes;
+positive real-footage detection is still unverified. Thresholds were kept unchanged.
+
 Run from the repository root:
 
 ```bash
