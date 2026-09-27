@@ -11,6 +11,7 @@ from app.analysis.exercises.squat_segmentation import segment_squats
 from app.analysis.geometry import AngleMeasurement, measure_joint_angle
 from app.analysis.placeholder import PlaceholderAnalyzer
 from app.analysis.rep_segmentation import AngleSample, RepSegment, SegmentationResult
+from app.analysis.tracking_feedback import tracking_feedback
 from app.domain.analysis import (
     AnalysisResponse,
     CameraQuality,
@@ -160,7 +161,21 @@ class RuleBasedAnalyzer:
         issues = [issue for rep in reps for issue in rep.issues]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
+        camera_issues.extend(
+            tracking_feedback(
+                frames,
+                side=side,
+                joints=movement.joints,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+                include_body_line=profile.id == "push-up",
+            )
+        )
         limitations = [
+            "Tracking coverage counts received samples, not elapsed time or current readiness. "
+            "Passing landmark checks does not establish camera angle, full-body visibility "
+            "or form quality.",
             f"2D {joint} angles use supplied landmarks; their camera origin cannot be verified.",
             "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
             f"Uncalibrated {profile.id} rules count observed extension-flexion-extension cycles. "
@@ -189,11 +204,6 @@ class RuleBasedAnalyzer:
             )
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
-        if unavailable:
-            camera_issues.append(
-                f"{joint.title()} angle unavailable in {unavailable} of {len(frames)} frames: "
-                "missing, outside-frame, low/unknown visibility, or coincident landmarks."
-            )
         if unavailable or result.tracking_breaks:
             limitations.append(
                 f"Incomplete tracking: {unavailable} unavailable frames and "

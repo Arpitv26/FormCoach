@@ -110,3 +110,9 @@ Next: physical webcam recheck after the fix, live counting integration, and real
 docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.
+
+Tracking-feedback checkpoint: existing cameraQuality.issues now reports angle sample coverage,
+named blocked joints and push-up shoulder/hip/ankle visibility coverage. No schema or counting
+change; all scores/full-body visibility remain null. See apps/api/TRACKING_FEEDBACK.md:
+311 tests pass; saved-clip counts/rep details remain unchanged. Next independent backend
+feature is a validated body-alignment measurement; real positive comparison footage is pending.

@@ -2,6 +2,12 @@
 
 ## New overlay checkpoint — 2026-09-26
 
+**Backend follow-up:** tracking coverage and missing-joint feedback now use the existing
+`cameraQuality.issues` strings. No frontend code or schema change. 311 backend tests,
+lint/format/schema checks pass; four saved real-pose replays retain identical reps,
+measurements, timestamps and flags (counts 3/1/1/2). See apps/api/TRACKING_FEEDBACK.md.
+Remote `frontend` rechecked during this work: still `5dd6bb4`; B's new features are in progress.
+
 [Backend PR #2](https://github.com/Arpitv26/helloHacks/pull/2) and
 [overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3) are now merged.
 Integrated main is `79f8da3`; Computer A fast-forwarded `backend-cv` to that baseline.

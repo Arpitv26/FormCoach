@@ -22,6 +22,7 @@ do not try to finish every stretch feature before the demo.
 | Push-up counting | Implemented | Human counts 3/1/1/2 match; small sample, not a general accuracy benchmark |
 | Rep timestamps and elbow measurements | Implemented | Duration, min/max, excursion, time around minimum angle; 2D observations |
 | Rep comparisons | Implemented, partly validated | Timing/range changes use two stable prior reps; real clips currently have zero flags; positive cases synthetic |
+| Tracking coverage / missing-joint feedback | Implemented | Sample counts and actionable joint reasons; no readiness or quality score |
 | Live analysis API | Implemented | Cumulative snapshots, deterministic replay; B is connecting the browser |
 | Live / uploaded skeleton | Implemented | Browser and portrait/landscape playback checks; actual webcam smoothness needs recheck |
 | Coach API | Implemented | Local summary and optional OpenAI evidence selection; B is building interactions |
@@ -54,6 +55,11 @@ the failure and next fix are recorded honestly. A timing flag does not validate 
 excursion-reduction rule. That still needs its own real example before demonstrating it.
 
 ### 2. Improve measurement availability and tracking feedback
+
+**Completed:** see [TRACKING_FEEDBACK.md](../apps/api/TRACKING_FEEDBACK.md). Existing
+camera-quality text now reports angle/landmark sample coverage and blocked joints. No
+schema change; 311 tests pass and the four saved real-pose replays retain 3/1/1/2 reps.
+The next independent implementation is checkpoint 3; checkpoint 1 still needs new footage.
 
 Expose useful measured coverage/reasons for missing joints instead of only generic limitations.
 Start with the selected shoulder/elbow/wrist; evaluate hip/ankle coverage before body-line work.
@@ -112,7 +118,7 @@ the recorded push-up demo and integration are already reliable and time remains.
 
 ## Validation baseline
 
-Audit rerun: **300 backend tests passed** on 2026-09-26. One existing Starlette TestClient
+Tracking-feedback checkpoint: **311 backend tests passed** on 2026-09-26. One existing Starlette TestClient
 deprecation warning remains. Latest overlay checkpoint: 35 frontend tests plus lint, types,
 contracts and production build passed; rerun those on B's new commits rather than treating
 this earlier result as coverage of work still in progress.

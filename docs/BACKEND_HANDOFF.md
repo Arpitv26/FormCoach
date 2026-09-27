@@ -42,7 +42,8 @@ see apps/api/COACH_SETUP.md and docs/AI_COACH.md. Authored fixture angles are no
 | Completed | Causal timing/range comparison flags with thresholds, reference evidence, and replay tests | Changes to review, not quality scores |
 | Completed | Evidence-only local coach and optional OpenAI selector with simulated HTTP tests | Stable v1.0 shape |
 | Next for A | Real positive-case comparison validation | Requires suitable footage; scoring still deferred |
-| Next for A | Actionable measurement coverage, then one validated body-alignment measurement | Small independent checkpoints; see NEXT_STEPS.md |
+| Completed | Actionable measurement coverage and named missing-joint reasons | Existing camera-quality text; see apps/api/TRACKING_FEEDBACK.md |
+| Next for A | One validated body-alignment measurement | Small independent checkpoint; see NEXT_STEPS.md |
 | Completed | Additive uploaded pose-track response and live browser skeleton (user-authorized A UI work) | See POSE_OVERLAY.md |
 | In progress on B | Live counting UI, coach interactions, comparison presentation | A reviews integrated behavior afterward |
 | Later | Lunge/other exercises | Only after the recorded push-up demo works |

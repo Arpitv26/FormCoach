@@ -142,6 +142,14 @@ HTTP 200 body is a full `AnalysisResponse`. User-selected exercise confidence, a
 camera quality score/fullBodyVisible, and scoring metadata remain null. The six-rep fixture
 is never substituted for a request. Empty issues do not establish good form.
 
+`cameraQuality.issues` also describes sampled-frame tracking coverage and named missing,
+outside-image, unknown/low-visibility joints. Coverage refers to the whole received sequence,
+not elapsed time or current readiness. Push-ups include shoulder/hip/ankle visibility
+coverage on the locked side, without assessing alignment or gating elbow counts on those
+extra joints. These strings are display text, not machine-readable metrics or severity
+codes. Do not parse them or treat the array length as an error count. See
+[tracking feedback](../apps/api/TRACKING_FEEDBACK.md). Response shape remains unchanged.
+
 **Squat measurement policy:** choose the first usable hip-knee-ankle side, preferring left
 if both work in that frame, and keep it for the entire set. Each joint needs visibility at
 least 0.7 and in-frame coordinates; undefined geometry is unavailable. Missing angles or gaps
