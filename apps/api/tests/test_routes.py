@@ -22,6 +22,21 @@ def test_browser_origin_is_allowed(client):
     assert response.headers["access-control-allow-origin"] == "http://localhost:3000"
 
 
+def test_ngrok_browser_header_is_allowed_only_for_configured_origins(client):
+    headers = {
+        "Origin": "http://localhost:3000",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "ngrok-skip-browser-warning,content-type",
+    }
+    response = client.options("/api/v1/videos/analyze-with-pose", headers=headers)
+    assert response.status_code == 200
+    assert "ngrok-skip-browser-warning" in response.headers["access-control-allow-headers"]
+    headers["Origin"] = "https://unapproved.example"
+    response = client.options("/api/v1/videos/analyze-with-pose", headers=headers)
+    assert response.status_code == 400
+    assert "access-control-allow-origin" not in response.headers
+
+
 def test_live_returns_honest_unknowns_and_is_repeatable(client, live_example):
     response = client.post("/api/v1/live/analyze-batch", json=live_example)
     assert response.status_code == 200

@@ -19,7 +19,7 @@ def create_app() -> FastAPI:
         allow_origins=list(get_settings().cors_origins),
         allow_credentials=False,
         allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type"],
+        allow_headers=["Content-Type", "ngrok-skip-browser-warning"],
     )
     for router in (health.router, live.router, videos.router, coach.router):
         app.include_router(router, prefix="/api/v1")

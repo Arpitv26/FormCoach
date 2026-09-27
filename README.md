@@ -19,6 +19,13 @@ No API key, database, Docker, or GPU is needed to run this foundation.
 
 [Watch the 22-second launch video](brag-output/brag.mp4) · [Cover image](brag-output/brag.jpg) · [Editable source and rendering instructions](brag-output/README.md)
 
+## Public demo
+
+[Open FormCoach](https://formcoach-hellohacks.vercel.app) · [Deployment and restart instructions](docs/DEPLOYMENT.md)
+
+The interface is hosted on Vercel. Analysis and chat require the demo Mac and its
+ngrok tunnel to remain running.
+
 ## How it works
 
 Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,

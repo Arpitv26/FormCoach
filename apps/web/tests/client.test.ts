@@ -28,6 +28,30 @@ test("network failures have an actionable message", async () => {
   await assert.rejects(createApiClient("http://localhost:8000", fetcher).health(), /backend is running/);
 });
 
+test("ngrok uploads bypass the browser warning without breaking multipart boundaries", async () => {
+  const file = new File(["video"], "set.mov");
+  const api = createApiClient("https://formcoach.ngrok-free.app", async (_input, init) => {
+    const headers = new Headers(init?.headers);
+    assert.equal(headers.get("ngrok-skip-browser-warning"), "1");
+    assert.equal(headers.has("Content-Type"), false);
+    assert.ok(init?.body instanceof FormData);
+    assert.equal(init.body.get("file"), file);
+    return Response.json({ contractVersion: "1.0" });
+  });
+  await api.analyzeVideoWithPose(file, "lat-pulldown");
+});
+
+test("ngrok coaching retains its JSON content type", async () => {
+  const api = createApiClient("https://formcoach.ngrok-free.app", async (_input, init) => {
+    const headers = new Headers(init?.headers);
+    assert.equal(headers.get("ngrok-skip-browser-warning"), "1");
+    assert.equal(headers.get("Content-Type"), "application/json");
+    return Response.json({ contractVersion: "1.0" });
+  });
+  const { getMockAnalysis } = await import("../src/lib/api/mock");
+  await api.coach({ analysis: getMockAnalysis(), mode: "summary" });
+});
+
 test("incompatible successful responses are rejected", async () => {
   const fetcher: typeof fetch = async () => Response.json({ contractVersion: "2.0" });
   await assert.rejects(

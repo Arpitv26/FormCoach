@@ -24,10 +24,19 @@ export function createApiClient(
     let body;
     const deadline = AbortSignal.timeout(timeoutMs);
     const signal = init?.signal ? AbortSignal.any([init.signal, deadline]) : deadline;
+    // Free ngrok endpoints otherwise return an HTML warning to browser clients.
+    // Keep uploads direct to the API and let the browser set multipart boundaries.
+    let headers = init?.headers;
+    if (/\.(ngrok-free\.app|ngrok-free\.dev|ngrok\.app|ngrok\.io)$/.test(new URL(baseUrl).hostname)) {
+      const tunnelHeaders = new Headers(headers);
+      tunnelHeaders.set("ngrok-skip-browser-warning", "1");
+      headers = tunnelHeaders;
+    }
     try {
       signal.throwIfAborted();
       response = await fetcher(`${baseUrl.replace(/\/$/, "")}/api/v1${path}`, {
         ...init,
+        headers,
         signal,
       });
       body = await response.json().catch((error) => {
