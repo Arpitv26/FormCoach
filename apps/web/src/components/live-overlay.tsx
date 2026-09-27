@@ -30,7 +30,8 @@ export function LiveOverlay({ video, onFrame, onStatus }: {
         // Analysis receives the raw unmirrored frame, before display-only smoothing.
         onFrame?.(frame, player.videoWidth, player.videoHeight, capturedAt ?? performance.now());
         drawPose(surface, filter.update(frame), player.videoWidth, player.videoHeight);
-      }, (next) => { setStatus(next); onStatus?.(next); });
+      }, (next) => { setStatus(next); onStatus?.(next); }, undefined,
+      () => drawPose(surface, filter.update(null), player.videoWidth, player.videoHeight));
   }, [video, onFrame, onStatus]);
   return <>
     <canvas ref={canvas} aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", transform: "scaleX(-1)" }} />
