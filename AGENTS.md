@@ -120,4 +120,12 @@ The body-line checkpoint now adds median shoulder–hip–ankle angles and sampl
 existing per-rep measurements dictionary. Read apps/api/BODY_LINE.md before interpreting them.
 Same side as elbow; full observed rep coverage required; no form cue or score. Seven real-frame
 overlays and independent arithmetic checked; existing counts/times/elbow measurements unchanged.
-Current checks: 335 backend tests, 35 frontend tests, lint/format/contracts/types and build pass.
+Body-line checkpoint checks: 335 backend tests, 35 frontend tests, lint/format/contracts/types and build pass.
+
+Coach follow-up: descriptive body-line evidence is now available to local next-set feedback
+and optional OpenAI selection. It requires consistent angle/side/sample metadata and retains
+2D/median limitations. No alignment correction or score is inferred. Real positive comparison
+footage and B's new frontend commits are still pending; preserve their active UI ownership.
+Coach follow-up checks: 359 backend tests pass, plus lint, formatting and schema checks.
+All four saved analyses pass local next-set HTTP coaching checks; no paid API calls were used.
+Frontend code and contracts are unchanged by this follow-up.

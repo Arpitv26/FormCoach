@@ -8,10 +8,13 @@ No raw video or pose frames go to OpenAI. Computer A owns the implementation.
 
 1. `apps/api/app/services/coach_evidence.py` builds reviewed statements from numeric fields.
    It can describe a supplied score, completed count, push-up timestamps, observed elbow
-   excursion, and corroborated comparisons against the two preceding reps.
+   excursion, corroborated comparisons against the two preceding reps, and descriptive
+   shoulder–hip–ankle medians with consistent sample metadata.
 2. `FallbackCoach` selects up to three statements locally. Review-flagged reps take priority;
    otherwise it starts with the first rep. The legacy scored fixture reports its supplied
    score. It never calculates a score. Local free-form QA is not implemented.
+   For `next_set` without review flags, one available body-line statement can replace the
+   third statement. Existing timing/range review flags retain priority.
 3. Optional `OpenAISelector` uses the Responses API with structured output to select up to
    three statement IDs. `OpenAICoach` validates the IDs, uniqueness, answerability, and response
    completion. The server renders the selected statements; **model-authored prose is never
@@ -32,6 +35,12 @@ irrelevant statement cannot introduce new wording or findings.
 - Rep duration comes from end minus start timestamps. Excursion must match max minus min,
   with angles inside 0–180 degrees. Comparison medians/deltas must agree with the actual
   two preceding reps and declared reference numbers. Inconsistent comparisons are omitted.
+- Body-line evidence requires a 0–180 degree median, integer sample count from 3–1800,
+  usable count equal to total, a consistent same-side elbow range, and no competing opposite-side
+  median. Absent/invalid keys omit the statement rather than repairing the values. The coach
+  cannot recompute the median, sample gaps or visibility from AnalysisResponse alone.
+  It describes unsigned 2D geometry and explicitly says it cannot distinguish hip sag/pike
+  or judge form. Medians can hide brief changes. No corrective alignment cue is generated.
 - The coach does not repeat arbitrary headlines, issue explanations, or cues as advice.
   It prioritizes reps containing issues but describes their numeric measurements only.
 - It does not rerun visibility checks or recalibrate thresholds. Supplied measurements
@@ -64,6 +73,13 @@ statements, mode, and (for QA) the user's question are sent; no session ID, anal
 video, or landmarks. Questions themselves may contain user-entered personal information.
 
 ## Validation checkpoint
+
+- Body-line follow-up: all seven reps in the four saved real analyses produce evidence cards;
+  local `next_set` requests for each clip pass through HTTP handling and retain camera limits.
+  Evidence paths resolve to supplied numeric values. Invalid/partial metadata, opposite-side
+  conflicts, 0/180-degree boundaries, synthetic labels and review-flag priority have tests.
+  A simulated selector verifies body-line QA rendering; no live model-relevance check was
+  made for this new card. No paid API call was used for this checkpoint.
 
 - Local fallback checked through the route against all four saved measured analyses:
   counts 3/1/1/2; no fabricated score or positive form claim.

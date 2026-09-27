@@ -78,6 +78,11 @@ median shoulder–hip–ankle angle. Synthetic tests, saved-clip regressions, in
 arithmetic and seven actual-frame overlays were checked. No form cue/score is implemented.
 The next decision is validation of interpretation, alongside the pending real comparison clip.
 
+**Coaching follow-up completed:** the coach can describe these medians with concrete evidence
+paths, rejecting inconsistent sample/side metadata. Local next-set feedback can include it;
+the optional selector can choose it for QA. This is an explanation of geometry, not a
+validated corrective cue. Real positive comparison validation still needs a new recording.
+
 Candidate: side-view shoulder–hip–ankle alignment during a rep, only when those landmarks
 are reliably observed. First document geometry, units, measurement window, missing-data policy
 and camera limitations. Then test synthetic geometry and inspect matching real frames.

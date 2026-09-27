@@ -37,8 +37,9 @@ and model estimates affect it. Do not rank recordings from different views with 
 The median weights samples equally, not elapsed time. It can hide a short deviation and is
 not peak misalignment, stability, or a fatigue measure. A good/bad threshold and corrective
 cue are deliberately not introduced without separate validation. Existing comparison flags
-still use elbow excursion and counted time only. Existing coach evidence cards do not yet
-explain this new measurement; they continue explaining their supported timing/range evidence.
+still use elbow excursion and counted time only. Coach evidence cards can explain this
+measurement when its side and sample metadata are consistent; see ../../docs/AI_COACH.md.
+That explanation retains these limits and supplies no corrective alignment cue.
 
 ## Frontend handoff
 

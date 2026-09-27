@@ -100,6 +100,10 @@ shoulder–hip–ankle angle and usable/received sample counts. See
 [BODY_LINE.md](../apps/api/BODY_LINE.md). Existing types and endpoints are unchanged; B can
 finish current features without rendering these keys. A can add the dedicated display in
 the later overhaul. Treat missing/null as unknown; no ideal-angle colour coding or form score.
+The backend coach now also explains available body-line measurements via the existing
+`message`/`evidence`/`limitations` fields. No panel contract change is needed. Local `next_set`
+may include one body-line statement when no timing/range review flags need priority;
+OpenAI selection can use it for QA, while local free-form QA remains unsupported.
 
 Read [API_CONTRACT.md](API_CONTRACT.md) and [POSE_OVERLAY.md](POSE_OVERLAY.md).
 Contract version is still **1.0**; `AnalysisResponse` is unchanged.
