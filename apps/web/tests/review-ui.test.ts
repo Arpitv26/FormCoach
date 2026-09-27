@@ -150,10 +150,10 @@ test("quick takeaways preserve kinds and phases across exercises; evidence stays
         createElement(UploadedResults, { analysis, canSeek: true, onSeek: () => {} }),
         createElement(AnalysisDetails, { analysis }))));
       const overview = container.querySelector('[role="tabpanel"]')!;
-      assert.match(overview.querySelector('[aria-label="Keep it up"]')!.textContent!, /Keep that position/);
-      assert.match(overview.querySelector('[aria-label="Try next set"]')!.textContent!, /Setup · Settle before starting/);
+      assert.match(overview.querySelector('[aria-label="Keep it up"]')!.textContent!, /A steady position.*Keep doing this: Keep that position/);
+      assert.match(overview.querySelector('[aria-label="Try next set"]')!.textContent!, /Before your reps · Setup observation.*Next time: Settle before starting/);
       assert.match(overview.querySelector('[aria-label="Worth noticing"]')!.textContent!, /After the set · The set finishes here/);
-      assert.doesNotMatch(overview.textContent!, /A steady position|Setup observation|All observations|Evidence timestamps/);
+      assert.doesNotMatch(overview.textContent!, /All observations|Evidence timestamps/);
       assert.equal(overview.querySelector("details"), null);
       const footer = [...container.querySelectorAll("details")].find(item => item.querySelector("summary")?.textContent === "About this analysis")!;
       assert.equal(footer.open, false);

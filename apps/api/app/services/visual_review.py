@@ -41,6 +41,12 @@ Each must state what
 is visibly observed, cite 2–8 supplied frame INDICES supporting that observation, and
 provide a short specific coaching cue. A cue is guidance, not proof of a defect. Positive
 findings need just as much visible evidence; never manufacture praise for balance.
+Write for someone new to the gym, using everyday words and short, complete sentences.
+The observation explains what their body or the equipment visibly did; the cue explains
+what to keep doing or try next time, without repeating the observation. Name the body part
+and movement instead of vague phrases such as 'stacked position', 'finish line' or
+'organized kick-up'. Explain any necessary exercise term in plain language. Keep the
+useful context and uncertainty; do not turn the observation into a generic slogan.
 Use 'appears' where the view is ambiguous; omit speculative faults instead of using that
 word to justify them. Describe clear patterns directly, including their visible extent.
 Differentiate exercise movement from setup

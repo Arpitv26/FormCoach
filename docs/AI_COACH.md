@@ -24,6 +24,11 @@ User filenames and their GoodForm/BadForm labels are not sent to the model. The 
 discloses the sampled-frame request. Provider retention is governed by the account's terms;
 `store=False` is not a zero-retention promise.
 
+The visual-review prompt requests everyday language for gym beginners: explain what moved
+and give a distinct practical cue, avoiding unexplained gym jargon. The grouped overview
+shows both the original observation and its labeled cue; supporting technical details remain
+in the bottom disclosure. Existing saved observations are not rewritten.
+
 Findings identify an observation, an actionable cue, exercise/setup/finish phase and exact
 sample references. Server code maps frame indices to timestamps and rejects invented
 references. Results and chat label these as AI interpretation, separate from measured

@@ -104,6 +104,8 @@
 .takeawayGroup ul { padding: 0 0 0 40px; margin: 0; list-style: none; }
 .takeawayGroup li + li { margin-top: 18px; }
 .takeawayGroup li p { font-size: .9375rem; line-height: 1.65; text-wrap: pretty; margin: 0; }
+.takeawayGroup li .takeawayCue { margin-top: 8px; color: var(--muted); font-size: .875rem; }
+.takeawayCue > span { color: #f3eff5; font-weight: 550; }
 .phase { color: var(--muted); }
 .watchLink { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 0; border: 0; background: transparent; color: var(--accent); font-size: .8125rem; }
 .watchLink:hover { text-decoration: underline; text-underline-offset: 4px; }

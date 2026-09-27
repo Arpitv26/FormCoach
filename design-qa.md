@@ -2,6 +2,21 @@
 
 final result: passed
 
+## Observation context restored — September 27 follow-up
+
+User approved the grouped layout but wanted the original explanation back. Each visual
+finding now shows its complete observation followed by a secondary, labeled cue: Keep doing
+this / Next time / Takeaway. Identical observation/cue text is not repeated. Setup is labeled
+Before your reps. Layout, groups, playback and bottom diagnostics are retained across exercises.
+The visual-review prompt now asks for everyday body/movement descriptions rather than gym
+jargon; no assessment rules or counts changed. Existing findings remain verbatim; the new
+wording instructions affect future analyses, not stored responses.
+
+Validation: 77 frontend tests, 11 visual-review backend tests, frontend lint/build and backend
+Ruff pass. Desktop and 390/320px Playwright checks pass using prior real analysis responses,
+including seeking and no overflow. Inspected restored-context overview screenshots. No new
+paid AI analysis was run to evaluate the prompt's writing quality.
+
 ## Review simplification — September 27
 
 User screenshots showed repetitive observation cards, prominent diagnostics, ambiguous rep

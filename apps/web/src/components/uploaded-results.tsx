@@ -55,7 +55,8 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
           return <section key={kind} className={styles.takeawayGroup} aria-label={title}>
             <h3><span className={styles.takeawayIcon}><Icon size={17} aria-hidden="true" /></span>{title}</h3>
             <ul>{items.map((finding, index) => <li key={index}>
-              <p>{finding.phase === "setup" && <span className={styles.phase}>Setup · </span>}{finding.phase === "finish" && <span className={styles.phase}>After the set · </span>}{kind === "observation" ? finding.observation : finding.cue}</p>
+              <p>{finding.phase === "setup" && <span className={styles.phase}>Before your reps · </span>}{finding.phase === "finish" && <span className={styles.phase}>After the set · </span>}{finding.observation}</p>
+              {finding.cue.trim() !== finding.observation.trim() && <p className={styles.takeawayCue}><span>{kind === "positive" ? "Keep doing this:" : kind === "adjustment" ? "Next time:" : "Takeaway:"}</span> {finding.cue}</p>}
               {seekEnabled && <button type="button" className={styles.watchLink} aria-label={`Watch moment: ${finding.observation}`} onClick={() => onSeek(finding.evidenceTimestampsMs[0])}><Play size={13} aria-hidden="true" />Watch</button>}
             </li>)}</ul>
           </section>;
