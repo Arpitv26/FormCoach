@@ -20,7 +20,7 @@ export default function Home() {
             <h1 id="live-heading">Your next rep.<br /><span>A little more intention.</span></h1>
             <p>Record a short push-up set from the side. Upload your clip to review counted reps and measured movement.</p>
             <Link className="primary-action" href="/upload">Analyze a push-up video <span aria-hidden="true">↗</span></Link>
-            <p className={styles.availability}>Video analysis needs the updated backend. Camera preview is also available.</p>
+            <p className={styles.availability}>Upload for playback and coaching, or use your camera for live push-up counting.</p>
           </div>
           <div className={styles.featuredExercise}>
             <span className={styles.exerciseNumber} aria-hidden="true">01</span>
@@ -49,7 +49,7 @@ export default function Home() {
 
         <aside className={styles.progressNote} aria-label="Current capabilities">
           <span aria-hidden="true">✦</span>
-          <div><h2>A clear view. Useful evidence.</h2><p>Upload a push-up clip for backend analysis. The camera screen remains a local framing preview; gym analysis and live tracking are still planned.</p></div>
+          <div><h2>A clear view. Useful evidence.</h2><p>Upload a push-up clip for backend analysis. You can also count push-ups with your webcam. Gym analysis remains planned; scores stay unavailable.</p></div>
         </aside>
         <BackendStatus />
         <footer><span>FormCoach · HelloHacks 2026</span><span>Small insights. More intentional movement.</span></footer>

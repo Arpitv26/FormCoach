@@ -59,15 +59,15 @@ export function createApiClient(
     return body as T;
   }
 
-  function post<T>(path: string, body: unknown) {
+  function post<T>(path: string, body: unknown, signal?: AbortSignal) {
     return request<T>(path, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal,
     });
   }
 
   return {
     health: () => request<HealthResponse>("/health"),
-    analyzeLiveBatch: (batch: LiveBatchRequest) => post<AnalysisResponse>("/live/analyze-batch", batch),
+    analyzeLiveBatch: (batch: LiveBatchRequest, signal?: AbortSignal) => post<AnalysisResponse>("/live/analyze-batch", batch, signal),
     analyzeVideo: (file: File, exerciseHint?: string, signal?: AbortSignal) => {
       const form = new FormData();
       form.append("file", file);
@@ -75,7 +75,7 @@ export function createApiClient(
       // The browser supplies the multipart boundary; do not set Content-Type yourself.
       return request<AnalysisResponse>("/videos/analyze", { method: "POST", body: form, signal }, 240_000);
     },
-    coach: (input: CoachRequest) => post<CoachResponse>("/coach", input),
+    coach: (input: CoachRequest, signal?: AbortSignal) => post<CoachResponse>("/coach", input, signal),
     analyzeVideoWithPose: (file: File, exerciseHint: string, signal?: AbortSignal) => {
       const form = new FormData();
       form.append("file", file);

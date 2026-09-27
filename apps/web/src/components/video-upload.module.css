@@ -61,3 +61,18 @@
   .summary dd { margin: 0; }
   .actions > button:first-child { width: 100%; justify-content: center; }
 }
+.overview, .changes { margin: 28px 0; padding-top: 24px; border-top: 1px solid var(--line); }
+.overview > p, .changes > p { margin-top: 12px; }
+.metricSwitch { display: flex; flex-wrap: wrap; gap: 8px; }
+.metricSwitch button { min-height: 44px; padding: 10px 12px; font-size: .8rem; border: 1px solid #3a4a60; border-radius: 8px; background: #172738; color: #dce6f3; }
+.metricSwitch button[aria-pressed="true"] { color: var(--lime); border-color: #aec879; background: #233528; }
+.barList { display: grid; gap: 8px; margin-top: 20px; }
+.barRow { display: grid; grid-template-columns: 48px minmax(20px, 1fr) 85px; gap: 12px; align-items: center; width: 100%; padding: 12px 8px; min-height: 44px; text-align: left; font-size: .8rem; background: #0b1521; border-radius: 8px; }
+.barRow strong { text-align: right; font-weight: 500; }
+.barTrack { display: block; height: 10px; background: #243143; border-radius: 6px; overflow: hidden; }
+.barTrack > span { display: block; height: 100%; background: linear-gradient(90deg, #7a9dff, #90d9e2); border-radius: inherit; }
+.changeCard { margin-top: 16px; padding: 18px; background: #1b2a35; border-left: 3px solid var(--blue); border-radius: 8px; }
+.changeCard h4 { margin: 0 0 10px; }
+.changeCard p { margin: 10px 0; font-size: .85rem; }
+.comparison { margin: 12px 0; padding: 12px 14px; background: #0a1420; border-radius: 8px; font-size: .8rem; }
+.comparison span { display: block; color: var(--muted); margin-top: 6px; }
