@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.incline_press import segment_incline_presses
 from app.analysis.exercises.lat_pulldown import segment_lat_pulldowns
 from app.analysis.exercises.pushup_body_line import add_body_line_measurements
 from app.analysis.exercises.pushup_comparisons import compare_pushup_reps
@@ -43,6 +44,12 @@ MOVEMENTS = {
     "squat": MovementSpec(("hip", "knee", "ankle"), "standing", "standing", segment_squats),
     "push-up": MovementSpec(
         ("shoulder", "elbow", "wrist"), "top", "the straight-arm top position", segment_pushups
+    ),
+    "incline-dumbbell-bench-press": MovementSpec(
+        ("shoulder", "elbow", "wrist"),
+        "top",
+        "a visible bent-arm starting position",
+        segment_incline_presses,
     ),
     "lat-pulldown": MovementSpec(
         ("shoulder", "elbow", "wrist"),
@@ -185,6 +192,15 @@ class RuleBasedAnalyzer:
             comparisons = compare_pushup_reps(reps, samples, side, profile)
             reps = comparisons.reps
             comparison_limitations = comparisons.limitations
+        if profile.id == "incline-dumbbell-bench-press":
+            for rep in reps:
+                rep.key_moments.append(
+                    KeyMoment(
+                        timestamp_ms=rep.end_ms,
+                        type="press_completed",
+                        label="Press reached the extension zone",
+                    )
+                )
         issues = [issue for rep in reps for issue in rep.issues]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
@@ -205,7 +221,7 @@ class RuleBasedAnalyzer:
             "or form quality.",
             f"2D {joint} angles use supplied landmarks; their camera origin cannot be verified.",
             "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
-            f"Uncalibrated {profile.id} rules count observed extension-flexion-extension cycles. "
+            f"Uncalibrated {profile.id} rules count observed movement under its selected profile. "
             "Shallow, fast, or interrupted attempts may not count; this is not a form judgment.",
             "Scores, biomechanical form assessment, and automatic exercise recognition "
             "are not implemented. "
@@ -262,6 +278,17 @@ class RuleBasedAnalyzer:
                 "swing, bilateral symmetry and form quality are not assessed. "
                 "Automatic rep comparison flags are not implemented for this exercise."
             )
+        if profile.id == "incline-dumbbell-bench-press":
+            limitations.append(
+                "Incline-press counter v1 confirms bent elbows <=100 degrees before each "
+                "press, starts timing on the confirmed bent run and completes at >=150 degrees, "
+                "with 100 ms raw dwell plus median confirmation. These are uncalibrated "
+                "counting zones, not form or lockout targets. Timing and elbow excursion "
+                "cover the bent-to-extended interval, including pauses/confirmation delay; "
+                "lowering rearms the counter but is not part of that interval. "
+                "Dumbbells, bench angle, bilateral symmetry and form are not evaluated. "
+                "Automatic rep comparison flags are not implemented for this exercise."
+            )
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable or result.tracking_breaks:
@@ -284,7 +311,13 @@ class RuleBasedAnalyzer:
             status = "partial"
             if (
                 is_final
-                and result.current_phase == movement.ready_phase
+                and (
+                    result.current_phase == movement.ready_phase
+                    or (
+                        profile.id == "incline-dumbbell-bench-press"
+                        and result.current_phase == "bottom"
+                    )
+                )
                 and not unavailable
                 and not result.tracking_breaks
             ):
@@ -292,7 +325,12 @@ class RuleBasedAnalyzer:
             headline = (
                 f"{len(reps)} completed {profile.id} reps observed. Scores are not available yet."
             )
-        if is_final and result.current_phase in {"descent", "bottom", "ascent"}:
+        unfinished = (
+            {"ascent"}
+            if profile.id == "incline-dumbbell-bench-press"
+            else {"descent", "bottom", "ascent"}
+        )
+        if is_final and result.current_phase in unfinished:
             limitations.append("The set ended during an unfinished repetition; it was not counted.")
 
         if issues:

@@ -11,10 +11,12 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 
 ## Gym exercise IDs (2026-09-27)
 
-`lat-pulldown` now supports upload and normalized-pose analysis. Selected exercise IDs
+`lat-pulldown` and `incline-dumbbell-bench-press` support upload and normalized-pose analysis. Selected exercise IDs
 are strings, so this adds no schema fields. Existing elbow measurement keys and key moments
 retain their 2D meanings; the lat-pulldown counting policy is in apps/api/GYM_EXERCISES.md.
-Push-up comparisons/body-line rules do not apply to lat pulldowns. Scores stay null.
+Incline-press duration covers bent arms to extension, including pauses; its new
+`press_completed` key moment marks extension. Push-up comparisons/body-line rules
+do not apply to gym exercises. Scores stay null.
 The frontend uses the same ID; old servers reject this hint until updated.
 
 ## Additive movement observations (2026-09-26)

@@ -33,6 +33,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
       <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{heading}</h2></div></div>
       {!measured && <p className={styles.notice}>This response is {analysis.provenance.kind} data, not verified measurements from your movement. Timestamp playback is disabled.</p>}
       <p>{analysis.summary.totalReps == null ? "We couldn’t reliably count this set." : `We detected ${analysis.summary.totalReps} completed reps.`}</p>
+      {analysis.exercise?.id === "incline-dumbbell-bench-press" && <p className="muted small">Rep times run from bent arms to extension, including pauses. Lowering prepares the next rep.</p>}
       <dl className={styles.summary}>
         <div><dt>Counted reps</dt><dd>{analysis.summary.totalReps ?? "Unavailable"}</dd></div>
         <div><dt>{live ? "Set length" : "Video duration"}</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>

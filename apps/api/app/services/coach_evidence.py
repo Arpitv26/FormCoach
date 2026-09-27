@@ -6,6 +6,14 @@ from statistics import median
 
 from app.domain.models import AnalysisResponse, CoachRequest, CoachResponse
 
+GYM_CONTEXT = {
+    "lat-pulldown": " The selected exercise is lat pulldown.",
+    "incline-dumbbell-bench-press": (
+        " The selected exercise is incline dumbbell bench press; timings cover "
+        "bent arms to extension, including pauses."
+    ),
+}
+
 
 @dataclass(frozen=True)
 class EvidenceCard:
@@ -157,22 +165,22 @@ def evidence_cards(
             )
         )
     count = analysis.summary.total_reps
+    exercise_context = GYM_CONTEXT.get(analysis.exercise.id, "") if analysis.exercise else ""
     if count is not None:
         cards.append(
             EvidenceCard(
                 "count",
-                f"The supplied analysis counts {count} completed rep(s)."
-                + (
-                    " The selected exercise is lat pulldown."
-                    if analysis.exercise and analysis.exercise.id == "lat-pulldown"
-                    else ""
-                ),
+                f"The supplied analysis counts {count} completed rep(s)." + exercise_context,
                 ("summary.totalReps", "exercise.id")
-                if analysis.exercise and analysis.exercise.id == "lat-pulldown"
+                if exercise_context
                 else ("summary.totalReps",),
             )
         )
-    if analysis.exercise is None or analysis.exercise.id not in {"push-up", "lat-pulldown"}:
+    if analysis.exercise is None or analysis.exercise.id not in {
+        "push-up",
+        "lat-pulldown",
+        "incline-dumbbell-bench-press",
+    }:
         return cards
     # Bound the model input, but don't omit the very rep the user asked about.
     ordered = [

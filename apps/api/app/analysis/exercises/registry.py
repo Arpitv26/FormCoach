@@ -1,4 +1,5 @@
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.incline_press import INCLINE_PRESS_PROFILE
 from app.analysis.exercises.lat_pulldown import LAT_PULLDOWN_PROFILE
 from app.analysis.exercises.lunge import LUNGE_PROFILE
 from app.analysis.exercises.pushup import PUSHUP_PROFILE
@@ -24,6 +25,7 @@ PROFILES = {
         SQUAT_PROFILE,
         PUSHUP_PROFILE,
         LAT_PULLDOWN_PROFILE,
+        INCLINE_PRESS_PROFILE,
         LUNGE_PROFILE,
         planned_profile("barbell-squat", "Barbell squat"),
         planned_profile("bicep-curl", "Bicep curl"),

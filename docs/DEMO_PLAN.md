@@ -4,8 +4,8 @@
 
 The demo is **live push-ups plus uploaded incline dumbbell bench press, cable lateral raise
 and lat pulldown**; triceps is removed. A owns both apps. Fourteen private gym clips are now
-available. Lat pulldown is the first implemented gym checkpoint; incline and lateral raise
-are still being reviewed. See [gym exercise evidence](../apps/api/GYM_EXERCISES.md).
+available. Lat pulldown and incline press upload checkpoints are implemented; lateral raise
+is still being reviewed. See [gym exercise evidence](../apps/api/GYM_EXERCISES.md).
 The earlier plan below is historical where it conflicts with this direction.
 
 

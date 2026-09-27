@@ -93,3 +93,41 @@ and badpushups' five independent observations remain intact.
 First checkpoint: **463 backend tests / 53 frontend tests pass**. One real OpenAI request
 correctly answered the third lat-pulldown rep duration as 2.87 seconds (7.87–10.74 s) with
 matching evidence paths. This verifies one answer, not general coaching accuracy.
+
+## Second milestone: incline dumbbell bench press
+
+Wire ID `incline-dumbbell-bench-press` now supports the same selection/upload/results/coach
+path. New `segment_incline_presses` observes bent arms <=100°, then a press through >=110°
+to >=150° extension; 100 ms raw dwell plus median confirmation. Extension completes a rep;
+returning to bent arms rearms it. A static overhead hold or lowering alone cannot add reps.
+Missing landmarks and >300 ms gaps reset an unfinished press. Intervals last 300–15000 ms.
+
+Timing starts on the first sample of the confirmed bent-arm run, not at exact anatomical
+lifting onset. Min/max/excursion begin at bent-position confirmation and end at confirmed
+extension. Bottom pauses are included; lowering before the bent zone is excluded. Do not
+compare these interval durations with full push-up or lat-pulldown cycles. Thresholds are
+engineering heuristics, not depth or lockout targets. No weight/bench-angle/form assessment.
+
+Selected export `inclinedDumbellChestPressGoodFormAngledView2-1080p.mov`: 300/300 usable
+selected-left-elbow samples, **7 presses**. Seven bent/extended video pairs were reviewed;
+confirmed extension times are 1.133, 3.868, 6.337, 9.003, 12.138, 14.740 and 18.008 s.
+Fresh native multipart upload returns the same seven intervals and 300 playback poses.
+This is a development check; a human good-form count was not supplied. Another right-side
+good-form export yields seven, but its full correspondence has not yet been independently reviewed.
+
+Known annotated failures on BadForm exports: angled **3/4**, left side **5/7**, right side
+**3/6**. Preserve these failures. A different count is not a bad-form detection. Interrupted
+tracking and insufficient sustained zone evidence require clip-specific review; do not
+force counts or claim that every human rep met this narrower counter definition.
+
+Checks: **485 backend tests**, including multi-rate/cumulative press sequences, both sides,
+missing/unknown/low/offscreen landmarks, gaps, no rearming, spikes, long holds, expired and
+unfinished presses, coach naming and extension completion. Existing push-up/lat tests pass.
+Frontend lint/types pass; browser verification remains blocked by unavailable computer use.
+
+Human descriptions of intended changes: press — elbows farther out, dumbbells not brought
+together at the top, possibly legs lifted at the end of one clip; pulldown — larger backward/
+forward torso swing and overhead stretch; lateral raise — cross-body swing from low near
+the opposite knee to above shoulder/head level, with torso turning/movement. These are
+annotations for comparison, not implemented detections. The pose model does not track
+dumbbells, and a single view cannot establish elbow tuck or axial rotation reliably.

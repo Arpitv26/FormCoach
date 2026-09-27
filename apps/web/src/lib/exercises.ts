@@ -13,7 +13,7 @@ export const exercises = [
     slug: "incline-dumbbell-bench-press",
     name: "Incline dumbbell bench press",
     group: "gym",
-    backendHint: null,
+    backendHint: "incline-dumbbell-bench-press",
     equipment: "Incline bench · dumbbells",
     framingTitle: "Leave room above the bench",
     framingText: "Include the bench, your upper body, and both dumbbells throughout their movement. Keep the camera clear of the equipment and walkway.",
