@@ -38,3 +38,7 @@ formcoach-live-*.json
 
 # User-approved public hero footage; private analysis recordings stay ignored.
 !apps/web/public/media/training-hero.mp4
+
+# Approved FormCoach launch film and its public source footage.
+!brag-output/brag.mp4
+!brag-output/composition/assets/training-hero.mp4

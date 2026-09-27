@@ -15,6 +15,10 @@ See [video setup](apps/api/VIDEO_SETUP.md)
 and [coach setup](apps/api/COACH_SETUP.md).
 No API key, database, Docker, or GPU is needed to run this foundation.
 
+## Launch video
+
+[Watch the 22-second launch video](brag-output/brag.mp4) · [Cover image](brag-output/brag.jpg) · [Editable source and rendering instructions](brag-output/README.md)
+
 ## How it works
 
 Our goal is to turn an ordinary camera into a movement coach. A user performs an exercise,

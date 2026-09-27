@@ -1,0 +1,11 @@
+# Local preview and render caches
+composition/.hyperframes/
+composition/.waveform-cache/
+composition/.thumbnails/
+composition/snapshots/
+composition/renders/
+qa/
+
+# Unused full-track source and reference still retained locally
+composition/assets/music-source.mp3
+composition/assets/training-hero-poster.jpg
