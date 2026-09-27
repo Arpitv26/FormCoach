@@ -1,5 +1,14 @@
 # Frontend handoff — Computer A after B’s PR #4
 
+## September 27: Dashboard / Upload / Live implementation
+
+Read [UI_IMPLEMENTATION.md](UI_IMPLEMENTATION.md) for the new shared design, tabbed review,
+device-local workout log, reanalysis/duplicate prevention and validation. Install the updated
+lockfile with `npm ci` in `apps/web`. The camera/upload/coach controllers and API contracts
+remain intact. Cross-set trends are withheld because analyzer revisions are not reported.
+The earlier sections below record historical checkpoints; browser QA is still pending because
+computer use cannot start. Do not treat DOM interaction tests as visual or camera validation.
+
 ## September 27: gym upload and visual-review integration
 
 A owns both apps. Integrate the full current backend-cv checkpoint, including contracts and

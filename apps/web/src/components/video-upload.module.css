@@ -74,3 +74,5 @@
 .barTrack > span { display: block; height: 100%; background: #7b9274; border-radius: inherit; }
 @media (max-width: 900px) { .workspace, .reviewWorkspace { grid-template-columns: minmax(0, 1fr); } .reviewWorkspace .uploadPanel { position: static; } .guide { display: none; } }
 @media (max-width: 520px) { .uploadPanel, .results { padding: 20px 16px; } .measurements { grid-template-columns: 1fr; gap: 10px; } .steps { gap: 20px; } .finding { padding: 16px; } .summary { gap: 24px; } .summary > div + div { padding-left: 24px; } .player { max-height: 48svh; } }
+
+.reviewColumn { min-width: 0; }

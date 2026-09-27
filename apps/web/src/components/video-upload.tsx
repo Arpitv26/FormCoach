@@ -6,11 +6,13 @@ import { exercises, type ExerciseOption } from "@/lib/exercises";
 import { api } from "@/lib/api/client";
 import { emptyUploadState, UploadSession } from "@/lib/video/upload-session";
 import { PlaybackOverlay } from "./playback-overlay";
+import { SaveSet } from "./save-set";
 import { UploadedResults } from "./uploaded-results";
 import styles from "./video-upload.module.css";
 
-export function VideoUpload({ exercise }: { exercise: Extract<ExerciseOption, { backendHint: string }> }) {
+export function VideoUpload({ exercise, replaceId }: { exercise: Extract<ExerciseOption, { backendHint: string }>; replaceId?: string }) {
   const router = useRouter();
+  const [logId, setLogId] = useState(replaceId ?? "");
   const [state, setState] = useState(emptyUploadState);
   const session = useRef<UploadSession | null>(null);
   const video = useRef<HTMLVideoElement | null>(null);
@@ -39,12 +41,13 @@ export function VideoUpload({ exercise }: { exercise: Extract<ExerciseOption, { 
   const selection = state.selection;
   return <>
     <div className="page-intro"><p className="eyebrow">Upload workspace</p><h1>{state.result ? exercise.name : "Bring your set into focus."}</h1><p className="muted">{state.result ? "Watch your movement. Explore what stood out." : "Choose your exercise and a short video. We’ll take it from there."}</p></div>
+    {replaceId && <p className="notice">Reanalyzing a saved upload. Choose the original clip, then select Update saved set after reviewing the new results. Your saved summary stays unchanged until then.</p>}
     <ol className={styles.steps} aria-label="Upload progress">{["Choose", "Analyze", "Review"].map((label, index) => <li key={label} aria-current={(state.result ? 2 : busy ? 1 : 0) === index ? "step" : undefined}><span>{index + 1}</span>{label}</li>)}</ol>
     <div className={state.result ? styles.reviewWorkspace : styles.workspace}>
       <section className={styles.uploadPanel} aria-labelledby="clip-heading">
         <div className="section-heading"><h2 id="clip-heading">{state.result ? "Your video" : "Choose a video"}</h2>{selection && <button ref={chooser} className={styles.secondary} onClick={() => input.current?.click()}>Replace clip</button>}</div>
         <div className={styles.exerciseSelect}><label className={styles.fileLabel} htmlFor="upload-exercise">Exercise</label><select id="upload-exercise" value={exercise.slug} onChange={(event) => router.push(`/upload?exercise=${event.target.value}`)}>{exercises.map(item => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></div>
-        <input tabIndex={-1} ref={input} id="video-file" className={styles.fileInput} type="file" accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm" aria-label="Choose your video" aria-describedby="file-help" onChange={event => { const file = event.currentTarget.files?.[0]; if (file) { session.current?.select(file); setPlaybackMessage(""); } event.currentTarget.value = ""; }} />
+        <input tabIndex={-1} ref={input} id="video-file" className={styles.fileInput} type="file" accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm" aria-label="Choose your video" aria-describedby="file-help" onChange={event => { const file = event.currentTarget.files?.[0]; if (file) { setLogId(replaceId ?? crypto.randomUUID()); session.current?.select(file); setPlaybackMessage(""); } event.currentTarget.value = ""; }} />
         {selection ? <>
           <div className={styles.fileInfo}><span>{selection.file.name}</span><span>{(selection.file.size / 1024 / 1024).toFixed(1)} MiB</span></div>
           <div className={styles.playerStage}><video key={selection.url} ref={video} className={styles.player} src={selection.url} controls playsInline preload="metadata" aria-label={`Preview of ${selection.file.name}`} onLoadedMetadata={event => { const player = event.currentTarget; session.current?.metadata(selection.url, player.duration, player.videoWidth, player.videoHeight); }} onError={() => session.current?.previewFailed(selection.url)} /><PlaybackOverlay video={video} track={state.poseTrack} enabled={showSkeleton && state.preview === "ready" && state.result?.provenance.kind === "measured"} /></div>
@@ -60,7 +63,7 @@ export function VideoUpload({ exercise }: { exercise: Extract<ExerciseOption, { 
         {!state.result && <p className="muted small">Analyze sends your video to FormCoach. When AI visual review is enabled, sampled frames are also sent to OpenAI.</p>}
         <details className={styles.evidence}><summary>Filming tips</summary><p><strong>{exercise.framingTitle}.</strong> {exercise.framingText}</p><p className="muted small">Keep the camera still, use even lighting, and avoid people crossing in front of you.</p></details>
       </section>
-      {state.result ? <UploadedResults key={state.result.sessionId} analysis={state.result} canSeek={state.preview === "ready"} onSeek={seek} /> : <aside className={styles.guide}><span className={styles.guideNumber}>01 — 03</span><h2>A little setup.<br />A useful perspective.</h2><ol><li><strong>Choose your exercise</strong><span>One workspace for your push-ups and supported gym sets.</span></li><li><strong>Analyze your clip</strong><span>Review counted reps and the movement we can observe.</span></li><li><strong>Make it yours</strong><span>Explore your reps, ask your coach, and save the set to your log.</span></li></ol></aside>}
+      {state.result ? <div className={styles.reviewColumn}><UploadedResults key={state.result.sessionId} analysis={state.result} canSeek={state.preview === "ready"} onSeek={seek} /><SaveSet analysis={state.result} logId={logId} replacing={!!replaceId && logId === replaceId} onSaved={setLogId} /></div> : <aside className={styles.guide}><span className={styles.guideNumber}>01 — 03</span><h2>A little setup.<br />A useful perspective.</h2><ol><li><strong>Choose your exercise</strong><span>One workspace for your push-ups and supported gym sets.</span></li><li><strong>Analyze your clip</strong><span>Review counted reps and the movement we can observe.</span></li><li><strong>Make it yours</strong><span>Explore your reps, ask your coach, and save the set to your log.</span></li></ol></aside>}
     </div>
   </>;
 }

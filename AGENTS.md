@@ -84,6 +84,15 @@ If a contract must change:
 
 ## Current capabilities
 
+**September 27 UI implementation:** Dashboard / Upload / Live now share a light sage design.
+Uploads and finalized live sets can explicitly save summaries to a versioned device-local
+workout log; saved reviews have no video/pose track and clearly disable playback. Review uses
+Overview / Reps / Coach tabs and retains set-scoped chat. Read docs/UI_IMPLEMENTATION.md
+for persistence semantics, checks and the browser-verification blocker. Analyzer revisions
+are absent from the API, so timing/movement values stay per-set rather than becoming a
+cross-version progress trend. No analyzer/API changes. Original handoff/planning files
+remain uncommitted. Physical live and actual-browser layout/playback checks remain open.
+
 **Visual-review overcorrection follow-up:** normal pulldown feedback was too similar to the
 changed clip. Removed the supplied fault example and correction quota; review now weighs
 within-rep magnitude, counterevidence and sparse-sampling limits. Filenames are never sent

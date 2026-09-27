@@ -9,6 +9,7 @@ import type { PoseFrame } from "@/lib/api/types";
 import type { TrackingStatus } from "@/lib/pose/live";
 import { LiveSession, initialLiveState } from "@/lib/live/session";
 import { LiveSessionPanel } from "./live-session-panel";
+import { SaveSet } from "./save-set";
 import { UploadedResults } from "./uploaded-results";
 import { LiveOverlay } from "./live-overlay";
 import styles from "./webcam-setup.module.css";
@@ -137,7 +138,8 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
           <button className="primary-action" onClick={() => { counterRef.current?.reset(); enableCamera(); }}>Start a new set</button>
           <details><summary>Count look wrong?</summary><p>Save joint positions from this set so we can replay the counter. No video or API key is included. Keep this file private.</p><button className={styles.secondaryButton} onClick={downloadCapture}>Download troubleshooting data</button></details>
         </div>
-        <UploadedResults analysis={liveState.result} canSeek={false} onSeek={() => {}} />
+        <UploadedResults key={liveState.result.sessionId} analysis={liveState.result} canSeek={false} onSeek={() => {}} />
+        <SaveSet analysis={liveState.result} logId={liveState.result.sessionId} />
       </>}
       </div>
 

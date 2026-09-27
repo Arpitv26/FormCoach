@@ -13,6 +13,7 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
   const session = useRef<CoachSession | null>(null);
   const conversation = useRef<HTMLDivElement>(null);
   const id = useId();
+  const [lastRequest, setLastRequest] = useState<{ mode: CoachRequest["mode"]; prompt: string } | null>(null);
   useEffect(() => {
     if (conversation.current) conversation.current.scrollTop = conversation.current.scrollHeight;
   }, [state.exchanges]);
@@ -23,6 +24,7 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
   }, [analysis]);
   function submit(mode: CoachRequest["mode"], prompt = question) {
     if (state.busy) return;
+    setLastRequest({ mode, prompt });
     void session.current?.submit(mode, prompt);
     if (mode === "qa" && prompt.trim()) setQuestion("");
   }
@@ -58,7 +60,7 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
       </div>
     </form>
     <div className={styles.feedback}><p role="status" className="small">{state.busy ? "Coach is thinking…" : ""}</p>{state.busy && <button type="button" onClick={() => session.current?.cancel()}>Cancel</button>}</div>
-    {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
+    {state.error && <div className={styles.error}><p role="alert">{state.error}</p>{lastRequest && <button type="button" onClick={() => { const request = lastRequest; if (request) submit(request.mode, request.prompt); }}>Retry last question</button>}</div>}
     <p className="muted small">{analysis.visualReview?.status === "complete" ? "Based on measured movement and an AI review of sampled video frames." : "Based on this set’s measurements; no completed AI visual review is attached."}</p>
   </section>;
 }

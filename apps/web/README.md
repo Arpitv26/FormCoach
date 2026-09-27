@@ -1,5 +1,11 @@
 # FormCoach web — Computer B
 
+**Current UI checkpoint:** Computer A has implemented Dashboard / Upload / Live with a
+shared light theme, tabbed review and explicit device-local saved sets. See
+[UI_IMPLEMENTATION.md](../../docs/UI_IMPLEMENTATION.md) for current behavior, persistence,
+tests and pending browser checks. Run `npm ci` for the updated dependencies. The older
+feature descriptions below are historical where they conflict with that checkpoint.
+
 Read [AGENTS.md](../../AGENTS.md), [frontend handoff](../../docs/FRONTEND_HANDOFF.md),
 [API contract](../../docs/API_CONTRACT.md), and [beginner setup](../../docs/BEGINNER_SETUP.md).
 Use Node 24. Frontend feature work stays in `apps/web`; the backend owns rep math.
