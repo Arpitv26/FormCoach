@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.pushup_body_line import add_body_line_measurements
 from app.analysis.exercises.pushup_comparisons import compare_pushup_reps
 from app.analysis.exercises.pushup_measurements import pushup_measurements
 from app.analysis.exercises.pushup_segmentation import segment_pushups
@@ -11,6 +12,7 @@ from app.analysis.exercises.squat_segmentation import segment_squats
 from app.analysis.geometry import AngleMeasurement, measure_joint_angle
 from app.analysis.placeholder import PlaceholderAnalyzer
 from app.analysis.rep_segmentation import AngleSample, RepSegment, SegmentationResult
+from app.analysis.tracking_feedback import tracking_feedback
 from app.domain.analysis import (
     AnalysisResponse,
     CameraQuality,
@@ -155,12 +157,37 @@ class RuleBasedAnalyzer:
         ]
         result = movement.segment(samples)
         reps = [_rep_result(rep, index, side, joint) for index, rep in enumerate(result.reps, 1)]
+        comparison_limitations = []
         if profile.id == "push-up" and side:
-            reps = compare_pushup_reps(reps, samples, side, profile)
+            reps = add_body_line_measurements(
+                reps,
+                frames,
+                side=side,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+            )
+            comparisons = compare_pushup_reps(reps, samples, side, profile)
+            reps = comparisons.reps
+            comparison_limitations = comparisons.limitations
         issues = [issue for rep in reps for issue in rep.issues]
         unavailable = sum(measurement.angle_deg is None for measurement in measurements)
         camera_issues = ["Camera orientation and full-body visibility have not been evaluated."]
+        camera_issues.extend(
+            tracking_feedback(
+                frames,
+                side=side,
+                joints=movement.joints,
+                image_width=image_width,
+                image_height=image_height,
+                minimum_visibility=profile.minimum_visibility,
+                include_body_line=profile.id == "push-up",
+            )
+        )
         limitations = [
+            "Tracking coverage counts received samples, not elapsed time or current readiness. "
+            "Passing landmark checks does not establish camera angle, full-body visibility "
+            "or form quality.",
             f"2D {joint} angles use supplied landmarks; their camera origin cannot be verified.",
             "Use a side view. Camera orientation is not validated; angles are not calibrated 3D.",
             f"Uncalibrated {profile.id} rules count observed extension-flexion-extension cycles. "
@@ -176,6 +203,14 @@ class RuleBasedAnalyzer:
             )
         if profile.id == "push-up":
             limitations.append(
+                "Body-line angles are sample medians of raw 2D shoulder-hip-ankle angles "
+                "over each counted rep, using the same side as the elbow. Require at least "
+                "three usable samples, both rep boundaries, no unavailable angles and no "
+                "gap over 300 ms; otherwise the median is null. This unsigned angle cannot "
+                "distinguish hip sag from pike, measure spinal posture or establish good form. "
+                "A median can hide brief deviations; camera orientation is not validated."
+            )
+            limitations.append(
                 "Elbow excursion is the observed 2D maximum minus minimum from confirmed "
                 "descent through completion, not a calibrated full range-of-motion score. "
                 "Time to/from minimum splits the counted interval at its first lowest angle; "
@@ -184,16 +219,13 @@ class RuleBasedAnalyzer:
             limitations.append(
                 "Comparison flags are uncalibrated review heuristics, not bad-form or fatigue "
                 "detections. Each rep needs two preceding completed reps with continuous tracking; "
-                "unstable reference metrics are skipped. Camera/view stability is not evaluated. "
+                "timing must differ substantially from both references in the same direction. "
+                "Unstable range references are skipped. Camera/view stability is not evaluated. "
                 "Absent comparison keys mean unavailable, not no change."
             )
+            limitations.extend(comparison_limitations)
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
-        if unavailable:
-            camera_issues.append(
-                f"{joint.title()} angle unavailable in {unavailable} of {len(frames)} frames: "
-                "missing, outside-frame, low/unknown visibility, or coincident landmarks."
-            )
         if unavailable or result.tracking_breaks:
             limitations.append(
                 f"Incomplete tracking: {unavailable} unavailable frames and "

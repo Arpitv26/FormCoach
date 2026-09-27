@@ -15,7 +15,7 @@ PUSHUP_PROFILE = ExerciseProfile(
         "right_hip",
         "right_ankle",
     ),
-    camera_orientation="Side view; elbow flexion only until body-line metrics are validated.",
+    camera_orientation="Side view; elbow and descriptive body-line angles, no form scorer.",
     phases=("top", "descent", "bottom", "ascent"),
     metrics=("rangeOfMotion", "tempo", "stability"),
     rules=("PUSHUP_REP_DURATION_CHANGED", "PUSHUP_ELBOW_EXCURSION_REDUCED"),
@@ -26,7 +26,6 @@ PUSHUP_PROFILE = ExerciseProfile(
         # Review thresholds, not targets or a validated definition of correct form.
         "minimumDurationChangeMs": 500,
         "durationChangeFraction": 0.30,
-        "maximumReferenceDurationSpreadFraction": 0.20,
         "minimumExcursionReductionDeg": 15,
         "excursionReductionFraction": 0.20,
         "maximumReferenceExcursionSpreadDeg": 10,

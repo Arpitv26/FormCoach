@@ -127,6 +127,7 @@ Open a NEW Terminal window. Return to the repository root from step 1, then:
 cd apps/web
 npm ci
 cp .env.example .env.local
+npm run pose:setup
 ```
 
 `npm ci` downloads the exact versions recorded in `package-lock.json`. It ends with an
@@ -135,6 +136,9 @@ added/audited packages summary. The frontend reads **apps/web/.env.local**; keep
 ```dotenv
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
+
+Copy `.env.example` only on first setup; preserve an existing `.env.local`.
+`pose:setup` downloads the browser pose model once and prints `Browser pose assets ready`.
 
 The two apps run independently. Computer B can skip backend setup entirely while working
 on the mock dashboard. The health check will simply report that the API is unavailable.
@@ -150,7 +154,8 @@ npm run dev
 Success shows a local URL and `Ready`. Open **http://localhost:3000**.
 You should see **FormCoach** with push-up upload and camera-preview choices. Open
 **Connection tools** near the bottom, then **Check backend health**: it should show
-`formcoach-api: ok` if Terminal 1 is running. Camera preview does not track/count movement.
+`formcoach-api: ok` if Terminal 1 is running. The camera shows a live skeleton after model
+setup; live counting is being connected by B (see NEXT_STEPS.md for the current checkpoint).
 For real recorded-video analysis, follow apps/api/VIDEO_SETUP.md, then open
 http://localhost:3000/upload and select a push-up clip.
 

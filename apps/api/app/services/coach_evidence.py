@@ -14,6 +14,44 @@ class EvidenceCard:
     paths: tuple[str, ...]
 
 
+def body_line_card(analysis: AnalysisResponse, index: int, side: str) -> EvidenceCard | None:
+    """Describe supplied geometry only when its side and sample metadata are consistent.
+
+    Called after the matching elbow range has been validated. The coach has no raw frames
+    to recheck visibility, gaps or the median itself; this is not measurement authentication.
+    """
+    rep = analysis.reps[index]
+    key = f"median{side}ShoulderHipAnkleAngleDeg"
+    other_side = "Right" if side == "Left" else "Left"
+    angle = rep.measurements.get(key)
+    total = rep.measurements.get("bodyLineSampleCount")
+    usable = rep.measurements.get("bodyLineUsableSampleCount")
+    if (
+        angle is None
+        or not 0 <= angle <= 180
+        or total is None
+        or not 3 <= total <= 1800
+        or total != int(total)
+        or usable != total
+        or rep.measurements.get(f"median{other_side}ShoulderHipAnkleAngleDeg") is not None
+    ):
+        return None
+    path = f"reps.{index}"
+    return EvidenceCard(
+        f"rep-{rep.rep_number}-{side.lower()}-body-line",
+        f"Rep {rep.rep_number} reports a median {side.lower()} shoulder–hip–ankle angle "
+        f"of {angle:.1f}° across {int(total)} usable samples. "
+        "This unsigned 2D angle cannot distinguish hip sag from pike or judge form. "
+        "The median can hide brief changes; camera view and pose estimates affect it.",
+        (
+            f"{path}.repNumber",
+            f"{path}.measurements.{key}",
+            f"{path}.measurements.bodyLineSampleCount",
+            f"{path}.measurements.bodyLineUsableSampleCount",
+        ),
+    )
+
+
 def comparison(
     analysis: AnalysisResponse, index: int, key: str, current: float
 ) -> tuple[str, tuple[str, ...]]:
@@ -143,6 +181,9 @@ def evidence_cards(analysis: AnalysisResponse) -> list[EvidenceCard]:
                     (f"{path}.repNumber", *(f"{path}.measurements.{key}" for key in keys), *paths),
                 )
             )
+            body_line = body_line_card(analysis, index, side)
+            if body_line is not None:
+                cards.append(body_line)
     return cards
 
 

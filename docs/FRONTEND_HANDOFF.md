@@ -1,22 +1,24 @@
-# Frontend handoff — Computer B
+# Frontend handoff — Computer A after B’s PR #4
 
-**Current checkpoint: 2026-09-26, including the camera logging/smoothing fix `dde10e2`.**
+**Current checkpoint: 2026-09-26, PR #4 reviewed and merged (`767a98b`).**
 Read this file and AGENTS.md before continuing. This replaces the old bootstrap handoff.
 The demo is **prerecorded push-ups**. Squat JSON is a legacy fixture, not the demo.
 
 ## Get all the work, in order
 
-1. Frontend PR #1 is already merged into main.
-2. Merge [backend PR #2](https://github.com/Arpitv26/helloHacks/pull/2) into main.
-3. Merge [overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3)
-   (`pose-overlay` → `main`) after its checks pass. It includes the upload
-   skeleton, live skeleton, UI cleanup, startup-log fix, display smoothing, and this handoff.
-4. Only after both feature PRs are merged, update Computer B using the commands below.
+PRs #1, [#2](https://github.com/Arpitv26/helloHacks/pull/2) and
+[#3](https://github.com/Arpitv26/helloHacks/pull/3), and
+[#4](https://github.com/Arpitv26/helloHacks/pull/4) are merged into main `767a98b`.
+This includes skeletons, smoothing, coach interactions, comparisons and live counting.
+Computer A’s backend-cv additionally has timing-v2, tracking and body-line follow-ups;
+its next PR must reach main before another computer gets that complete backend behavior.
+Update Computer B using the commands below.
 
-**PR #2 alone does not include the overlays.** `pose-overlay` contains all backend commits
-plus the later overlay commits. Before #2 merges, the overlay PR also lists the backend
-changes; after a normal merge of #2, its diff narrows to the overlay/handoff work.
 Do not cherry-pick the individual fixes or overwrite the frontend directory with an old copy.
+
+**Confirmed assignment:** B’s feature handoff is integrated. A now owns the visual overhaul
+on Computer A. B should coordinate further screen edits. Physical webcam rehearsal is still
+needed; the simulated-camera check does not replace it. See [NEXT_STEPS.md](NEXT_STEPS.md).
 
 From your repository folder (the one containing `apps`), first run:
 
@@ -59,13 +61,13 @@ open camera page, stop the camera, press **Command+Shift+R**, and enable it agai
 | `/upload` | File validation, local preview, real backend upload, cancellation/stale-response handling |
 | Uploaded results | Rep count, per-rep elbow min/max/excursion, timing parts, review cues, timestamp jumps |
 | Uploaded skeleton | Exact pose track from the same extraction, aligned with landscape/portrait playback; toggle on/off |
-| `/camera?exercise=push-up` | Permission/error/stop states, local browser pose extraction and mirrored live skeleton |
+| `/camera?exercise=push-up` | Permission/error/stop states, mirrored skeleton, cumulative live count, finish/reset/retry |
 | Display smoothing | Light live x/y smoothing only; raw analysis poses remain unchanged; lost/uncertain joints disappear |
 | Startup logging | Known successful XNNPACK notice is informational; real errors are preserved |
-| Backend coach | Local evidence summary plus optional OpenAI evidence selection; UI panel still needs integration |
+| Backend coach | Integrated summary/next-set/QA panel with provider, evidence and limitations; local QA unsupported |
 | Unknowns | Scores remain null; no prominent empty score card; unmeasured elbow columns hidden; detailed limits expandable |
 
-**Still unfinished:** live rep counting UI, coach panel, real positive comparison-case validation,
+**Still unfinished:** physical live-count rehearsal, independent positive comparison-case validation,
 form scoring, automatic exercise recognition, other gym exercise analyzers, recording/history.
 The human reports physical-camera tracking works with some flicker; the latest smoothing needs
 another physical-camera comparison. Do not claim general tracking/form accuracy from this demo.
@@ -90,10 +92,32 @@ All paths below are relative to `apps/web` unless specified.
 | `src/lib/api/mock.ts` | Legacy squat fixture helper; not the push-up demo source |
 | `tests/` | Camera, upload, client, contract, rendering and logging tests |
 
-The older `SessionResults` component is not the current upload view. Its `partial` label says
-“Set in progress”; fix that before reusing it, because final uploads can also be partial.
+The older `SessionResults` component is not the current upload view. PR #4 corrected its
+partial-result label. Use `UploadedResults` for current upload/final live presentation.
+New seams: `coach-panel.tsx` + `lib/coach/session.ts`, `rep-overview.tsx`,
+and `lib/live/session.ts` + `live-session-panel.tsx`. Preserve their lifecycle tests during redesign.
 
 ## API and rendering boundary
+
+**Timing-policy follow-up (v2):** the existing duration issue now requires a substantial
+change from both preceding durations in the same direction. Optional numeric keys in the
+existing measurements dictionary identify `durationComparisonVersion: 2`, reference min/max
+and lower/upper duration boundaries; API_CONTRACT.md defines them. Render the returned issues
+and explanations; do not recompute flags from a hardcoded 20% reference gate. Older results
+may omit these keys. Unavailable comparisons now have rep-specific `limitations` strings.
+No schema/type/endpoint change or frontend source edit. The synthetic comparison fixture is
+updated, still explicitly synthetic. IMG_6942 now flags rep 3; rep 4 remains unflagged under
+the two-reference rule. Integrate this backend checkpoint before relying on this behavior.
+
+**Additive backend follow-up:** push-up rep measurements now optionally include a median
+shoulder–hip–ankle angle and usable/received sample counts. See
+[BODY_LINE.md](../apps/api/BODY_LINE.md). Existing types and endpoints are unchanged; B can
+finish current features without rendering these keys. A can add the dedicated display in
+the later overhaul. Treat missing/null as unknown; no ideal-angle colour coding or form score.
+The backend coach now also explains available body-line measurements via the existing
+`message`/`evidence`/`limitations` fields. No panel contract change is needed. Local `next_set`
+may include one body-line statement when no timing/range review flags need priority;
+OpenAI selection can use it for QA, while local free-form QA remains unsupported.
 
 Read [API_CONTRACT.md](API_CONTRACT.md) and [POSE_OVERLAY.md](POSE_OVERLAY.md).
 Contract version is still **1.0**; `AnalysisResponse` is unchanged.
@@ -134,7 +158,7 @@ synthetic labels. None has a matching recording.
 - `contracts/examples/squat-analysis.json`: legacy scored UI fixture only; do not rename its
   knee measurements as push-up findings.
 
-## Next frontend work, in small tested commits
+## Implemented in PR #4 — preserve these requirements
 
 1. **Coach panel:** call `api.coach({ analysis, mode: "summary" })` using the current result.
    Modes are `summary`, `next_set`, `qa` (QA requires a nonblank question). Display `message`,
@@ -153,14 +177,15 @@ synthetic labels. None has a matching recording.
 4. **Demo check:** actual laptop webcam after the logging fix, slow/missing model, no person,
    stop/restart/navigation, backend down, upload cancellation, and one landscape/portrait clip.
 
-A owns measurement algorithms and real positive-case validation. B owns frontend code again
-following the user-authorized overlay work by A. Avoid overlapping edits to camera/upload files;
-coordinate the next live-counting change before starting it on both computers.
+A owns measurement algorithms, validation and the next visual overhaul after B’s integrated
+handoff. The first three items above are implemented; item 4 still needs physical rehearsal.
 
 ## Checks and known evidence
 
-Most recent checkpoint: **300 backend tests, 35 frontend tests**, lint, types, contract checks
-and production build pass. Landscape/portrait upload skeleton alignment and simulated-camera
+Most recent integrated checkpoint: **399 backend tests, 49 frontend tests**, lint, types,
+contract checks and production build pass. Actual IMG_6942 upload/coaching/flag seeking and
+simulated-camera counting against the real API pass. Physical camera rehearsal is pending.
+Earlier overlay evidence: Landscape/portrait upload skeleton alignment and simulated-camera
 stop/restart/missing-model behavior were checked in Chrome. The follow-up dev-browser check
 asserts zero XNNPACK console errors, not just absence of uncaught exceptions.
 

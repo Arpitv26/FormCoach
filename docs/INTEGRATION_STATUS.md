@@ -1,10 +1,75 @@
 # Computer A / Computer B integration checkpoint
 
+## Current integration checkpoint — 2026-09-26
+
+Frontend PR #4 (`60c47bb`) is merged into main as `767a98b`. Computer A merged that main
+into backend-cv as `ae959a1` without conflicts. The combined backend and frontend passed
+399 Python tests, 49 frontend tests, schema/type checks, lint, and a production build.
+GitHub PR #4 checks also passed. A now owns the next visual overhaul; B should coordinate
+any further screen edits. No redesign has started in this checkpoint.
+
+Actual production Chrome → isolated FastAPI → native MediaPipe upload of IMG_6942 returns
+4 reps and the timing-v2 flag on rep 3. Review and coach evidence links seek to 8.737 s.
+Counted-time/elbow-range chart switching, local summary/next-set evidence, local QA fallback,
+removing the clip, and 390px mobile overflow checks pass. No paid OpenAI request was made.
+Real browser Lite pose extraction with a simulated camera sends cumulative batches to the
+actual API: 6 snapshots / 62 frames in the first set, final response received, then new-session
+reset and camera-stop finalization pass. Camera tracks are released; no uncaught browser errors.
+The simulated stream is not a physical-camera counting benchmark. Personal artifacts stay ignored.
+
+Remaining: physical webcam count/finish/reset rehearsal, independent footage for timing-v2
+validation, and visual overhaul. Scores, corrective alignment cues, other gym analyzers and
+fatigue detection remain deferred. Main includes B's features; the newer backend follow-ups
+are on backend-cv until its next PR is merged. Review apps/web/DEMO_CHECKS.md before presenting.
+
+## Earlier checkpoints (historical)
+
 ## New overlay checkpoint — 2026-09-26
 
-[Overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3) contains the complete feature,
-fixes and refreshed handoff. `pose-overlay` branches from backend PR #2 at `f049013`;
-#2 remains unchanged. Merge #2 first, then #3 after its checks pass.
+**Latest timing follow-up:** policy v2 compares the current duration with BOTH preceding
+durations using the existing 500 ms / 30% margin per reference. IMG_6942 now flags rep 3;
+rep 4 remains unflagged. All five captures preserve counts/rep geometry/timestamps, and local
+coaching explains the measured slower third rep. Unavailable comparisons have rep-specific
+limitations. Shared contract docs/example and frontend handoff updated; no frontend source
+or generated schema/type changes. 399 backend and 35 frontend tests pass; B's published branch
+remains `5dd6bb4`. The 6942 result is a development regression, not independent validation.
+
+**Latest recording:** IMG_6942 counts 4/4 with observed durations 1.735/1.400/3.068/1.068 s.
+Video/rep-moment overlays reviewed, live-route cumulative replay stable, local coach evidence
+valid. Expected rep-3 timing flag is absent due to 21.37% reference spread exceeding the 20%
+gate; see apps/api/REVIEW_6942.md. This is a recorded failure case, not successful flag validation.
+B's published frontend remains `5dd6bb4`. Browser verification of this clip is pending.
+
+**Current native backend rehearsal (`4b87e35`):** four fresh real-video extractions through
+TestClient multipart handling return 3/1/1/2 reps, exact matching pose-track analysis, and
+local body-line coaching. Blank-video and corrupt-video/recovery checks pass. No browser
+claim or paid API call; details in apps/api/VALIDATION.md. The human confirms the gym recording
+and B's PR are not ready yet. Remote frontend remains `5dd6bb4`; active UI ownership stays with B.
+
+**Latest backend checks:** 375 tests, lint, formatting and schema checks pass after adding
+explicit expected timing/range flags to the replay tool. All four saved captures pass zero-flag
+regressions with counts 3/1/1/2. Earlier coach follow-up `7a29d34` adds descriptive body-line
+evidence without changing the response contract. No frontend source changed in these follow-ups.
+Remote frontend rechecked: still `5dd6bb4`. Positive comparison footage and B's handoff are pending.
+
+**Body-line follow-up:** completed push-ups now include a descriptive median 2D
+shoulder–hip–ankle angle and usable/received sample counts in the existing measurement
+dictionary. No schema or frontend source change. Read apps/api/BODY_LINE.md for sample
+requirements, reviewed values and limits; these are not form scores or corrective cues.
+335 backend and 35 frontend tests, lint/format/contracts/types and production build pass.
+All four saved-pose replays preserve counts and earlier metrics; seven actual-frame overlays
+were visually reviewed. The latest fetch still shows B at `5dd6bb4`; their work is ongoing.
+
+**Backend follow-up:** tracking coverage and missing-joint feedback now use the existing
+`cameraQuality.issues` strings. No frontend code or schema change. 311 backend tests,
+lint/format/schema checks pass; four saved real-pose replays retain identical reps,
+measurements, timestamps and flags (counts 3/1/1/2). See apps/api/TRACKING_FEEDBACK.md.
+Remote `frontend` rechecked during this work: still `5dd6bb4`; B's new features are in progress.
+
+[Backend PR #2](https://github.com/Arpitv26/helloHacks/pull/2) and
+[overlay PR #3](https://github.com/Arpitv26/helloHacks/pull/3) are now merged.
+Integrated main is `79f8da3`; Computer A fast-forwarded `backend-cv` to that baseline.
+The audit reran the backend suite: **300 passed**, one existing TestClient deprecation warning.
 User explicitly authorized A to implement the camera/upload overlay UI because B was not
 editing those screens. Remote frontend rechecked: still `5dd6bb4`.
 Read **POSE_OVERLAY.md** for setup, changed seams and test evidence. The new endpoint is
@@ -12,10 +77,15 @@ additive; existing AnalysisResponse stays unchanged. Landscape and portrait uplo
 and simulated live-camera tracking are verified. The human also reports physical-camera
 tracking works with some flicker. The follow-up `dde10e2` fixes false XNNPACK console errors
 and adds display-only smoothing; 35 frontend tests and the dev-browser regression check pass.
-Physical-camera recheck after that fix and live counting remain next. Review/merge #2 before this feature, then B can pull the integrated main.
+Physical-camera recheck after that fix and live counting remain next. B can merge origin/main.
 
 The refreshed FRONTEND_HANDOFF.md is the current entry point for B, including all features,
 fixes, mock data, setup commands and next work. PR #2 alone does not contain the overlays.
+
+The human confirms B is now finishing coach interactions, rep comparisons, results polish,
+live rep counting and demo verification. These are not yet verified in remote code. A owns
+backend validation and measurement work meanwhile. After B's tested PR is integrated, A
+will take over the frontend visual overhaul. See NEXT_STEPS.md for the current ordered plan.
 
 The section below records the earlier integration baseline; its test counts and preview-only
 status describe that earlier snapshot, not the overlay branch.

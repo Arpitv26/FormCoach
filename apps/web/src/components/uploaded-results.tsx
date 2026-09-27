@@ -41,7 +41,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
       <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} />
       <section className={styles.changes} aria-labelledby={`${id}-changes`}>
         <div className="section-heading"><h3 id={`${id}-changes`}>Changes to review</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>
-        {analysis.issues.length === 0 ? <p className="muted small">No changes were flagged. Comparisons need two preceding stable reps and usable tracking; no flags does not establish good form.</p> : analysis.issues.map((issue) => (
+        {analysis.issues.length === 0 ? <p className="muted small">No changes were flagged. Comparisons need two preceding reps and usable tracking; eligibility depends on the measurement. No flags does not establish good form.</p> : analysis.issues.map((issue) => (
           <article key={issue.id} className={styles.changeCard}>
             <h4>{issue.title}</h4><p>{issue.explanation}</p><p className="small">{issue.shortCue}</p>
             <p className="muted small">Review priority: {issue.severity} · Confidence: {issue.confidence == null ? "Unknown" : `${Math.round(issue.confidence * 100)}%`}</p>

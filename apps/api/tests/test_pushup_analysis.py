@@ -59,6 +59,9 @@ def test_pushup_http_measures_elbow_not_knee_and_keeps_scores_unknown(client, si
         "angleMeasurementStartMs": 800,
         "timeToMinElbowAngleMs": 500,
         "timeFromMinElbowAngleMs": 1200,
+        "bodyLineSampleCount": 18,
+        "bodyLineUsableSampleCount": 0,
+        f"median{side.title()}ShoulderHipAnkleAngleDeg": None,
     }
     assert (rep.start_ms, rep.end_ms) == (600, 2300)
     assert rep.key_moments[0].type == "minimum_elbow_angle"

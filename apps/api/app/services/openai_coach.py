@@ -79,6 +79,10 @@ class FallbackCoach:
         cards = evidence_cards(request.analysis)
         # Preserve the legacy scored fixture summary; never calculate a new score.
         selected = cards[:1] if cards and cards[0].id == "score" else cards[:3]
+        if request.mode == "next_set" and not request.analysis.issues:
+            body_line = next((card for card in cards if card.id.endswith("-body-line")), None)
+            if body_line is not None and body_line not in selected:
+                selected = [*selected[:2], body_line]
         note = self.note
         if request.mode == "qa":
             note += " Local free-form QA is not implemented."

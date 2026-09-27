@@ -1,7 +1,9 @@
 # Product scope
 
-This is the post-bootstrap product roadmap. Checked items are delivered in the foundation;
+This is the post-bootstrap product roadmap. Checked items are implemented;
 unchecked items require feature work. Prioritize a reliable short demo, with prerecorded push-ups first (updated user direction).
+See NEXT_STEPS.md for current ownership and the order of work. B finishes frontend features;
+A then takes over the visual overhaul after integration.
 
 ## Must have
 
@@ -11,7 +13,7 @@ unchecked items require feature work. Prioritize a reliable short demo, with pre
 - [x] Upload UI and honest processing/error states.
 - [x] Live and uploaded-video pose skeleton from a pretrained provider (physical webcam demo check pending).
 - [x] Real-video push-up analysis and completed-rep counting (four clips match human counts).
-- [ ] Per-rep measurements/metrics and explainable summary.
+- [x] Per-rep descriptive elbow/timing measurements and explainable summary (quality scores are separate).
 - [ ] Polished responsive results experience.
 
 ## Should have
@@ -20,8 +22,12 @@ unchecked items require feature work. Prioritize a reliable short demo, with pre
 
 - [ ] Live feedback through the existing HTTP contract.
 - [ ] Lunges.
-- [ ] Evidence-grounded AI coaching.
-- [ ] Worst-rep playback against matching video.
+- [x] Evidence-grounded backend coaching, with optional OpenAI selection.
+- [ ] Coach panel/interactions (B in progress).
+- [x] Rep-start/minimum-angle playback against the matching video.
+- [ ] Real positive comparison flag validated against footage.
+- [ ] Body-alignment measurement and evidence-supported review cue.
+- [ ] Justified form scoring and worst-form rep ranking; unavailable until measurements/rubric are validated.
 - [ ] Clear per-rep and set-level graphs.
 
 ## Wow / stretch

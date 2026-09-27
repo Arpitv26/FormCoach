@@ -142,6 +142,14 @@ HTTP 200 body is a full `AnalysisResponse`. User-selected exercise confidence, a
 camera quality score/fullBodyVisible, and scoring metadata remain null. The six-rep fixture
 is never substituted for a request. Empty issues do not establish good form.
 
+`cameraQuality.issues` also describes sampled-frame tracking coverage and named missing,
+outside-image, unknown/low-visibility joints. Coverage refers to the whole received sequence,
+not elapsed time or current readiness. Push-ups include shoulder/hip/ankle visibility
+coverage on the locked side, without assessing alignment or gating elbow counts on those
+extra joints. These strings are display text, not machine-readable metrics or severity
+codes. Do not parse them or treat the array length as an error count. See
+[tracking feedback](../apps/api/TRACKING_FEEDBACK.md). Response shape remains unchanged.
+
 **Squat measurement policy:** choose the first usable hip-knee-ankle side, preferring left
 if both work in that frame, and keep it for the entire set. Each joint needs visibility at
 least 0.7 and in-frame coordinates; undefined geometry is unavailable. Missing angles or gaps
@@ -180,12 +188,25 @@ not a range-of-motion score. All `metrics` score fields remain null. See
 [measurement definitions](../apps/api/MEASUREMENTS.md) and the explicitly synthetic
 `contracts/examples/pushup-analysis.json` example. Missing keys mean unavailable, never zero.
 No body-alignment, depth-quality, or injury claim is implied by these provisional cycles.
+
+**Descriptive push-up body-line angle:** completed reps additionally include
+`medianLeftShoulderHipAnkleAngleDeg` or `medianRightShoulderHipAnkleAngleDeg`, plus
+`bodyLineSampleCount` and `bodyLineUsableSampleCount`. The median uses raw, aspect-corrected
+2D angles at the hip over the inclusive counted rep interval. It requires both boundaries,
+at least three samples, every angle usable, and no sample gap over 300 ms; otherwise null.
+The selected side matches elbow counting. These keys are additive in the existing numeric
+dictionary; old results may omit them. Neither a quality score nor a sag/pike classification
+is implied. Body-line failure does not remove counted reps. See [BODY_LINE.md](../apps/api/BODY_LINE.md)
+for exact semantics, limits, and the reviewed real-clip values.
+
 **Push-up comparison flags:** from rep 3 onward, compare with the immediately preceding two
 completed reps. Require continuous usable angles across that entire reference/current span,
-including between reps. Duration references must differ by at most 20% of their median;
-excursion references by at most 10°. Eligible comparisons emit numeric evidence even without a flag.
+including between reps. Timing policy v2 compares with each prior duration independently;
+excursion references must differ by at most 10°. Eligible comparisons emit numeric evidence even without a flag.
 
-- `PUSHUP_REP_DURATION_CHANGED`: absolute duration change >= max(500 ms, 30% of reference median).
+- `PUSHUP_REP_DURATION_CHANGED` (timing v2): current duration is longer than BOTH preceding
+  durations by at least max(500 ms, 30% of each reference), or shorter than BOTH by those
+  margins. This replaces the original 20% reference-spread eligibility gate; no count/angle change.
 - `PUSHUP_ELBOW_EXCURSION_REDUCED`: excursion reduction >= max(15°, 20% of reference median).
 
 These are uncalibrated review heuristics. Issue severity is `low`, confidence is null,
@@ -196,9 +217,17 @@ Earlier rep results never change when frames are appended, including later track
 
 New optional measurement keys: `comparisonReferenceStartRep`, `comparisonReferenceEndRep`,
 `referenceMedianDurationMs`, `durationDeltaMs`, `durationDeltaPercent`, `durationChangeThresholdMs`,
+`durationComparisonVersion` (2), `referenceMinDurationMs`, `referenceMaxDurationMs`,
+`durationReviewLowerBoundMs`, `durationReviewUpperBoundMs`,
 `referenceMedianElbowExcursionDeg`, `elbowExcursionDeltaDeg`, `elbowExcursionDeltaPercent`,
 `elbowExcursionReductionThresholdDeg`. Deltas are current minus reference. Missing keys mean
-unavailable (too few reps, tracking loss, unstable/missing reference metric), not zero change.
+unavailable (too few reps, tracking loss, invalid duration or unstable/missing range reference),
+not zero change. Existing `limitations` gives rep-specific unavailability reasons.
+Timing bounds are current-duration boundaries, not delta values or desired tempo. The lower
+bound can be negative, making shorter flags impossible for positive durations. In v2,
+`durationChangeThresholdMs` is the distance from the median to the bound in the current delta's
+direction (upper for zero/positive delta); older results without the version key use the original
+median margin. Clients should render supplied flags/explanations and support absent optional keys.
 See [comparison policy](../apps/api/COMPARISONS.md) for exact units and limitations and
 `contracts/examples/pushup-comparison-analysis.json` for a clearly synthetic flagged example.
 The user-selected push-up demo replaces the earlier squat demo priority; wire shapes are unchanged.

@@ -12,8 +12,8 @@ The bootstrap task ends with a verified shared foundation on main. Do not implem
 full product during bootstrap. Feature work begins after humans create their branches.
 Future agents should implement the responsibilities in their handoff, not restart the design.
 
-**Updated user priority:** prerecorded push-ups; no squat demo. Computer B is still building
-the frontend. Do not wait on browser tracking to implement backend video pose extraction.
+**Updated user priority:** prerecorded push-ups; no squat demo. B’s frontend PR #4 is now
+merged and integrated on Computer A. Preserve the working upload and live analysis paths.
 Keep the legacy squat fixture for compatibility, not as the intended presentation.
 
 ## Read before coding
@@ -24,6 +24,7 @@ Keep the legacy squat fixture for compatibility, not as the intended presentatio
 4. docs/PRODUCT_SCOPE.md, docs/TASKS.md, and docs/SAFETY.md.
 5. Backend measurement work: docs/EXERCISE_SYSTEM.md and docs/SCORING.md.
 6. Coaching work: docs/AI_COACH.md.
+7. Current remaining work and ownership transition: docs/NEXT_STEPS.md.
 
 ## Settled architecture
 
@@ -51,6 +52,11 @@ isolated. Generated `apps/web/src/lib/api/types.ts` is a coordinated exception: 
 contract change must include matching types. Communicate with the other human before
 relying on the change; do not send external messages on the human's behalf without authorization.
 
+**Current human agreement (2026-09-26):** B handed off PR #4 with coach interactions, rep
+comparisons and live counting. It is reviewed, merged into main (`767a98b`) and integrated
+into backend-cv (`ae959a1`). A now owns the next frontend visual overhaul on this computer.
+B should coordinate further screen edits. Physical webcam rehearsal is still pending.
+
 If a contract must change:
 
 1. Explain the requirement and compatibility effect.
@@ -75,6 +81,26 @@ If a contract must change:
 
 ## Current capabilities
 
+**Current integration:** PR #4 merged; 399 backend and 49 frontend tests, contracts, lint,
+types and production build pass. Actual IMG_6942 browser upload/coaching/flag seeking pass;
+simulated camera → actual API count/final/reset/stop pass. Physical webcam rehearsal and
+independent timing validation remain open. Read docs/INTEGRATION_STATUS.md and NEXT_STEPS.md.
+
+### Backend checkpoint before PR #4
+
+**Latest checkpoint:** IMG_6942 counts 4 (normal/normal/slow/fast). It exposed a missed timing
+flag under the old 20% reference gate. Timing policy v2 now requires a substantial change from
+BOTH preceding durations, each using max(500 ms, 30% of that reference). Rep 3 now flags;
+rep 4 remains unflagged. Read apps/api/COMPARISONS.md and REVIEW_6942.md. Unavailable comparisons
+have rep-specific limitations; new numeric keys identify policy version/boundaries, with no
+schema/type/endpoint changes. FRONTEND_HANDOFF and API_CONTRACT explain compatibility.
+All five clips retain counts/measurements/timestamps; original four stay unflagged. 399 backend
+and 35 frontend tests pass. Local coaching describes rep 3; no paid calls. This is development
+regression evidence, not independent validation. Next: separate footage and B's integrated UI.
+B's published branch remains `5dd6bb4`; frontend handoff/redesign is still pending.
+
+### Earlier checkpoints (historical)
+
 Health works. Pose analysis counts push-ups using elbow angles and retains the earlier squat
 counter. It returns per-rep timestamps and smoothed angles; insufficient observations return null counts. Other hints or no
 hint remain `not_implemented`. Scores stay null. Upload runs the optional local CV pipeline; coach defaults to a useful local fallback with an optional OpenAI evidence selector.
@@ -98,8 +124,41 @@ camera/upload code. Live skeleton works locally; live counting is not connected.
 AnalysisResponse is unchanged; additive VideoAnalysisResponse includes the exact pose track.
 The human reports physical-camera tracking works with some flicker. The `dde10e2` follow-up
 fixes false Next.js startup errors and adds display-only smoothing. FRONTEND_HANDOFF.md is
-refreshed for the complete checkpoint; B must integrate both backend and overlay PRs.
+refreshed for the complete checkpoint. Backend PR #2 and overlay PR #3 are merged into main
+at `79f8da3`; B is integrating that baseline before completing the features listed above.
 Next: physical webcam recheck after the fix, live counting integration, and real positive-case comparison validation. Recheck origin/frontend periodically and update
 docs/INTEGRATION_STATUS.md. Keep form scoring deferred until evidence/calibration requirements are met.
 Keep scores null until grounded scoring exists. Optional CV setup: apps/api/VIDEO_SETUP.md.
 Read apps/api/README.md for counting limits and apps/api/examples/README.md for capture replay.
+
+Tracking-feedback checkpoint: existing cameraQuality.issues now reports angle sample coverage,
+named blocked joints and push-up shoulder/hip/ankle visibility coverage. No schema or counting
+change; all scores/full-body visibility remain null. See apps/api/TRACKING_FEEDBACK.md:
+311 tests passed at that checkpoint; saved-clip counts/rep details remained unchanged.
+Real positive comparison footage is pending.
+The body-line checkpoint now adds median shoulder–hip–ankle angles and sample counts to the
+existing per-rep measurements dictionary. Read apps/api/BODY_LINE.md before interpreting them.
+Same side as elbow; full observed rep coverage required; no form cue or score. Seven real-frame
+overlays and independent arithmetic checked; existing counts/times/elbow measurements unchanged.
+Body-line checkpoint checks: 335 backend tests, 35 frontend tests, lint/format/contracts/types and build pass.
+
+Coach follow-up: descriptive body-line evidence is now available to local next-set feedback
+and optional OpenAI selection. It requires consistent angle/side/sample metadata and retains
+2D/median limitations. No alignment correction or score is inferred. Real positive comparison
+footage and B's new frontend commits are still pending; preserve their active UI ownership.
+Coach follow-up checks: 359 backend tests pass, plus lint, formatting and schema checks.
+All four saved analyses pass local next-set HTTP coaching checks; no paid API calls were used.
+Frontend code and contracts are unchanged by this follow-up.
+
+Replay validation preparation: `app.tools.replay_live` now accepts exact expected timing/range
+flag rep numbers (omitted = unchecked, empty option = expect none). It reports missing/extra
+flags and exits 1 on mismatch; original frames/thresholds are unchanged. See apps/api/examples/README.md.
+375 backend tests, lint/format/schema checks pass; four saved captures retain 3/1/1/2 reps and
+pass explicit zero-flag checks. Real positive footage and B's handoff remain pending.
+
+Latest human update: they still need to drive to the gym; the new recording and B's PR are
+not ready. Continue checking published frontend commits periodically; do not assume a handoff.
+Native backend rehearsal on `4b87e35` passed fresh uploads of all four original clips through
+TestClient plus matching pose-track analysis and local coach evidence. Blank video returns
+unknown count; corrupt-video error then recovery passes. See apps/api/VALIDATION.md for scope.
+No runtime changes were needed. Remaining footage/browser checkpoints are still open.

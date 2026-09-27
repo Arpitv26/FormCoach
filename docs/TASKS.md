@@ -4,6 +4,11 @@ Ownership: **[A]** backend/CV/ML/AI · **[B]** frontend/product/UX · **[SHARED]
 Keep feature work in the app folder you own. The bootstrap stops after the foundation; the
 remaining checkboxes are the next agents' backlog, not work to finish in the initial commit.
 
+**Current order and acceptance criteria:** [NEXT_STEPS.md](NEXT_STEPS.md).
+B’s feature PR #4 is reviewed, merged into main `767a98b`, and integrated on backend-cv.
+A now owns the visual overhaul. First publish the integrated backend follow-up PR and
+complete physical-camera/independent-footage rehearsal. No visual overhaul started yet.
+
 ## BOOTSTRAP
 
 - [x] [SHARED] Monorepo structure, root agent context, ownership boundaries.
@@ -27,6 +32,13 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 - [x] [A] Descriptive per-rep elbow excursion and timing parts; see apps/api/MEASUREMENTS.md.
 - [x] [A] Causal within-set timing/range comparisons with traceable review flags and synthetic positive cases.
 - [ ] [A] Validate a real positive comparison case; do not infer positive-case accuracy from current unflagged clips.
+- [x] [A] Review IMG_6942 pace variation: 4/4 count, missed rep-3 timing flag documented in apps/api/REVIEW_6942.md.
+- [x] [A] Timing v2 compares against BOTH preceding durations, explains unavailable comparisons, passes five-clip regressions; 6942 rep 3 flags, separate validation still pending.
+- [x] [A] Improve measured tracking coverage and actionable missing-joint feedback (apps/api/TRACKING_FEEDBACK.md; counts unchanged).
+- [x] [A] Implement descriptive 2D shoulder–hip–ankle median; synthetic tests, independent arithmetic and seven real-frame checks (apps/api/BODY_LINE.md).
+- [ ] [A] Validate a body-alignment interpretation/cue separately; current angle is not a form judgment.
+- [x] [A] Let the coach explain body-line geometry with evidence paths and explicit limits; reject inconsistent sample metadata.
+- [x] [A] Add replay expectations for missing/extra timing/range flags; real positive footage remains pending.
 - [ ] [A] Justified score formulas only after evidence/view/calibration review.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.
@@ -44,29 +56,33 @@ remaining checkboxes are the next agents' backlog, not work to finish in the ini
 
 ## FRONTEND
 
-- [ ] [B] Landing/demo interface and responsive visual direction.
-- [ ] [B] Results dashboard entirely from canonical mock; null and error states.
-- [ ] [B] Camera permission, framing/readiness states, exercise selector.
+- [x] [B] Initial landing/demo interface and responsive visual direction.
+- [x] [B] Uploaded results with actual measurements, null and error states.
+- [x] [B] Camera permission, framing guidance, exercise selector (automatic readiness remains unavailable).
 - [x] [B] Upload selection/preview and honest loading/error states (PR #1).
 - [x] [A, authorized by user] Browser pose adapter and correctly mirrored skeleton overlay; simulated-camera verified, physical check pending (POSE_OVERLAY.md).
 - [x] [A, authorized by user] Uploaded pose-track endpoint and synchronized landscape/portrait playback overlay.
-- [ ] [B] Cumulative live requests, session reset/finalization, response replacement.
-- [ ] [B] Per-rep cards, metric graphs, issue timeline, lowest-score highlight.
-- [ ] [B] Worst-rep jump against synchronized video.
-- [ ] [B] Coach panel and visible provider/confidence/limitations.
+- [x] [B] Cumulative live requests, session reset/finalization, response replacement.
+- [x] [B] Per-rep measurement cards and synchronized rep/minimum-angle jumps.
+- [x] [B] Rep comparison presentation, graphs and issue navigation; scores remain null.
+- [ ] [A, later] Worst-form rep ranking only after justified scoring exists.
+- [x] [B] Coach panel and visible provider/confidence/limitations.
 - [ ] [B] Accessibility, transitions, small-screen layout, demo polish.
+- [x] [SHARED] Review and integrate B's completed feature PR; transfer UI ownership.
+- [ ] [A, after handoff] Full frontend visual overhaul, preserving tested analysis/overlay behavior.
 
 ## INTEGRATION
 
-- [ ] [SHARED] Both computers branch from the same published bootstrap main commit.
-- [ ] [SHARED] Agree on browser pose provider and first supported camera view.
+- [x] [SHARED] Both computers branch from the same published bootstrap main commit.
+- [x] [SHARED] Browser MediaPipe Lite and side-view push-up demo selected.
 - [ ] [SHARED] Confirm identical coordinates/timestamps in browser and video adapters.
 - [x] [SHARED] Connect real push-up upload responses without dashboard-specific shape changes.
 - [ ] [SHARED] Test live reset, final snapshot, camera loss, backend down, and stale responses.
 - [ ] [SHARED] Ensure synthetic/placeholder results are never presented as measured.
 - [x] [SHARED] Validate rep-start and minimum-angle playback on IMG_6939 (0.733 s / 1.733 s).
-- [ ] [SHARED] Validate playback of a real comparison flag when suitable footage exists.
-- [ ] [SHARED] Merge shared contract changes first; all checks pass on integrated main.
+- [x] [SHARED] Validate playback of a real comparison flag when suitable footage exists.
+- [x] [SHARED] Merge backend and overlay contract changes into main (PRs #2/#3).
+- [x] [SHARED] Run all checks on B's upcoming integrated feature commit.
 
 ## DEMO
 

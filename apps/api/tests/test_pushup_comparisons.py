@@ -49,7 +49,7 @@ def inputs(durations=(2000, 2000, 2600), ranges=(80, 80, 64), side="left"):
 
 
 def compare(reps, samples, side="left"):
-    return compare_pushup_reps(reps, samples, side, PUSHUP_PROFILE)
+    return compare_pushup_reps(reps, samples, side, PUSHUP_PROFILE).reps
 
 
 @pytest.mark.parametrize("side", ["left", "right"])
@@ -101,8 +101,8 @@ def test_excursion_absolute_floor(current, flag):
 def test_reference_stability_is_independent_for_each_metric():
     reps, samples = inputs(durations=(1000, 2000, 3000))
     result = compare(reps, samples)[-1]
-    assert [i.code for i in result.issues] == [RANGE]
-    assert "referenceMedianDurationMs" not in result.measurements
+    assert [i.code for i in result.issues] == [DURATION, RANGE]
+    assert result.measurements["referenceMedianDurationMs"] == 1500
     reps, samples = inputs(ranges=(80, 100, 50))
     result = compare(reps, samples)[-1]
     assert [i.code for i in result.issues] == [DURATION]

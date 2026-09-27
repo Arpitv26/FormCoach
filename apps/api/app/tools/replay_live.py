@@ -15,6 +15,8 @@ from app.domain.pose import LiveBatchRequest
 
 MAX_CAPTURE_BYTES = 32 * 1024 * 1024
 type SendBatch = Callable[[LiveBatchRequest], AnalysisResponse]
+DURATION_CODE = "PUSHUP_REP_DURATION_CHANGED"
+EXCURSION_CODE = "PUSHUP_ELBOW_EXCURSION_REDUCED"
 
 
 class ReplayError(Exception):
@@ -69,6 +71,8 @@ def replay_capture(
     *,
     expected_reps: int,
     batch_frames: int = 15,
+    expected_duration_change_reps: list[int] | None = None,
+    expected_excursion_reduction_reps: list[int] | None = None,
 ) -> dict:
     """Send growing snapshots, then repeat the final request to check determinism.
 
@@ -82,6 +86,19 @@ def replay_capture(
         raise ValueError("batch_frames must be an integer from 1 to 1800.")
     if type(expected_reps) is not int or expected_reps < 0:
         raise ValueError("expected_reps must be a nonnegative integer.")
+    expectations = {
+        DURATION_CODE: expected_duration_change_reps,
+        EXCURSION_CODE: expected_excursion_reduction_reps,
+    }
+    for expected in expectations.values():
+        if expected is None:
+            continue
+        if capture.exercise_hint != "push-up":
+            raise ValueError("Comparison expectations require a push-up capture.")
+        if any(type(rep) is not int or not 3 <= rep <= expected_reps for rep in expected) or len(
+            set(expected)
+        ) != len(expected):
+            raise ValueError("Expected flag reps must be unique integers from 3 to expected_reps.")
     frame_count = len(capture.frames)
     stops = [*range(batch_frames, frame_count, batch_frames), frame_count]
     previous: AnalysisResponse | None = None
@@ -115,6 +132,24 @@ def replay_capture(
         outcome = "incomplete_analysis"
     elif not count_matches:
         outcome = "count_mismatch"
+    comparison_checks = {}
+    for code, expected in expectations.items():
+        if expected is None:
+            continue  # Omission means unchecked, not an assertion of zero flags.
+        observed = sorted(
+            rep.rep_number for rep in result.reps if any(i.code == code for i in rep.issues)
+        )
+        comparison_checks[code] = {
+            "expectedReps": sorted(expected),
+            "observedReps": observed,
+            "missingReps": sorted(set(expected) - set(observed)),
+            "unexpectedReps": sorted(set(observed) - set(expected)),
+            "matches": sorted(expected) == observed,
+        }
+    if outcome == "count_match" and any(
+        not check["matches"] for check in comparison_checks.values()
+    ):
+        outcome = "comparison_mismatch"
     return {
         "outcome": outcome,
         "expectedReps": expected_reps,
@@ -122,11 +157,14 @@ def replay_capture(
         "countMatches": count_matches,
         "cumulativeRepsStable": True,
         "finalReplayIdentical": True,
+        "comparisonChecks": comparison_checks,
         "snapshots": snapshots,
         "analysis": result.model_dump(mode="json", by_alias=True),
         "reviewRequired": (
             "Compare each rep interval with the matching recording. A matching count alone "
             "does not establish correct timing, form assessment, or real-camera accuracy. "
+            "Matching expected flags checks the declared expectation only; review the numeric "
+            "evidence and matching footage independently. Unspecified flag types are unchecked. "
             "The tool cannot verify whether input poses were captured or synthetic."
         ),
     }
@@ -142,6 +180,20 @@ def main(argv: list[str] | None = None) -> int:
         "--batch-frames", type=int, default=15, help="New frames per cumulative POST"
     )
     parser.add_argument("--api-base-url", default="http://localhost:8000")
+    parser.add_argument(
+        "--expected-duration-change-reps",
+        type=int,
+        nargs="*",
+        default=None,
+        help="Exact timing-flag rep numbers; use the option without numbers to expect none",
+    )
+    parser.add_argument(
+        "--expected-excursion-reduction-reps",
+        type=int,
+        nargs="*",
+        default=None,
+        help="Exact range-flag rep numbers; use the option without numbers to expect none",
+    )
     args = parser.parse_args(argv)
     try:
         capture = load_capture(args.capture)
@@ -150,6 +202,8 @@ def main(argv: list[str] | None = None) -> int:
             lambda batch: post_batch(args.api_base_url, batch),
             expected_reps=args.expected_reps,
             batch_frames=args.batch_frames,
+            expected_duration_change_reps=args.expected_duration_change_reps,
+            expected_excursion_reduction_reps=args.expected_excursion_reduction_reps,
         )
     except ValidationError as error:
         # Do not dump the pose capture into terminal logs on a malformed file/response.

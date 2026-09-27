@@ -2,8 +2,9 @@
 
 The user authorized Computer A to implement the camera/upload UI for this feature while
 Computer B was not editing those screens. Work is on `pose-overlay`, based on `backend-cv`
-at `f049013`. It does not change the existing backend PR #2. Merge #2 first, then review
-this feature against main. B should integrate the feature commit before editing these screens.
+at `f049013`. Backend PR #2 and overlay PR #3 are now merged into main `79f8da3`.
+B is integrating that main before adding live counts. This document records the overlay
+checkpoint; see NEXT_STEPS.md for the current work assignment and later visual overhaul.
 
 ## Try it on Computer A
 

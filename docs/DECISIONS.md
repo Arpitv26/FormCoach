@@ -5,7 +5,8 @@ demo problem, and record the reason here so future agents do not restart the arc
 
 | Decision | Why | Consequence |
 | --- | --- | --- |
-| Prerecorded push-up demo first | User changed the demo away from squats; browser tracking is not ready | Backend video extraction and push-up validation are next; keep old fixtures honest |
+| Prerecorded push-up demo first | User changed the demo away from squats; recorded playback is repeatable | Keep the real upload path reliable while B connects live counting; keep old fixtures honest |
+| A takes over visual overhaul after B's feature handoff | B is finishing interactions with limited remaining credits | Review/integrate B's PR first; avoid simultaneous edits to the same frontend screens |
 | One monorepo with two apps | Two people can share types/docs while owning separate folders | Avoid edits outside your app without coordination |
 | FastAPI + Python + Pydantic | Python is practical for CV/math; FastAPI exposes typed HTTP routes and interactive docs | Backend owns validation and movement interpretation |
 | Next.js + TypeScript + Tailwind | Familiar React product tools, typed responses, quick responsive styling | Frontend decides the detailed product design |

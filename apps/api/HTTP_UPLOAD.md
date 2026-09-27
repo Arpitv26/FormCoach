@@ -4,6 +4,10 @@
 analyzer as live batches. The request and response shapes stay at contract version **1.0**.
 This is a synchronous local demo endpoint: one request waits for one analysis result.
 
+**Current integration:** the frontend already uses the 240-second timeout and the additive
+`/videos/analyze-with-pose` endpoint for skeleton playback. The analysis-only endpoint below
+remains supported. See ../../docs/POSE_OVERLAY.md and ../../docs/NEXT_STEPS.md.
+
 ## Try it on Computer A
 
 The optional packages and model must be installed once using [VIDEO_SETUP.md](VIDEO_SETUP.md).
@@ -51,8 +55,8 @@ Computer B owns the client/UI changes. Read docs/API_CONTRACT.md and retain the 
 - Send multipart fields `file` and `exerciseHint: "push-up"`. Browser `FormData` sets the
   Content-Type boundary automatically. An omitted selection returns `EXERCISE_REQUIRED`;
   there is no automatic recognition. Legacy `squat` also counts; other profiles are rejected.
-- Increase **only the upload request's** timeout from the bootstrap client's 15 seconds
-  to **240 seconds** for local demo testing. Health/live requests can keep their shorter timeout.
+- Keep **only the upload request's** timeout at **240 seconds** for local demo testing.
+  Health/live requests keep their shorter timeout.
   Add a client test that the upload gets that separate timeout. Show an indeterminate
   “Analyzing video” state; the backend does not report progress percentages.
 - Disable repeated submission while processing. HTTP 503 `VIDEO_PROCESSOR_BUSY` means wait
@@ -62,8 +66,9 @@ Computer B owns the client/UI changes. Read docs/API_CONTRACT.md and retain the 
   deletes temporary copies. Revoke old object URLs when the user changes the clip or leaves.
 - Seek to `rep.startMs / 1000`. Ignore stale responses after a new selection. A complete
   result can still have null scores; do not show a worst rep until scores exist.
-- This endpoint returns analysis, **not per-frame pose coordinates**, so a skeleton overlay
-  is a later coordinated feature. Do not draw a fabricated skeleton from rep angles.
+- This endpoint returns analysis, **not per-frame pose coordinates**. The implemented
+  `/videos/analyze-with-pose` endpoint returns the matching pose track alongside analysis.
+  Do not draw a fabricated skeleton from rep angles.
 - A browser may not play every codec the backend decodes. If HEVC preview fails on the demo
   browser, export H.264 MP4 and re-analyze that exact exported clip for matching timestamps.
 - `localhost` always refers to the browser's own computer. B can run this backend locally
