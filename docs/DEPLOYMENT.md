@@ -14,6 +14,12 @@ chat; Vercel will still serve the interface. A `caffeinate` process keeps this
 session idle-awake, but does not make a closed laptop an always-on server. The
 ngrok process now runs as a per-user Mac LaunchAgent (`ca.formcoach.ngrok-demo`)
 with automatic restart while this Mac user session is active.
+The launcher also restarts on an SDK disconnect notification and checks public
+API health every minute; two failed checks exit the process so LaunchAgent can
+reconnect it. This catches a running process whose public tunnel has gone offline.
+To reconnect immediately, use `launchctl kickstart -k gui/$(id -u)/ca.formcoach.ngrok-demo`.
+For a presentation on this Mac, `http://localhost:3000` connects directly to the
+local API on port 8000 and avoids the tunnel entirely.
 
 The current deployment was created from the CLI, not connected to GitHub for
 automatic deployments. New Git commits do not automatically update the site.
