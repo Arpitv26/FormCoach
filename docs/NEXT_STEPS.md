@@ -1,18 +1,17 @@
 # Remaining work — after backend and overlay integration
 
-Updated 2026-09-26. Integrated baseline: main `79f8da3` (PRs #1, #2 and #3 merged).
+Updated 2026-09-26. Main `767a98b` includes PRs #1–#4; backend-cv `ae959a1` combines
+that frontend with the newer backend follow-ups. Those follow-ups still need their PR into main.
 This is the current work order. Keep the longer product vision in PRODUCT_SCOPE.md;
 do not try to finish every stretch feature before the demo.
 
 ## Ownership confirmed by the humans
 
-- **Computer B now:** coach panel/interactions, rep comparisons, results polish, live rep
-  counting, and demo verification. These are in progress, not verified delivered features.
-- **Computer A now:** backend analysis, validation, reliability and integration support.
-  Do not edit B's active frontend components or change their contract unexpectedly.
-- **Computer A after B's handoff:** the full frontend visual overhaul. B first commits,
-  pushes and opens a PR; A reviews/tests it, integrates it, then takes ownership of web UI.
-  B stops editing those screens before the redesign starts. Preserve working behavior/tests.
+- **Computer B:** feature handoff complete in merged PR #4. Coordinate any further screen edits.
+- **Computer A:** owns integration, backend and the upcoming frontend visual overhaul.
+  Preserve tested upload/pose pairing, raw live input, request lifecycle and evidence behavior.
+- **Next order:** publish the integrated backend follow-up PR; rehearse physical camera and
+  separate footage; then redesign the UI in small screen-by-screen commits. No redesign yet.
 
 ## What the code actually does today
 
@@ -23,9 +22,9 @@ do not try to finish every stretch feature before the demo.
 | Rep timestamps and elbow measurements | Implemented | Duration, min/max, excursion, time around minimum angle; 2D observations |
 | Rep comparisons | Timing policy v2 implemented | Change must exceed a margin against both preceding durations; 6942 rep 3 now flags as a development regression. Separate validation still needed |
 | Tracking coverage / missing-joint feedback | Implemented | Sample counts and actionable joint reasons; no readiness or quality score |
-| Live analysis API | Implemented | Cumulative snapshots, deterministic replay; B is connecting the browser |
+| Live analysis API | Implemented | Browser cumulative snapshots, final/reset/stop verified against actual API using simulated media; physical rehearsal pending |
 | Live / uploaded skeleton | Implemented | Browser and portrait/landscape playback checks; actual webcam smoothness needs recheck |
-| Coach API | Implemented | Local summary and optional OpenAI evidence selection; B is building interactions |
+| Coach API | Implemented | Integrated panel; actual local summary/next-set/evidence links verified; optional OpenAI configured separately |
 | Form score and five quality metric scores | **Missing** | `analysis/scoring.py` is a placeholder; real scores remain null |
 | Body-line geometry | Implemented | Median 2D shoulder–hip–ankle angle per rep; seven real-frame checks; not a form assessment |
 | Body alignment / depth-quality coaching | **Missing** | A reliable interpretation and corrective cue still need separate validation |
@@ -43,8 +42,8 @@ is explicitly unsupported. The UI can show multiple interactions, but each API c
 
 **Original failure:** IMG_6942 was supplied and reviewed: four counted reps with durations
 1.735 / 1.400 / 3.068 / 1.068 s. Video review agrees with the slow-third/fast-fourth annotation.
-The expected timing flag is missing because the first two durations have 21.37% spread,
-just above the current 20% reference gate. Replay correctly reports `comparison_mismatch`.
+The expected timing flag was missing because the first two durations have 21.37% spread,
+just above the former 20% reference gate. Replay correctly reported `comparison_mismatch`.
 See [REVIEW_6942.md](../apps/api/REVIEW_6942.md) for that original unchanged-policy check.
 
 **Implemented follow-up:** timing policy v2 requires the current duration to differ from BOTH
@@ -53,8 +52,8 @@ margin. It supplies versioned numeric boundaries and reasons for unavailable com
 All five saved captures pass count/stability checks; 6942 now flags rep 3 and the local coach
 explains it. Rep 4 does not differ enough from BOTH references to flag. The first four clips
 remain unflagged and all rep measurements/timestamps are unchanged. This is a development
-regression, since 6942 motivated the revision. Next: validate v2 on separate footage and review
-B's integrated UI when ready. Do not keep retuning against 6942 or claim general detection accuracy.
+regression, since 6942 motivated the revision. B's integrated UI now passes the actual-video
+flag/coach/seek check. Next: validate v2 on separate footage. Do not keep retuning against 6942 or claim general detection accuracy.
 
 Use a fixed side-view recording with two similar-paced comfortable reps, followed by a
 noticeably slower third rep. Include a brief straight-arm pause before and after the set.
@@ -120,6 +119,10 @@ a dashboard. If evidence/time is insufficient, demo measurements and changes wit
 
 ### 5. Review B's completed integration
 
+**Completed code/integration review:** PR #4 merged; 399 backend and 49 frontend tests plus
+lint/types/contracts/build pass. Real IMG_6942 upload, timing flag, coach and seeks pass.
+Simulated browser camera → actual API final/reset/stop passes. Physical rehearsal below remains open.
+
 Test actual upload → skeleton → rep results/comparisons → coach, and live start → count →
 finish → reset. Check stale responses, lost tracking, no person, backend unavailable, missing
 model and local coach fallback. Browser Lite and upload Full pose models can produce different
@@ -147,6 +150,11 @@ custom ML training, history/accounts, voice feedback and fatigue claims. Add one
 the recorded push-up demo and integration are already reliable and time remains.
 
 ## Validation baseline
+
+Current integrated review: 399 backend / 49 frontend tests, contracts, lint, types, build and
+PR #4 CI pass. See INTEGRATION_STATUS.md for actual-browser scope and remaining human checks.
+
+### Earlier backend checkpoints
 
 Timing v2: 399 backend tests and 35 frontend tests pass; five saved-pose replays keep all
 counting/geometry/timestamps unchanged, with the intended rep-3 duration flag on 6942 only.

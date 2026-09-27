@@ -5,9 +5,9 @@ Keep feature work in the app folder you own. The bootstrap stops after the found
 remaining checkboxes are the next agents' backlog, not work to finish in the initial commit.
 
 **Current order and acceptance criteria:** [NEXT_STEPS.md](NEXT_STEPS.md).
-B is finishing coach interactions, comparisons, results polish, live counting and demo
-verification. A continues backend work, then owns the visual overhaul after B's PR is
-reviewed and integrated. PRs #1/#2/#3 are already merged into main `79f8da3`.
+B’s feature PR #4 is reviewed, merged into main `767a98b`, and integrated on backend-cv.
+A now owns the visual overhaul. First publish the integrated backend follow-up PR and
+complete physical-camera/independent-footage rehearsal. No visual overhaul started yet.
 
 ## BOOTSTRAP
 
@@ -62,13 +62,13 @@ reviewed and integrated. PRs #1/#2/#3 are already merged into main `79f8da3`.
 - [x] [B] Upload selection/preview and honest loading/error states (PR #1).
 - [x] [A, authorized by user] Browser pose adapter and correctly mirrored skeleton overlay; simulated-camera verified, physical check pending (POSE_OVERLAY.md).
 - [x] [A, authorized by user] Uploaded pose-track endpoint and synchronized landscape/portrait playback overlay.
-- [ ] [B] Cumulative live requests, session reset/finalization, response replacement.
+- [x] [B] Cumulative live requests, session reset/finalization, response replacement.
 - [x] [B] Per-rep measurement cards and synchronized rep/minimum-angle jumps.
-- [ ] [B] Rep comparison presentation, graphs and issue navigation; scores remain null.
+- [x] [B] Rep comparison presentation, graphs and issue navigation; scores remain null.
 - [ ] [A, later] Worst-form rep ranking only after justified scoring exists.
-- [ ] [B] Coach panel and visible provider/confidence/limitations.
+- [x] [B] Coach panel and visible provider/confidence/limitations.
 - [ ] [B] Accessibility, transitions, small-screen layout, demo polish.
-- [ ] [SHARED] Review and integrate B's completed feature PR; transfer UI ownership.
+- [x] [SHARED] Review and integrate B's completed feature PR; transfer UI ownership.
 - [ ] [A, after handoff] Full frontend visual overhaul, preserving tested analysis/overlay behavior.
 
 ## INTEGRATION
@@ -80,9 +80,9 @@ reviewed and integrated. PRs #1/#2/#3 are already merged into main `79f8da3`.
 - [ ] [SHARED] Test live reset, final snapshot, camera loss, backend down, and stale responses.
 - [ ] [SHARED] Ensure synthetic/placeholder results are never presented as measured.
 - [x] [SHARED] Validate rep-start and minimum-angle playback on IMG_6939 (0.733 s / 1.733 s).
-- [ ] [SHARED] Validate playback of a real comparison flag when suitable footage exists.
+- [x] [SHARED] Validate playback of a real comparison flag when suitable footage exists.
 - [x] [SHARED] Merge backend and overlay contract changes into main (PRs #2/#3).
-- [ ] [SHARED] Run all checks on B's upcoming integrated feature commit.
+- [x] [SHARED] Run all checks on B's upcoming integrated feature commit.
 
 ## DEMO
 

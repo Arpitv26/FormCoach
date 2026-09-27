@@ -12,8 +12,8 @@ The bootstrap task ends with a verified shared foundation on main. Do not implem
 full product during bootstrap. Feature work begins after humans create their branches.
 Future agents should implement the responsibilities in their handoff, not restart the design.
 
-**Updated user priority:** prerecorded push-ups; no squat demo. Computer B is still building
-the frontend. Do not wait on browser tracking to implement backend video pose extraction.
+**Updated user priority:** prerecorded push-ups; no squat demo. B’s frontend PR #4 is now
+merged and integrated on Computer A. Preserve the working upload and live analysis paths.
 Keep the legacy squat fixture for compatibility, not as the intended presentation.
 
 ## Read before coding
@@ -52,10 +52,10 @@ isolated. Generated `apps/web/src/lib/api/types.ts` is a coordinated exception: 
 contract change must include matching types. Communicate with the other human before
 relying on the change; do not send external messages on the human's behalf without authorization.
 
-**Current human agreement (2026-09-26):** B is finishing coach interactions, rep comparisons,
-results polish, live counting and demo verification. A continues backend work now. After B
-hands off a committed, reviewed and integrated PR, A owns the frontend visual overhaul on
-this computer. Do not start that overhaul while B is editing these screens.
+**Current human agreement (2026-09-26):** B handed off PR #4 with coach interactions, rep
+comparisons and live counting. It is reviewed, merged into main (`767a98b`) and integrated
+into backend-cv (`ae959a1`). A now owns the next frontend visual overhaul on this computer.
+B should coordinate further screen edits. Physical webcam rehearsal is still pending.
 
 If a contract must change:
 
@@ -80,6 +80,13 @@ If a contract must change:
 - Use explicit files with `git add`; review the diff and commit frequently. Never force-push shared main.
 
 ## Current capabilities
+
+**Current integration:** PR #4 merged; 399 backend and 49 frontend tests, contracts, lint,
+types and production build pass. Actual IMG_6942 browser upload/coaching/flag seeking pass;
+simulated camera → actual API count/final/reset/stop pass. Physical webcam rehearsal and
+independent timing validation remain open. Read docs/INTEGRATION_STATUS.md and NEXT_STEPS.md.
+
+### Backend checkpoint before PR #4
 
 **Latest checkpoint:** IMG_6942 counts 4 (normal/normal/slow/fast). It exposed a missed timing
 flag under the old 20% reference gate. Timing policy v2 now requires a substantial change from

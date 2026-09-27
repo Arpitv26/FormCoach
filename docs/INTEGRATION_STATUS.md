@@ -1,5 +1,29 @@
 # Computer A / Computer B integration checkpoint
 
+## Current integration checkpoint — 2026-09-26
+
+Frontend PR #4 (`60c47bb`) is merged into main as `767a98b`. Computer A merged that main
+into backend-cv as `ae959a1` without conflicts. The combined backend and frontend passed
+399 Python tests, 49 frontend tests, schema/type checks, lint, and a production build.
+GitHub PR #4 checks also passed. A now owns the next visual overhaul; B should coordinate
+any further screen edits. No redesign has started in this checkpoint.
+
+Actual production Chrome → isolated FastAPI → native MediaPipe upload of IMG_6942 returns
+4 reps and the timing-v2 flag on rep 3. Review and coach evidence links seek to 8.737 s.
+Counted-time/elbow-range chart switching, local summary/next-set evidence, local QA fallback,
+removing the clip, and 390px mobile overflow checks pass. No paid OpenAI request was made.
+Real browser Lite pose extraction with a simulated camera sends cumulative batches to the
+actual API: 6 snapshots / 62 frames in the first set, final response received, then new-session
+reset and camera-stop finalization pass. Camera tracks are released; no uncaught browser errors.
+The simulated stream is not a physical-camera counting benchmark. Personal artifacts stay ignored.
+
+Remaining: physical webcam count/finish/reset rehearsal, independent footage for timing-v2
+validation, and visual overhaul. Scores, corrective alignment cues, other gym analyzers and
+fatigue detection remain deferred. Main includes B's features; the newer backend follow-ups
+are on backend-cv until its next PR is merged. Review apps/web/DEMO_CHECKS.md before presenting.
+
+## Earlier checkpoints (historical)
+
 ## New overlay checkpoint — 2026-09-26
 
 **Latest timing follow-up:** policy v2 compares the current duration with BOTH preceding
