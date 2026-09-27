@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { exercises, type ExerciseOption } from "@/lib/exercises";
+import { type ExerciseOption } from "@/lib/exercises";
 import { CameraPreview, initialCameraState, type CameraState } from "@/lib/camera/preview";
 import { api } from "@/lib/api/client";
 import type { PoseFrame } from "@/lib/api/types";
@@ -24,7 +23,6 @@ const labels: Record<CameraState["phase"], string> = {
 };
 
 export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
-  const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const previewRef = useRef<CameraPreview | null>(null);
   const [state, setState] = useState(initialCameraState);
@@ -86,12 +84,6 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
   const busy = state.phase === "requesting" || state.phase === "starting";
   const live = state.phase === "live";
 
-  function changeExercise(slug: string) {
-    counterRef.current?.reset();
-    previewRef.current?.stop();
-    router.push(`/camera?exercise=${slug}`);
-  }
-
   const finished = liveState.phase === "finished";
   function downloadCapture() {
     const batch = counterRef.current?.snapshot();
@@ -150,31 +142,7 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
       </div>
 
       <aside hidden={finished || liveState.phase === "capturing" || liveState.phase === "finishing"} className={styles.guidance} aria-labelledby="framing-heading">
-        <section className={`panel ${styles.selection}`} aria-labelledby="exercise-heading">
-          <h2 id="exercise-heading">Your session</h2>
-          <label htmlFor="exercise">Selected exercise</label>
-          <select id="exercise" value={exercise.slug} onChange={(event) => changeExercise(event.target.value)}>
-            <optgroup label="Live demo"><option value="push-up">Push-ups</option></optgroup>
-            <optgroup label="Gym exercises">{exercises.filter((option) => option.group === "gym").map((option) => <option key={option.slug} value={option.slug}>{option.name}</option>)}</optgroup>
-          </select>
-          <p>Changing exercises stops your camera. This is your selection, not an automatic detection.</p>
-        </section>
-        <section className="panel">
-          <p className="eyebrow">Set yourself up</p>
-          <h2 id="framing-heading">A little room to move.</h2>
-          <ol className={styles.tips}>
-            <li><span aria-hidden="true">01</span><div><h3>{exercise.framingTitle}</h3><p>{exercise.framingText}</p></div></li>
-            <li><span aria-hidden="true">02</span><div><h3>Find steady ground</h3><p>Place your device on a stable surface. Keep the camera still and the floor clear.</p></div></li>
-            <li><span aria-hidden="true">03</span><div><h3>Face the light</h3><p>Use even lighting so your body is easy to see. Avoid a bright window behind you.</p></div></li>
-          </ol>
-        </section>
-        <section className={`${styles.nextStep} panel`} aria-labelledby="next-heading">
-          <p className="eyebrow">One step at a time</p>
-          <h2 id="next-heading">See how you move.</h2>
-          <p>{exercise.group === "live" ? "Start a push-up set to count completed reps with the connected backend. For playback and timestamp review, upload a recorded video." : exercise.backendHint ? "Use an uploaded video to analyze this gym exercise." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} The skeleton shows estimated joint positions, not an assessment of form. Camera angle and full-body visibility are not automatically verified.</p>
-          {exercise.backendHint && <Link href={`/upload?exercise=${exercise.slug}`}>Analyze a video →</Link>}
-          <Link href="/" className={styles.demoLink}>Choose another exercise <span aria-hidden="true">↗</span></Link>
-        </section>
+        <section className="panel"><p className="eyebrow">Before you begin</p><h2 id="framing-heading">A little room to move.</h2><p className={styles.setupCue}>{exercise.framingText}</p><details><summary>More setup tips</summary><p className="muted small">Use a stable surface and even lighting. Keep one person in view. The skeleton shows estimated positions, not a form assessment.</p></details><Link className="text-link" href={`/upload?exercise=${exercise.slug}`}>Have a video? Upload your set →</Link></section>
       </aside>
     </div>
   );

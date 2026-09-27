@@ -1,59 +1,17 @@
 import Link from "next/link";
 import { BackendStatus } from "@/components/backend-status";
+import { AppIcon } from "@/components/app-navigation";
 import { exercises } from "@/lib/exercises";
 import styles from "./page.module.css";
 
 export default function Home() {
-  return (
-    <>
-      <a className="skip-link" href="#main-content">Skip to exercises</a>
-      <header className="site-header">
-        <Link className="brand" href="/" aria-label="FormCoach home"><span className="brand-mark" aria-hidden="true">f<span>c</span></span>FormCoach<span className="brand-dot">.</span></Link>
-        <nav aria-label="Main navigation"><a href="#live-demo">Push-up analysis</a><a href="#gym">Gym exercises</a></nav>
-        <Link className="camera-entry" href="/camera?exercise=push-up">Use camera <span aria-hidden="true">↗</span></Link>
-      </header>
-      <main id="main-content">
-        <div className="page-heading"><p>YOUR MOVEMENT, IN FOCUS</p><span>Choose your session <span aria-hidden="true">↙</span></span></div>
-        <section className={styles.hero} id="live-demo" aria-labelledby="live-heading">
-          <div className={styles.heroCopy}>
-            <p className="eyebrow">Your push-up demo starts here</p>
-            <h1 id="live-heading">Your next rep.<br /><span>A little more intention.</span></h1>
-            <p>Record a short push-up set from the side. Upload your clip to review counted reps and measured movement.</p>
-            <Link className="primary-action" href="/upload">Analyze a push-up video <span aria-hidden="true">↗</span></Link>
-            <p className={styles.availability}>Upload for playback and coaching, or use your camera for live push-up counting.</p>
-          </div>
-          <div className={styles.featuredExercise}>
-            <span className={styles.exerciseNumber} aria-hidden="true">01</span>
-            <span className="provenance-badge">Push-up video analysis</span>
-            <h2>Push-ups</h2>
-            <p>Bodyweight. A little floor space.<br />A side view of every move.</p>
-            <div className={styles.featuredFooter}><span>RECORD · UPLOAD · REVIEW</span><span aria-hidden="true">↗</span></div>
-          </div>
-        </section>
-
-        <section id="gym" className={styles.gymSection} aria-labelledby="gym-heading">
-          <div className="section-heading"><div><p className="eyebrow">Take it to the gym</p><h2 id="gym-heading">Your gym lineup</h2></div><span className="outline-tag">Video review</span></div>
-          <p className={styles.sectionIntro}>Choose a supported exercise to upload a set. Other exercises are still in development.</p>
-          <div className={styles.exerciseGrid}>
-            {exercises.filter((exercise) => exercise.group === "gym").map((exercise, index) => (
-              <article className={styles.exerciseCard} key={exercise.slug}>
-                <span className={styles.cardNumber} aria-hidden="true">0{index + 2}</span>
-                <p className="eyebrow">{exercise.equipment}</p>
-                <h3>{exercise.name}</h3>
-                <p>{exercise.framingText}</p>
-                <Link href={`/${exercise.backendHint ? "upload" : "camera"}?exercise=${exercise.slug}`} aria-label={`${exercise.backendHint ? "Analyze" : "Preview framing for"} ${exercise.name}`}>{exercise.backendHint ? "Analyze video" : "Preview framing"} <span aria-hidden="true">↗</span></Link>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <aside className={styles.progressNote} aria-label="Current capabilities">
-          <span aria-hidden="true">✦</span>
-          <div><h2>A clear view. Useful evidence.</h2><p>Upload a push-up clip for backend analysis. You can also count push-ups with your webcam. Selected gym exercises support uploads; scores stay unavailable.</p></div>
-        </aside>
-        <BackendStatus />
-        <footer><span>FormCoach · HelloHacks 2026</span><span>Small insights. More intentional movement.</span></footer>
-      </main>
-    </>
-  );
+  return <main id="main-content">
+    <section className={styles.welcome}>
+      <div><p className="eyebrow">Your training, in focus</p><h1>Ready for your next set?</h1><p className="muted">A clear view of your movement. A little more intention in every rep.</p><div className="action-row"><Link className="primary-action" href="/camera?exercise=push-up"><AppIcon name="live" />Start live push-ups</Link><Link className="secondary-action" href="/upload"><AppIcon name="upload" />Upload a video</Link></div></div>
+      <div className={styles.welcomeMark} aria-hidden="true"><svg viewBox="0 0 200 130" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 107h160M30 94l63-42 52 8 17 34M93 52l12 42h20"/><circle cx="160" cy="47" r="12"/><circle cx="93" cy="52" r="5" fill="currentColor"/></svg><span>Make room for your next move.</span></div>
+    </section>
+    <section className={styles.activity}><div className="section-heading"><h2>Your workout log</h2><span className="muted small">Saved on this device</span></div><div className={styles.empty}><span className={styles.emptyIcon}><AppIcon name="dashboard" /></span><h3>Your story starts with a set.</h3><p className="muted">Review a video or finish a live set, then save it here.<br />Your actual reps and observations, all in one place.</p><Link className="text-link" href="/upload">Review your first set →</Link></div></section>
+    <section className={styles.lineup}><div className="section-heading"><h2>Bring your gym set</h2><span className="muted small">Choose an exercise to upload</span></div><div className={styles.exerciseGrid}>{exercises.filter(e => e.group === "gym").map((exercise, index) => <Link className={styles.exerciseCard} href={`/upload?exercise=${exercise.slug}`} key={exercise.slug}><span className={styles.exerciseNumber}>0{index + 1}</span><div><h3>{exercise.name}</h3><p className="muted small">{exercise.equipment}</p></div><AppIcon name="arrow" /></Link>)}</div></section>
+    <BackendStatus /><footer><span>FormCoach · HelloHacks 2026</span><span>Movement feedback, grounded in your set.</span></footer>
+  </main>;
 }

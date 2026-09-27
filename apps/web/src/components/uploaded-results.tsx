@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useId, useState, type KeyboardEvent } from "react";
 import { CoachPanel } from "./coach-panel";
 import { RepOverview } from "./rep-overview";
 import { MovementObservations } from "./movement-observations";
@@ -8,66 +8,62 @@ import { referenceComparisons } from "@/lib/results/measurements";
 import type { AnalysisResponse } from "@/lib/api/types";
 import styles from "./video-upload.module.css";
 
-function seconds(value: number | null | undefined) {
-  return value == null ? "Unavailable" : `${(value / 1000).toFixed(2)} s`;
-}
-function angle(value: number | null | undefined) {
-  return value == null ? "Unavailable" : `${value.toFixed(1)}°`;
-}
-const statuses = {
-  complete: "Analysis complete", partial: "Some movement may be missing",
-  insufficient_data: "Not enough visible movement", not_implemented: "Analysis unavailable",
-};
+function seconds(value: number | null | undefined) { return value == null ? "Unavailable" : `${(value / 1000).toFixed(2)} s`; }
+function angle(value: number | null | undefined) { return value == null ? "Unavailable" : `${value.toFixed(1)}°`; }
+const tabs = ["Overview", "Reps", "Coach"] as const;
+type ReviewTab = (typeof tabs)[number];
 
 export function UploadedResults({ analysis, canSeek, onSeek }: {
   analysis: AnalysisResponse; canSeek: boolean; onSeek: (timestampMs: number) => void;
 }) {
   const id = useId();
-  const repDetails = useRef<HTMLDetailsElement>(null);
+  const [tab, setTab] = useState<ReviewTab>("Overview");
   const live = analysis.source.type === "live";
   const measured = analysis.provenance.kind === "measured";
-  const seekEnabled = canSeek && measured && analysis.source.type === "upload";
-  const heading = analysis.reps.length === 0 && analysis.movementObservations?.length ? "Movement reviewed" : statuses[analysis.status];
-  return (
-    <section className={styles.results} aria-labelledby={`${id}-heading`}>
-      <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{heading}</h2></div></div>
-      {!measured && <p className={styles.notice}>This response is {analysis.provenance.kind} data, not verified measurements from your movement. Timestamp playback is disabled.</p>}
-      <p>{analysis.summary.totalReps == null ? "We couldn’t reliably count this set." : `We detected ${analysis.summary.totalReps} completed reps.`}</p>
-      {analysis.exercise?.id === "incline-dumbbell-bench-press" && <p className="muted small">Rep times run from bent arms to extension, including pauses. Lowering prepares the next rep.</p>}
-      {analysis.exercise?.id === "cable-lateral-raise" && <p className="muted small">Rep times run from a lowered arm to the raised zone. The measured angle is projected hip–shoulder–elbow geometry.</p>}
-      <dl className={styles.summary}>
-        <div><dt>Counted reps</dt><dd>{analysis.summary.totalReps ?? "Unavailable"}</dd></div>
-        <div><dt>{live ? "Set length" : "Video duration"}</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>
-        {analysis.summary.overallScore != null && <div><dt>Form score</dt><dd>{analysis.summary.overallScore}/100</dd></div>}
-      </dl>
-      {analysis.status === "partial" && analysis.reps.length > 0 && <p className={styles.notice}>Some movement could not be fully counted. The detected count may be lower than the number you performed.</p>}
-      {analysis.reps.length === 0 && <p className={styles.notice}>{analysis.summary.totalReps === 0 ? "No complete movements met the counting rules. That doesn’t mean no movement happened." : "There wasn’t enough information to count completed reps reliably."}</p>}
+  const seekEnabled = canSeek && measured && !live;
+  const visual = analysis.visualReview;
+  const findings = visual?.findings ?? [];
+  const highlights = findings.filter(finding => !finding.phase || finding.phase === "exercise").slice(0, 2);
+  function changeTab(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    let next = index;
+    if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+    else if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = tabs.length - 1;
+    else return;
+    event.preventDefault(); setTab(tabs[next]);
+    document.getElementById(`${id}-tab-${tabs[next]}`)?.focus();
+  }
+  function visualCard(finding: (typeof findings)[number], index: number) {
+    return <article key={index} className={styles.finding}>
+      <div className="section-heading"><span className={styles.findingLabel}>AI visual observation</span><span className="muted small">{finding.phase === "setup" ? "Setup" : finding.phase === "finish" ? "After the set" : finding.kind === "positive" ? "What looked consistent" : finding.kind === "adjustment" ? "Something to try" : "During your set"}</span></div>
+      <h3>{finding.observation}</h3><p>{finding.cue}</p>
+      {seekEnabled && <button type="button" className={styles.secondary} onClick={() => onSeek(finding.evidenceTimestampsMs[0])}>Watch moment · {seconds(finding.evidenceTimestampsMs[0])} ↗</button>}
+      <details><summary>Evidence timestamps</summary><div className={styles.moments}>{finding.evidenceTimestampsMs.map(time => seekEnabled ? <button key={time} onClick={() => onSeek(time)}>{seconds(time)}</button> : <span key={time}>{seconds(time)}</span>)}</div></details>
+    </article>;
+  }
+  return <section className={styles.results} aria-labelledby={`${id}-heading`}>
+    <div className={styles.resultHeader}><p className="eyebrow">{live ? "Live set" : "Video review"}</p><h2 id={`${id}-heading`} data-results-heading>Your set, in focus.</h2></div>
+    {!measured && <p className={styles.notice}>{analysis.provenance.label} · {analysis.provenance.kind} data. Playback is disabled.</p>}
+    <dl className={styles.summary}><div><dd>{analysis.summary.totalReps ?? "—"}</dd><dt>{analysis.summary.totalReps === null ? "Count unavailable" : "Detected reps"}</dt></div><div><dd>{seconds(analysis.source.durationMs)}</dd><dt>{live ? "Sample coverage" : "Clip length"}</dt></div></dl>
+    {analysis.status === "partial" && <p className={styles.notice}>Some movement may be uncounted. <a className="text-link" href={`#${id}-limits`} onClick={() => { const details = document.getElementById(`${id}-limits`) as HTMLDetailsElement | null; if (details) details.open = true; }}>See tracking details</a></p>}
+    {analysis.reps.length === 0 && <p className="muted small">{analysis.summary.totalReps === 0 ? "No complete movements met the counting rules. Movement observations can still be useful." : "There wasn’t enough information to count completed reps reliably."}</p>}
+    <div className={styles.tabs} role="tablist" aria-label="Set review">{tabs.map((name, index) => <button key={name} type="button" role="tab" id={`${id}-tab-${name}`} aria-selected={tab === name} aria-controls={`${id}-panel-${name}`} tabIndex={tab === name ? 0 : -1} onKeyDown={event => changeTab(event, index)} onClick={() => setTab(name)}>{name}{name === "Reps" && analysis.reps.length > 0 ? ` · ${analysis.reps.length}` : ""}</button>)}</div>
+    <div role="tabpanel" id={`${id}-panel-Overview`} aria-labelledby={`${id}-tab-Overview`} hidden={tab !== "Overview"} tabIndex={0}>
+      {highlights.map(visualCard)}
+      {visual?.status === "unavailable" && <p className={styles.notice}>AI visual review couldn’t finish. Your measured results are still available.</p>}
+      {!highlights.length && <div className={styles.finding}><span className={styles.findingLabel}>Measured movement</span><h3>{analysis.reps.length ? "Take a closer look at your reps." : "Your available observations"}</h3><p>{analysis.reps.length ? "Explore the timing and available joint angles in Reps, or ask your coach about this set." : "A missing count doesn’t establish that no movement happened. Tracking details explain what could be measured."}</p>{visual?.status === "complete" && !findings.length && <p className="muted small">No clear visual findings were established from the sampled frames.</p>}</div>}
       <MovementObservations observations={analysis.movementObservations} onSeek={seekEnabled ? onSeek : undefined} />
-      <CoachPanel key={analysis.sessionId} analysis={analysis} onSeek={seekEnabled ? onSeek : undefined} />
-      {analysis.visualReview && <section aria-label="AI visual review">
-        <h3>What the visual review noticed</h3>
-        <p className="muted small">AI interpretation of sampled video frames · separate from measured angles and rep counts.</p>
-        {analysis.visualReview.status === "unavailable" ? <p>Visual review couldn’t finish. Your measured results are still available; analyze again to retry.</p> : analysis.visualReview.findings.length === 0 ? <p>No clear technique observations were established from these frames.</p> : analysis.visualReview.findings.map((finding, index) => <div key={index}>
-          <p className="muted small">{finding.phase === "setup" ? "During setup" : finding.phase === "finish" ? "After the set" : "During the exercise"}</p>
-          <p><strong>{finding.observation}</strong></p><p>{finding.cue}</p>
-          <div className={styles.moments}>{finding.evidenceTimestampsMs.map((time) => <button key={time} type="button" disabled={!seekEnabled} onClick={() => onSeek(time)}>Review {seconds(time)}</button>)}</div>
-        </div>)}
-        <details><summary>Visual review details</summary><p>{analysis.visualReview.sampledTimestampsMs.length} frames reviewed.</p><ul>{analysis.visualReview.limitations.map((limit, index) => <li key={index}>{limit}</li>)}</ul></details>
-      </section>}
-      <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} onShowDetails={() => { if (repDetails.current) repDetails.current.open = true; }} />
-      {(analysis.reps.length > 0 || analysis.issues.length > 0) && <section className={styles.changes} aria-labelledby={`${id}-changes`}>
-        <div className="section-heading"><h3 id={`${id}-changes`}>Rep-to-rep changes</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>
-        {analysis.issues.length === 0 ? <p className="muted small">{analysis.exercise?.id !== "push-up" ? "Automatic change flags aren’t available for this exercise yet. Explore the rep times and angles below." : analysis.reps.length < 3 ? "We need at least three well-tracked reps to compare changes." : "No substantial changes were flagged in the reps we could compare."} This isn’t a form rating.</p> : analysis.issues.map((issue) => (
-          <article key={issue.id} className={styles.changeCard}>
-            <h4>{issue.title}</h4><p className="small">{issue.shortCue}</p>
-            {seekEnabled && <button type="button" className={styles.secondary} onClick={() => onSeek(issue.startMs)}>Review at {seconds(issue.startMs)} ↗</button>}
-            <details><summary>Why this was flagged</summary><p className="small">{issue.explanation}</p><p className="muted small">Review priority: {issue.severity} · Confidence: {issue.confidence == null ? "Unknown" : `${Math.round(issue.confidence * 100)}%`}</p></details>
-          </article>
-        ))}
-      </section>}
-      {analysis.reps.length > 0 && <details ref={repDetails} className={styles.evidence}><summary>Explore each rep’s measurements</summary>
+      {analysis.issues.slice(0, 2).map(issue => <article className={styles.finding} key={issue.id}><span className={styles.findingLabel}>Measured change</span><h3>{issue.title}</h3><p>{issue.shortCue}</p>{seekEnabled && <button className={styles.secondary} onClick={() => onSeek(issue.startMs)}>Watch moment · {seconds(issue.startMs)} ↗</button>}<details><summary>Why this was flagged</summary><p>{issue.explanation}</p><p className="small muted">Review priority: {issue.severity} · Confidence: {issue.confidence === null ? "Unknown" : `${Math.round(issue.confidence * 100)}%`}</p></details></article>)}
+      {(findings.length > highlights.length || analysis.issues.length > 2) && <details className={styles.evidence}><summary>All observations</summary>{findings.filter(f => !highlights.includes(f)).map(visualCard)}{analysis.issues.slice(2).map(issue => <article className={styles.finding} key={issue.id}><span className={styles.findingLabel}>Measured change</span><h3>{issue.title}</h3><p>{issue.shortCue}</p><p>{issue.explanation}</p>{seekEnabled && <button onClick={() => onSeek(issue.startMs)} className={styles.secondary}>Watch moment · {seconds(issue.startMs)}</button>}</article>)}</details>}
+      {visual && <details className={styles.evidence}><summary>About AI visual observations</summary><p className="muted small">Interpretation of {visual.sampledTimestampsMs.length} sampled video frames, separate from measured counts and angles.</p><ul>{visual.limitations.map((limit, index) => <li key={index}>{limit}</li>)}</ul></details>}
+    </div>
+    <div role="tabpanel" id={`${id}-panel-Reps`} aria-labelledby={`${id}-tab-Reps`} hidden={tab !== "Reps"} tabIndex={0}>
+      <p className={styles.timingNote}>{analysis.exercise?.id === "incline-dumbbell-bench-press" ? "Counted time runs from bent arms to extension, including pauses. Lowering prepares the next rep." : analysis.exercise?.id === "cable-lateral-raise" ? "Counted time runs from the lowered arm to the raised zone. Angles describe projected hip–shoulder–elbow geometry." : "Counted time includes pauses and confirmation delay. Angles describe this 2D camera view."}</p>
+      {analysis.reps.length === 0 && <p className="muted">No completed reps to display. Overview retains any movement observations.</p>}
       {analysis.reps.map((rep) => (
-        <article className={styles.rep} key={rep.repNumber} id={`${id}-rep-${rep.repNumber}`}>
+        <details className={styles.rep} key={rep.repNumber} id={`${id}-rep-${rep.repNumber}`} onToggle={(event) => { if (event.currentTarget.open && seekEnabled) onSeek(rep.startMs); }}>
+          <summary className={styles.repRow}><strong>Rep {rep.repNumber}</strong><span>{seconds(rep.startMs)} – {seconds(rep.endMs)}</span><span>{seconds(rep.measurements.durationMs)}</span></summary>
           <div className={styles.repHeading}><h3>Rep {rep.repNumber}</h3>{!live && <button type="button" disabled={!seekEnabled} onClick={() => onSeek(rep.startMs)}>View at {seconds(rep.startMs)} <span aria-hidden="true">↗</span></button>}</div>
           <p className="muted small">{seconds(rep.startMs)} – {seconds(rep.endMs)} · Counted duration: {seconds(rep.measurements.durationMs)}</p>
           <dl className={styles.measurements}>
@@ -83,18 +79,11 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
           {referenceComparisons(rep).map((item) => <p key={item.label} className={styles.comparison}><strong>{item.label}: {item.current}</strong><span>Reference median ({item.reference}): {item.baseline} · Change: {item.change}</span></p>)}
           {!live && <div className={styles.moments}>{rep.keyMoments.map((moment, index) => <button type="button" key={`${moment.type}-${index}`} disabled={!seekEnabled} onClick={() => onSeek(moment.timestampMs)}>{moment.label} · {seconds(moment.timestampMs)}</button>)}</div>}
 
-        </article>
+        </details>
       ))}
-      </details>}
-      <details className={styles.evidence}><summary>About these measurements</summary>
-      <p className="muted small">Angles are smoothed 2D observations and depend on the camera view. Timing can include pauses and rep confirmation; it does not identify lifting or lowering phases.</p>
-      <p className="muted small">Only visible, sufficiently tracked joints are measured. Full-body visibility and camera angle are not verified.</p>
-
-        <p>Full body visible: {analysis.cameraQuality.fullBodyVisible === null ? "Unknown" : analysis.cameraQuality.fullBodyVisible ? "Yes" : "No"}. Camera quality: {analysis.cameraQuality.score ?? "Unavailable"}.</p>
-        <p className="muted small">{analysis.exercise?.name ?? "This"} is your selected exercise. Selection alone does not confirm exercise detection.</p>
-        {[...analysis.cameraQuality.issues, ...analysis.limitations].length > 0 && <ul>{[...analysis.cameraQuality.issues, ...analysis.limitations].map((item, index) => <li key={index}>{item}</li>)}</ul>}
-
-      </details>
-    </section>
-  );
+      {analysis.reps.length > 1 && <details className={styles.evidence}><summary>Compare rep measurements</summary><RepOverview reps={analysis.reps} idPrefix={id} onSeek={seekEnabled ? onSeek : undefined} onShowDetails={() => { document.querySelectorAll<HTMLDetailsElement>(`[id^="${id}-rep-"]`).forEach(item => { item.open = true; }); }} /></details>}
+    </div>
+    <div role="tabpanel" id={`${id}-panel-Coach`} aria-labelledby={`${id}-tab-Coach`} hidden={tab !== "Coach"} tabIndex={0}><CoachPanel key={analysis.sessionId} analysis={analysis} onSeek={seekEnabled ? onSeek : undefined} /></div>
+    <details id={`${id}-limits`} className={styles.evidence}><summary>Tracking & measurement details</summary><p className="muted small">Angles depend on the camera view. Only sufficiently visible joints are measured. Exercise selection does not confirm detection.</p><p className="muted small">Full body visible: {analysis.cameraQuality.fullBodyVisible === null ? "Unknown" : analysis.cameraQuality.fullBodyVisible ? "Yes" : "No"}. Camera quality: {analysis.cameraQuality.score ?? "Unavailable"}.</p><ul>{[...analysis.cameraQuality.issues, ...analysis.limitations].map((item, index) => <li key={index}>{item}</li>)}</ul></details>
+  </section>;
 }

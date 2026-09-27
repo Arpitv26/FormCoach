@@ -33,7 +33,6 @@ export function CoachPanel({ analysis, onSeek }: { analysis: AnalysisResponse; o
     <div className={styles.actions} aria-label="Suggested questions">
       <button type="button" disabled={state.busy} onClick={() => submit("summary")}>How did my set go?</button>
       <button type="button" disabled={state.busy} onClick={() => submit("next_set")}>What should I focus on?</button>
-      {analysis.status === "partial" && <button type="button" disabled={state.busy} onClick={() => submit("qa", "I think you missed some reps. What can we check?")}>You missed some reps</button>}
     </div>
     <div ref={conversation} className={styles.conversation} role="log" aria-label="Conversation with coach" tabIndex={0}>
       {state.exchanges.map((turn, index) => <div key={index} className={styles.exchange}>
