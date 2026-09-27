@@ -171,8 +171,8 @@ export function WebcamSetup({ exercise }: { exercise: ExerciseOption }) {
         <section className={`${styles.nextStep} panel`} aria-labelledby="next-heading">
           <p className="eyebrow">One step at a time</p>
           <h2 id="next-heading">See how you move.</h2>
-          <p>{exercise.group === "live" ? "Start a push-up set to count completed reps with the connected backend. For playback and timestamp review, upload a recorded video." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} The skeleton shows estimated joint positions, not an assessment of form. Camera angle and full-body visibility are not automatically verified.</p>
-          {exercise.group === "live" && <Link href="/upload">Analyze a push-up video →</Link>}
+          <p>{exercise.group === "live" ? "Start a push-up set to count completed reps with the connected backend. For playback and timestamp review, upload a recorded video." : exercise.backendHint ? "Use an uploaded video to analyze this gym exercise." : "Analysis for this gym exercise is planned. Its supported camera angle still needs to be verified."} The skeleton shows estimated joint positions, not an assessment of form. Camera angle and full-body visibility are not automatically verified.</p>
+          {exercise.backendHint && <Link href={`/upload?exercise=${exercise.slug}`}>Analyze a video →</Link>}
           <Link href="/" className={styles.demoLink}>Choose another exercise <span aria-hidden="true">↗</span></Link>
         </section>
       </aside>

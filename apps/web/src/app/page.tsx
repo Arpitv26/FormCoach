@@ -32,8 +32,8 @@ export default function Home() {
         </section>
 
         <section id="gym" className={styles.gymSection} aria-labelledby="gym-heading">
-          <div className="section-heading"><div><p className="eyebrow">Take it to the gym</p><h2 id="gym-heading">Your gym lineup</h2></div><span className="outline-tag">Analysis planned</span></div>
-          <p className={styles.sectionIntro}>Choose an exercise to check your camera framing. These exercises do not produce analysis yet.</p>
+          <div className="section-heading"><div><p className="eyebrow">Take it to the gym</p><h2 id="gym-heading">Your gym lineup</h2></div><span className="outline-tag">Video review</span></div>
+          <p className={styles.sectionIntro}>Choose a supported exercise to upload a set. Other exercises are still in development.</p>
           <div className={styles.exerciseGrid}>
             {exercises.filter((exercise) => exercise.group === "gym").map((exercise, index) => (
               <article className={styles.exerciseCard} key={exercise.slug}>
@@ -41,7 +41,7 @@ export default function Home() {
                 <p className="eyebrow">{exercise.equipment}</p>
                 <h3>{exercise.name}</h3>
                 <p>{exercise.framingText}</p>
-                <Link href={`/camera?exercise=${exercise.slug}`} aria-label={`Preview framing for ${exercise.name}`}>Preview framing <span aria-hidden="true">↗</span></Link>
+                <Link href={`/${exercise.backendHint ? "upload" : "camera"}?exercise=${exercise.slug}`} aria-label={`${exercise.backendHint ? "Analyze" : "Preview framing for"} ${exercise.name}`}>{exercise.backendHint ? "Analyze video" : "Preview framing"} <span aria-hidden="true">↗</span></Link>
               </article>
             ))}
           </div>
@@ -49,7 +49,7 @@ export default function Home() {
 
         <aside className={styles.progressNote} aria-label="Current capabilities">
           <span aria-hidden="true">✦</span>
-          <div><h2>A clear view. Useful evidence.</h2><p>Upload a push-up clip for backend analysis. You can also count push-ups with your webcam. Gym analysis remains planned; scores stay unavailable.</p></div>
+          <div><h2>A clear view. Useful evidence.</h2><p>Upload a push-up clip for backend analysis. You can also count push-ups with your webcam. Selected gym exercises support uploads; scores stay unavailable.</p></div>
         </aside>
         <BackendStatus />
         <footer><span>FormCoach · HelloHacks 2026</span><span>Small insights. More intentional movement.</span></footer>

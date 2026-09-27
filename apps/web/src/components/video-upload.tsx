@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { exercises, type ExerciseOption } from "@/lib/exercises";
 import { api } from "@/lib/api/client";
 import { emptyUploadState, UploadSession } from "@/lib/video/upload-session";
 import { PlaybackOverlay } from "./playback-overlay";
 import { UploadedResults } from "./uploaded-results";
 import styles from "./video-upload.module.css";
 
-export function VideoUpload() {
+export function VideoUpload({ exercise }: { exercise: Extract<ExerciseOption, { backendHint: string }> }) {
+  const router = useRouter();
   const [state, setState] = useState(emptyUploadState);
   const session = useRef<UploadSession | null>(null);
   const video = useRef<HTMLVideoElement | null>(null);
@@ -16,10 +19,10 @@ export function VideoUpload() {
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [playbackMessage, setPlaybackMessage] = useState("");
   useEffect(() => {
-    const current = new UploadSession((file, signal) => api.analyzeVideoWithPose(file, "push-up", signal), setState);
+    const current = new UploadSession((file, signal) => api.analyzeVideoWithPose(file, exercise.backendHint, signal), setState);
     session.current = current;
     return () => { current.dispose(); session.current = null; };
-  }, []);
+  }, [exercise.backendHint]);
 
   function seek(timestampMs: number) {
     const player = video.current;
@@ -36,11 +39,13 @@ export function VideoUpload() {
   const selection = state.selection;
   return (
     <>
-      <div className={styles.intro}><p className="eyebrow">Push-ups · video analysis</p><h1>Capture your set.<br /><span>Understand each rep.</span></h1><p className="muted">Record a short set on your phone, then review counted reps and measured elbow movement.</p></div>
+      <div className={styles.intro}><p className="eyebrow">{exercise.name} · video analysis</p><h1>Capture your set.<br /><span>Understand each rep.</span></h1><p className="muted">Record a short set on your phone, then review counted reps and measured movement.</p></div>
       <div className={styles.workspace}>
         <div className={styles.reviewColumn}>
         <section className={styles.uploadPanel} aria-labelledby="clip-heading">
-          <div className="section-heading"><h2 id="clip-heading">Your push-up clip</h2><span className="outline-tag">01 / UPLOAD</span></div>
+          <div className="section-heading"><h2 id="clip-heading">Your exercise clip</h2><span className="outline-tag">01 / UPLOAD</span></div>
+          <label className={styles.fileLabel} htmlFor="upload-exercise">Exercise</label>
+          <select id="upload-exercise" value={exercise.slug} onChange={(event) => router.push(`/upload?exercise=${event.target.value}`)}>{exercises.filter((item) => item.backendHint).map((item) => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select>
           <label className={styles.fileLabel} htmlFor="video-file">{selection ? "Choose a different video" : "Choose your video"}</label>
           <button ref={chooser} type="button" className={styles.secondary} onClick={() => input.current?.click()}>{selection ? "Replace clip" : "Choose file"}</button>
           <input tabIndex={-1} ref={input} id="video-file" className={styles.fileInput} type="file" accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm" aria-describedby="file-help" onChange={(event) => {
@@ -64,10 +69,10 @@ export function VideoUpload() {
               {state.preview === "unplayable" && <p className={styles.notice}>This browser cannot preview this codec. You can still try analysis, but timestamp playback is unavailable. For playback, export an H.264 MP4 and analyze that same export.</p>}
               <p className="small" role="status">{playbackMessage}</p>
             </>
-          ) : <div className={styles.emptyPreview}><span aria-hidden="true">↥</span><h3>A clearer view of your movement.</h3><p>Choose a clip to preview it here.<br />It stays local until you select Analyze push-ups.</p></div>}
+          ) : <div className={styles.emptyPreview}><span aria-hidden="true">↥</span><h3>A clearer view of your movement.</h3><p>Choose a clip to preview it here.<br />It stays local until you select Analyze video.</p></div>}
           {state.validationError && <p className={styles.error} role="alert">{state.validationError}</p>}
           <div className={styles.actions}>
-            <button className="primary-action" type="button" disabled={!selection || !!state.validationError || busy} onClick={() => { setPlaybackMessage(""); void session.current?.submit(); }}>{busy ? "Analyzing video…" : state.phase === "error" ? "Try analysis again" : "Analyze push-ups"}<span aria-hidden="true">↗</span></button>
+            <button className="primary-action" type="button" disabled={!selection || !!state.validationError || busy} onClick={() => { setPlaybackMessage(""); void session.current?.submit(); }}>{busy ? "Analyzing video…" : state.phase === "error" ? "Try analysis again" : "Analyze video"}<span aria-hidden="true">↗</span></button>
             {busy ? <button className={styles.secondary} type="button" onClick={() => session.current?.cancel()}>Stop waiting</button> : selection && <button className={styles.secondary} type="button" onClick={() => { session.current?.select(null); setPlaybackMessage(""); chooser.current?.focus(); }}>Remove clip</button>}
           </div>
           <div role="status" aria-live="polite">
@@ -79,7 +84,7 @@ export function VideoUpload() {
         </section>
         {state.result && <UploadedResults analysis={state.result} canSeek={state.preview === "ready"} onSeek={seek} />}
         </div>
-        <aside className={styles.guide} aria-labelledby="guide-heading"><p className="eyebrow">A little setup goes a long way</p><h2 id="guide-heading">Make every rep visible.</h2><ol><li><strong>Film from the side.</strong><span>Keep your full body in frame, including shoulders, elbows, hips and feet.</span></li><li><strong>Keep the phone still.</strong><span>Use a stable surface and good lighting. Avoid people crossing in front of you.</span></li><li><strong>Keep it short.</strong><span>A clear clip of 3–5 push-ups is a good place to start.</span></li></ol><div className={styles.guideNote}><span aria-hidden="true">✦</span><p>Counted reps and timestamps first. Scores stay unavailable when the backend cannot measure them.</p></div><p className="muted small">Push-ups only for now. Gym exercise analysis is still planned.</p></aside>
+        <aside className={styles.guide} aria-labelledby="guide-heading"><p className="eyebrow">A little setup goes a long way</p><h2 id="guide-heading">Make every rep visible.</h2><ol><li><strong>{exercise.framingTitle}</strong><span>{exercise.framingText}</span></li><li><strong>Keep the phone still.</strong><span>Use a stable surface and good lighting. Avoid people crossing in front of you.</span></li><li><strong>Keep it short.</strong><span>A clear clip of 3–6 reps is a good place to start.</span></li></ol><div className={styles.guideNote}><span aria-hidden="true">✦</span><p>Counted reps and timestamps first. Scores stay unavailable when the backend cannot measure them.</p></div></aside>
       </div>
     </>
   );

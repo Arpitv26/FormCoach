@@ -10,6 +10,7 @@ from fastapi import UploadFile
 
 from app.analysis.exercises.registry import PROFILES
 from app.analysis.interfaces import MovementAnalyzer
+from app.analysis.movement import MOVEMENTS
 from app.domain.analysis import AnalysisResponse, Source
 from app.domain.video import PoseTrack, VideoAnalysisResponse
 from app.services.mediapipe_pose import MAX_VIDEO_BYTES
@@ -47,12 +48,14 @@ class UploadedVideoProcessor:
         self, file: UploadFile, exercise_hint: str | None
     ) -> VideoAnalysisResponse:
         if not exercise_hint:
-            raise VideoRequestError(400, "EXERCISE_REQUIRED", "Select push-up before uploading.")
+            raise VideoRequestError(
+                400, "EXERCISE_REQUIRED", "Select an exercise before uploading."
+            )
         if exercise_hint not in PROFILES:
             raise VideoRequestError(400, "UNKNOWN_EXERCISE", "Use a registered exercise ID.")
-        if exercise_hint not in {"push-up", "squat"}:
+        if exercise_hint not in MOVEMENTS:
             raise VideoRequestError(
-                400, "EXERCISE_NOT_SUPPORTED", "Video counting supports push-up and squat only."
+                400, "EXERCISE_NOT_SUPPORTED", "Video counting is not available for this exercise."
             )
         suffix = Path(file.filename or "").suffix.lower()
         if suffix not in {".mp4", ".mov", ".webm"}:

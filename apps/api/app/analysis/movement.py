@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.lat_pulldown import segment_lat_pulldowns
 from app.analysis.exercises.pushup_body_line import add_body_line_measurements
 from app.analysis.exercises.pushup_comparisons import compare_pushup_reps
 from app.analysis.exercises.pushup_measurements import pushup_measurements
@@ -42,6 +43,12 @@ MOVEMENTS = {
     "squat": MovementSpec(("hip", "knee", "ankle"), "standing", "standing", segment_squats),
     "push-up": MovementSpec(
         ("shoulder", "elbow", "wrist"), "top", "the straight-arm top position", segment_pushups
+    ),
+    "lat-pulldown": MovementSpec(
+        ("shoulder", "elbow", "wrist"),
+        "extended",
+        "the arms-overhead return position",
+        segment_lat_pulldowns,
     ),
 }
 
@@ -142,9 +149,7 @@ class RuleBasedAnalyzer:
                 profile=profile,
                 is_final=is_final,
             )
-            response.limitations.append(
-                "Select push-up or squat to use an implemented rep counter."
-            )
+            response.limitations.append("Select an implemented exercise to use a rep counter.")
             return response
 
         movement = MOVEMENTS[profile.id]
@@ -247,6 +252,16 @@ class RuleBasedAnalyzer:
                 "Absent comparison keys mean unavailable, not no change."
             )
             limitations.extend(comparison_limitations)
+        if profile.id == "lat-pulldown":
+            limitations.append(
+                "Lat-pulldown counter v1 uses a 120-degree elbow return zone and "
+                "70-degree pulled zone, with 100 ms of raw observations plus median "
+                "confirmation. One rep runs from a pull through the overhead return. "
+                "These are uncalibrated counting zones, not full-extension or depth targets. "
+                "Elbow excursion and timing describe the observed cycle. Equipment, torso "
+                "swing, bilateral symmetry and form quality are not assessed. "
+                "Automatic rep comparison flags are not implemented for this exercise."
+            )
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable or result.tracking_breaks:

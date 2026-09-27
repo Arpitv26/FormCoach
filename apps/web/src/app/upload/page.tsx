@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { findExercise } from "@/lib/exercises";
 import { VideoUpload } from "@/components/video-upload";
 
-export const metadata: Metadata = { title: "Analyze push-ups | FormCoach" };
+export const metadata: Metadata = { title: "Video analysis | FormCoach" };
 
-export default function UploadPage() {
+export default async function UploadPage({ searchParams }: { searchParams: Promise<{ exercise?: string | string[] }> }) {
+  const { exercise: slug = "push-up" } = await searchParams;
+  const exercise = typeof slug === "string" ? findExercise(slug) : undefined;
+  if (!exercise?.backendHint) notFound();
   return (
     <>
       <a className="skip-link" href="#main-content">Skip to video upload</a>
@@ -13,7 +18,7 @@ export default function UploadPage() {
         <nav aria-label="Main navigation"><Link href="/">Exercises</Link><Link href="/upload" aria-current="page">Video analysis</Link><Link href="/camera?exercise=push-up">Camera setup</Link></nav>
       </header>
       <main id="main-content">
-        <VideoUpload />
+        <VideoUpload key={exercise.slug} exercise={exercise} />
         <footer><span>FormCoach · HelloHacks 2026</span><span>General movement feedback. Visibility matters.</span></footer>
       </main>
     </>

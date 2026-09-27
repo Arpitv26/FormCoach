@@ -6,7 +6,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from app.analysis.exercises.registry import PROFILES
-from app.analysis.movement import RuleBasedAnalyzer
+from app.analysis.movement import MOVEMENTS, RuleBasedAnalyzer
 from app.domain.analysis import Source
 from app.domain.pose import LiveBatchRequest
 from app.services.mediapipe_pose import MediaPipePoseProvider
@@ -15,6 +15,7 @@ from app.services.mediapipe_pose import MediaPipePoseProvider
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("video", type=Path)
+    parser.add_argument("--exercise", choices=sorted(MOVEMENTS), default="push-up")
     parser.add_argument(
         "--model", type=Path, default=Path("artifacts/models/pose_landmarker_full.task")
     )
@@ -29,11 +30,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
     try:
-        print("Extracting push-up poses locally. This may take a minute...", file=sys.stderr)
+        print(
+            f"Extracting {args.exercise} poses locally. This may take a minute...", file=sys.stderr
+        )
         sequence = MediaPipePoseProvider(args.model).extract(args.video)
         capture = LiveBatchRequest(
             session_id=str(uuid4()),
-            exercise_hint="push-up",
+            exercise_hint=args.exercise,
             frames=sequence.frames,
             image_width=sequence.image_width,
             image_height=sequence.image_height,
@@ -45,7 +48,7 @@ def main(argv: list[str] | None = None) -> int:
             source=Source(type="upload", duration_ms=sequence.duration_ms),
             image_width=sequence.image_width,
             image_height=sequence.image_height,
-            profile=PROFILES["push-up"],
+            profile=PROFILES[args.exercise],
             is_final=True,
         )
         analysis.limitations.append(

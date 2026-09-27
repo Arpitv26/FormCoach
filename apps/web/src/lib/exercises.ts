@@ -31,19 +31,10 @@ export const exercises = [
     slug: "lat-pulldown",
     name: "Lat pulldowns",
     group: "gym",
-    backendHint: null,
+    backendHint: "lat-pulldown",
     equipment: "Lat pulldown machine",
     framingTitle: "Include the overhead movement",
     framingText: "Include your seated torso, shoulders, elbows, hands, and the bar at its highest and lowest positions. Avoid placing the camera behind an obstructing machine.",
-  },
-  {
-    slug: "triceps-pushdown",
-    name: "Triceps pushdowns",
-    group: "gym",
-    backendHint: null,
-    equipment: "Cable station · rope or bar",
-    framingTitle: "Keep your arms in frame",
-    framingText: "Keep your shoulders, elbows, hands, and the cable attachment visible throughout the movement. Position the camera outside the cable path.",
   },
 ] as const;
 

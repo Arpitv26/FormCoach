@@ -9,6 +9,14 @@ Canonical sources: `apps/api/app/domain/` models, generated `contracts/*.schema.
 generated `apps/web/src/lib/api/types.ts`, and fixtures under `contracts/examples/`.
 Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated files.
 
+## Gym exercise IDs (2026-09-27)
+
+`lat-pulldown` now supports upload and normalized-pose analysis. Selected exercise IDs
+are strings, so this adds no schema fields. Existing elbow measurement keys and key moments
+retain their 2D meanings; the lat-pulldown counting policy is in apps/api/GYM_EXERCISES.md.
+Push-up comparisons/body-line rules do not apply to lat pulldowns. Scores stay null.
+The frontend uses the same ID; old servers reject this hint until updated.
+
 ## Additive movement observations (2026-09-26)
 
 `AnalysisResponse.movementObservations` is a new list, defaulting to `[]` when an older

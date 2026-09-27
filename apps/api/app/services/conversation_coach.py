@@ -176,7 +176,8 @@ def local_reply(request: CoachRequest, *, unavailable=False) -> CoachResponse:
         )
         paths = []
     else:
-        message = f"I detected {count} completed push-up{'s' if count != 1 else ''}."
+        noun = "push-up" if analysis.exercise and analysis.exercise.id == "push-up" else "rep"
+        message = f"I detected {count} completed {noun}{'s' if count != 1 else ''}."
         paths = ["summary.totalReps"]
         if analysis.status == "partial":
             message += " This result is incomplete, so I may have missed some reps."
@@ -212,7 +213,7 @@ def local_reply(request: CoachRequest, *, unavailable=False) -> CoachResponse:
     if request.mode == "next_set":
         message += (
             " For the next capture, keep your elbow in view "
-            "and pause briefly with your arms straight before starting."
+            "and keep the camera still throughout the set."
         )
     return response(
         request,

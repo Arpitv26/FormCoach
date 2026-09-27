@@ -32,7 +32,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
     <section className={styles.results} aria-labelledby={`${id}-heading`}>
       <div className="section-heading"><div><p className="eyebrow">{live ? "Your live set, reviewed" : "Your video, reviewed"}</p><h2 id={`${id}-heading`} data-results-heading>{heading}</h2></div></div>
       {!measured && <p className={styles.notice}>This response is {analysis.provenance.kind} data, not verified measurements from your movement. Timestamp playback is disabled.</p>}
-      <p>{analysis.summary.totalReps == null ? "We couldn’t reliably count this set." : `We detected ${analysis.summary.totalReps} completed push-ups.`}</p>
+      <p>{analysis.summary.totalReps == null ? "We couldn’t reliably count this set." : `We detected ${analysis.summary.totalReps} completed reps.`}</p>
       <dl className={styles.summary}>
         <div><dt>Counted reps</dt><dd>{analysis.summary.totalReps ?? "Unavailable"}</dd></div>
         <div><dt>{live ? "Set length" : "Video duration"}</dt><dd>{seconds(analysis.source.durationMs)}</dd></div>
@@ -45,7 +45,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
       <RepOverview reps={analysis.reps} onSeek={seekEnabled ? onSeek : undefined} idPrefix={id} onShowDetails={() => { if (repDetails.current) repDetails.current.open = true; }} />
       {(analysis.reps.length > 0 || analysis.issues.length > 0) && <section className={styles.changes} aria-labelledby={`${id}-changes`}>
         <div className="section-heading"><h3 id={`${id}-changes`}>Rep-to-rep changes</h3><span className="outline-tag">{analysis.issues.length} reported</span></div>
-        {analysis.issues.length === 0 ? <p className="muted small">{analysis.reps.length < 3 ? "We need at least three well-tracked reps to compare changes." : "No substantial changes were flagged in the reps we could compare."} This isn’t a form rating.</p> : analysis.issues.map((issue) => (
+        {analysis.issues.length === 0 ? <p className="muted small">{analysis.exercise?.id !== "push-up" ? "Automatic change flags aren’t available for this exercise yet. Explore the rep times and angles below." : analysis.reps.length < 3 ? "We need at least three well-tracked reps to compare changes." : "No substantial changes were flagged in the reps we could compare."} This isn’t a form rating.</p> : analysis.issues.map((issue) => (
           <article key={issue.id} className={styles.changeCard}>
             <h4>{issue.title}</h4><p className="small">{issue.shortCue}</p>
             {seekEnabled && <button type="button" className={styles.secondary} onClick={() => onSeek(issue.startMs)}>Review at {seconds(issue.startMs)} ↗</button>}
@@ -75,7 +75,7 @@ export function UploadedResults({ analysis, canSeek, onSeek }: {
       <p className="muted small">Only visible, sufficiently tracked joints are measured. Full-body visibility and camera angle are not verified.</p>
 
         <p>Full body visible: {analysis.cameraQuality.fullBodyVisible === null ? "Unknown" : analysis.cameraQuality.fullBodyVisible ? "Yes" : "No"}. Camera quality: {analysis.cameraQuality.score ?? "Unavailable"}.</p>
-        <p className="muted small">Push-ups are your selected exercise. Selection alone does not confirm exercise detection.</p>
+        <p className="muted small">{analysis.exercise?.name ?? "This"} is your selected exercise. Selection alone does not confirm exercise detection.</p>
         {[...analysis.cameraQuality.issues, ...analysis.limitations].length > 0 && <ul>{[...analysis.cameraQuality.issues, ...analysis.limitations].map((item, index) => <li key={index}>{item}</li>)}</ul>}
 
       </details>
