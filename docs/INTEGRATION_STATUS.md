@@ -2,6 +2,12 @@
 
 ## New overlay checkpoint — 2026-09-26
 
+**Latest backend checks:** 375 tests, lint, formatting and schema checks pass after adding
+explicit expected timing/range flags to the replay tool. All four saved captures pass zero-flag
+regressions with counts 3/1/1/2. Earlier coach follow-up `7a29d34` adds descriptive body-line
+evidence without changing the response contract. No frontend source changed in these follow-ups.
+Remote frontend rechecked: still `5dd6bb4`. Positive comparison footage and B's handoff are pending.
+
 **Body-line follow-up:** completed push-ups now include a descriptive median 2D
 shoulder–hip–ankle angle and usable/received sample counts in the existing measurement
 dictionary. No schema or frontend source change. Read apps/api/BODY_LINE.md for sample

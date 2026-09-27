@@ -99,3 +99,9 @@ No new pose extraction was needed. See VALIDATION.md for numerical evidence.
 real-world detection reliability or choosing a form score. Use comfortable normal motion
 and optional pauses; never ask someone to perform unsafe form to provoke a detector.
 Evidence-only coaching can explain measured values while scoring remains deferred.
+
+The replay checker now accepts exact expected flag rep numbers, or explicit zero flags,
+for each rule independently. See [examples/README.md](examples/README.md#6-check-expected-comparison-flags).
+It reports missing/extra flags and exits unsuccessfully on mismatches without changing any
+input frames or thresholds. Synthetic positive checks pass; all four saved real-pose captures
+pass explicit zero-flag checks with counts 3/1/1/2. Positive real-footage validation is still pending.

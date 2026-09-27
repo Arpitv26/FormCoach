@@ -36,6 +36,7 @@ reviewed and integrated. PRs #1/#2/#3 are already merged into main `79f8da3`.
 - [x] [A] Implement descriptive 2D shoulder–hip–ankle median; synthetic tests, independent arithmetic and seven real-frame checks (apps/api/BODY_LINE.md).
 - [ ] [A] Validate a body-alignment interpretation/cue separately; current angle is not a form judgment.
 - [x] [A] Let the coach explain body-line geometry with evidence paths and explicit limits; reject inconsistent sample metadata.
+- [x] [A] Add replay expectations for missing/extra timing/range flags; real positive footage remains pending.
 - [ ] [A] Justified score formulas only after evidence/view/calibration review.
 - [x] [A] Counter/API tests for occlusion, missing joints, jitter, timing gaps, and partial reps.
 - [ ] [A] Extend those failure-case tests to future form metrics and scoring.

@@ -129,3 +129,9 @@ footage and B's new frontend commits are still pending; preserve their active UI
 Coach follow-up checks: 359 backend tests pass, plus lint, formatting and schema checks.
 All four saved analyses pass local next-set HTTP coaching checks; no paid API calls were used.
 Frontend code and contracts are unchanged by this follow-up.
+
+Replay validation preparation: `app.tools.replay_live` now accepts exact expected timing/range
+flag rep numbers (omitted = unchecked, empty option = expect none). It reports missing/extra
+flags and exits 1 on mismatch; original frames/thresholds are unchanged. See apps/api/examples/README.md.
+375 backend tests, lint/format/schema checks pass; four saved captures retain 3/1/1/2 reps and
+pass explicit zero-flag checks. Real positive footage and B's handoff remain pending.

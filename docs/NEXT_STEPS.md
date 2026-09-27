@@ -46,6 +46,10 @@ noticeably slower third rep. Include a brief straight-arm pause before and after
 Record the human count and identify which rep changed pace. Keep the original file private.
 
 Run the existing extraction/replay tools in apps/api/VIDEO_SETUP.md and examples/README.md.
+The replay tool now supports `--expected-duration-change-reps 3` and a separate excursion
+expectation; omitted rules are unchecked, and options without numbers assert zero flags.
+It catches missing/extra flags while preserving input poses and timestamps. The four saved
+recordings pass zero-flag regressions; this preparation does not complete the positive check.
 Review every counted interval against the video, then check that the third rep's timing
 comparison, reference values and flag agree with the footage. Review the coach's evidence
 and the UI seek after B's integration. Keep thresholds fixed during this check; a failed
@@ -128,6 +132,9 @@ custom ML training, history/accounts, voice feedback and fatigue claims. Add one
 the recorded push-up demo and integration are already reliable and time remains.
 
 ## Validation baseline
+
+Coach follow-up: 359 backend tests plus lint/format/schema checks passed. Four saved analyses
+passed local next-set coaching checks with body-line evidence; no paid API calls.
 
 Body-line checkpoint: **335 backend tests passed** on 2026-09-26. One existing Starlette TestClient
 deprecation warning remains. 35 frontend tests plus lint, types,

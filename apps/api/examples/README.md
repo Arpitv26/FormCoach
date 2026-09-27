@@ -106,10 +106,12 @@ replay runs quickly without real-time delays, so it is not a camera latency benc
 | --- | --- |
 | `count_match` | Final measured analysis completed and its count matches; inspect each rep's timing next |
 | `count_mismatch` | Inspect the matching video, intervals, and limitations; record which rep was missed/added |
+| `comparison_mismatch` | Count matched, but requested timing/range flags differ; inspect `comparisonChecks` and the footage |
 | `incomplete_analysis` | Tracking/readiness/unfinished movement or an old unimplemented backend prevented a complete result; even a matching count needs review |
 | `Replay failed` / `Invalid capture` | Fix server startup, JSON fields, or inconsistent responses before interpreting the count |
 
-Exit codes for scripts: 0 = complete count match, 1 = mismatch/incomplete, 2 = file, network,
+Exit codes for scripts: 0 = complete count match and all requested flag checks match,
+1 = count/flag mismatch or incomplete analysis, 2 = file, network,
 validation, or response-consistency failure. An empty capture is rejected before any POST.
 The report format is a local diagnostic, not a new public API contract.
 
@@ -121,3 +123,41 @@ by returning to the top position and a new rep. Keep a short local note with hum
 reps, timing differences, and visibility problems. Do not tune thresholds from one clip alone.
 
 Stop the API with **Control+C** in Terminal 1 when finished.
+
+## 6. Check expected comparison flags
+
+For the pending positive timing check, first record and manually review a fixed-view set:
+two similarly paced completed reps, then a noticeably slower third. Extract its poses using
+[VIDEO_SETUP.md](../VIDEO_SETUP.md). Do not change timestamps or thresholds to force a flag.
+
+For example, if you saved that extraction in `artifacts/slow-third`, run this from `apps/api`
+while the API is running:
+
+```bash
+.venv/bin/python -m app.tools.replay_live artifacts/slow-third/poses.json --expected-reps 3 --expected-duration-change-reps 3 > artifacts/slow-third/replay.json
+cat artifacts/slow-third/replay.json
+```
+
+This expects **exactly rep 3** to have `PUSHUP_REP_DURATION_CHANGED`. It does not check the
+separate excursion rule. `comparisonChecks` lists expected/observed rep numbers, `missingReps`,
+`unexpectedReps`, and `matches`. A missing flag may correctly reflect unstable reference
+timing or tracking loss; inspect the supplied measurements rather than assuming a bug.
+
+To explicitly check that a reviewed clip has **no flags of either type**, use both options
+without numbers. For Computer A's existing private 6937 capture (3 human-counted reps):
+
+```bash
+.venv/bin/python -m app.tools.replay_live artifacts/recording-review/baseline/IMG_6937/poses.json --expected-reps 3 --expected-duration-change-reps --expected-excursion-reduction-reps
+```
+
+The 6937 capture is local and is not included when someone clones the repository. Use your
+own extraction path and count for another clip. Omit an option to leave that rule unchecked.
+Multiple expected reps are space-separated,
+for example `--expected-duration-change-reps 3 6`. Numbers must be unique, at least 3, and
+no greater than the human count; the rules need two preceding reference reps.
+
+`count_match` means requested checks also matched; it does **not** mean unrequested rules
+were checked. Partial analysis and count mismatches still take precedence in `outcome`;
+the detailed flag checks remain available. This is a local diagnostic, with no public API
+change, new pose extraction or OpenAI call. It compares declared expectations to output;
+it cannot establish the recording's identity, event alignment, or movement quality.
