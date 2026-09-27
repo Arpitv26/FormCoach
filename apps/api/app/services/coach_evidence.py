@@ -7,6 +7,8 @@ from statistics import median
 from app.domain.models import AnalysisResponse, CoachRequest, CoachResponse
 
 GYM_CONTEXT = {
+    "cable-lateral-raise": " The selected exercise is cable lateral raise; angles describe "
+    "projected hip-shoulder-elbow geometry, not anatomical abduction or a form grade.",
     "lat-pulldown": " The selected exercise is lat pulldown.",
     "incline-dumbbell-bench-press": (
         " The selected exercise is incline dumbbell bench press; timings cover "
@@ -180,6 +182,7 @@ def evidence_cards(
         "push-up",
         "lat-pulldown",
         "incline-dumbbell-bench-press",
+        "cable-lateral-raise",
     }:
         return cards
     # Bound the model input, but don't omit the very rep the user asked about.
@@ -208,11 +211,12 @@ def evidence_cards(
                 (f"{path}.repNumber", f"{path}.startMs", f"{path}.endMs", *paths),
             )
         )
+        joint = "Shoulder" if analysis.exercise.id == "cable-lateral-raise" else "Elbow"
         for side in ("Left", "Right"):
             keys = [
-                f"minSmoothed{side}ElbowAngleDeg",
-                f"maxSmoothed{side}ElbowAngleDeg",
-                f"smoothed{side}ElbowExcursionDeg",
+                f"minSmoothed{side}{joint}AngleDeg",
+                f"maxSmoothed{side}{joint}AngleDeg",
+                f"smoothed{side}{joint}ExcursionDeg",
             ]
             minimum, maximum, excursion = [rep.measurements.get(key) for key in keys]
             if (
@@ -228,12 +232,12 @@ def evidence_cards(
                 EvidenceCard(
                     f"rep-{rep.rep_number}-{side.lower()}-range",
                     f"Rep {rep.rep_number} has {excursion:.1f}° of observed {side.lower()}"
-                    f" elbow excursion ({minimum:.1f}° to {maximum:.1f}°)."
+                    f" {joint.lower()} excursion ({minimum:.1f}° to {maximum:.1f}°)."
                     " This is a 2D measurement, not a form score." + detail,
                     (f"{path}.repNumber", *(f"{path}.measurements.{key}" for key in keys), *paths),
                 )
             )
-            body_line = body_line_card(analysis, index, side)
+            body_line = body_line_card(analysis, index, side) if joint == "Elbow" else None
             if body_line is not None:
                 cards.append(body_line)
     return cards

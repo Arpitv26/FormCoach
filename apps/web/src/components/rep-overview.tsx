@@ -10,8 +10,8 @@ export function RepOverview({ reps, onSeek, onShowDetails, idPrefix }: { reps: R
   if (reps.length === 0) return null;
   const max = Math.max(1, ...reps.map((rep) => repMetric(rep, metric) ?? 0));
   return <section className={styles.overview} aria-label="Rep measurement comparison">
-    <div className="section-heading"><h3>Your set at a glance</h3><div className={styles.metricSwitch} role="group" aria-label="Chart measurement"><button type="button" aria-pressed={metric === "duration"} onClick={() => setMetric("duration")}>Counted time</button><button type="button" aria-pressed={metric === "range"} onClick={() => setMetric("range")}>Elbow range</button></div></div>
-    <p className="muted small">{metric === "duration" ? "Time per completed rep, including pauses and confirmation delay." : "Observed 2D elbow range in this camera view."} Longer bars do not mean better form.</p>
+    <div className="section-heading"><h3>Your set at a glance</h3><div className={styles.metricSwitch} role="group" aria-label="Chart measurement"><button type="button" aria-pressed={metric === "duration"} onClick={() => setMetric("duration")}>Counted time</button><button type="button" aria-pressed={metric === "range"} onClick={() => setMetric("range")}>Angle range</button></div></div>
+    <p className="muted small">{metric === "duration" ? "Time per completed rep, including pauses and confirmation delay." : "Observed 2D joint-angle range in this camera view."} Longer bars do not mean better form.</p>
     <div className={styles.barList}>
       {reps.map((rep) => {
         const value = repMetric(rep, metric);

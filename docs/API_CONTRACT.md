@@ -11,13 +11,21 @@ Interactive route docs: http://localhost:8000/docs. Do not hand-edit generated f
 
 ## Gym exercise IDs (2026-09-27)
 
-`lat-pulldown` and `incline-dumbbell-bench-press` support upload and normalized-pose analysis. Selected exercise IDs
+`lat-pulldown`, `incline-dumbbell-bench-press` and `cable-lateral-raise` support upload and normalized-pose analysis. Selected exercise IDs
 are strings, so this adds no schema fields. Existing elbow measurement keys and key moments
 retain their 2D meanings; the lat-pulldown counting policy is in apps/api/GYM_EXERCISES.md.
 Incline-press duration covers bent arms to extension, including pauses; its new
 `press_completed` key moment marks extension. Push-up comparisons/body-line rules
 do not apply to gym exercises. Scores stay null.
 The frontend uses the same ID; old servers reject this hint until updated.
+
+Lateral raises use projected hip–shoulder–elbow geometry, not anatomical abduction. Keys:
+`minSmoothed{Left|Right}ShoulderAngleDeg`, `maxSmoothed{Left|Right}ShoulderAngleDeg`,
+`smoothed{Left|Right}ShoulderExcursionDeg`, `timeToMinShoulderAngleMs`,
+`timeFromMinShoulderAngleMs`, plus existing `angleMeasurementStartMs` and `durationMs`.
+Intervals cover the low run through confirmed raised position; `raised_position` marks
+completion. Lowering only rearms. These additive dictionary keys need no schema change;
+unknown keys remain safe for older clients, which may not display them.
 
 ## Additive movement observations (2026-09-26)
 

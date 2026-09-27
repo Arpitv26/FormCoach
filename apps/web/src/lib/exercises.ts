@@ -22,7 +22,7 @@ export const exercises = [
     slug: "cable-lateral-raise",
     name: "Cable lateral raises",
     group: "gym",
-    backendHint: null,
+    backendHint: "cable-lateral-raise",
     equipment: "Cable station · handle",
     framingTitle: "Leave room on both sides",
     framingText: "Keep your torso and working arm visible from shoulder to hand. Leave space in the image for your arm to move without leaving the frame.",

@@ -10,7 +10,7 @@ Wire ID `lat-pulldown`, shared by selection, upload, analysis and coaching. The 
 v1.0 string IDs and numeric measurement dictionary support this without a schema change.
 The upload page accepts an exercise query and remounts its upload session when it changes,
 so old clips/results/requests cannot become a different exercise's evidence. Push-up live
-capture is unchanged. Incline press and lateral raise remain planned until their checkpoints.
+capture is unchanged. Incline press and lateral raise are also implemented below.
 
 Rules: side-view shoulder–elbow–wrist angle; visibility >=0.7, in-frame, nondegenerate joints.
 Lock the first usable side, left on a tie. Require a return angle >=120°, a pull <=70°, then
@@ -28,7 +28,7 @@ Coach evidence includes selected exercise, requested rep timing and elbow range.
 14 gym originals are in the repository root and ignored. `NEW_SESSION_PROMPT.md` was not
 present; the session used the handoff pasted by the human. Original filenames describe
 exercise/view and intended good/bad form, but do not supply exact counts or fault descriptions.
-An asynchronous clarification was requested; those human annotations remain unconfirmed.
+The human subsequently supplied the bad-form counts and intended changes recorded below.
 
 Private 1080p exports and poses: `apps/api/artifacts/gym-review/`. Originals are preserved.
 The two good-form lateral-raise originals exceed the 250 MiB upload limit (264.4 / 290.6 MiB).
@@ -81,7 +81,7 @@ actual browser upload, playback seeks and exercise switching still require a man
 
 Human counts supplied during review (all filenames labeled BadForm): cable lateral raise
 back view **6**, side view **7**; lat pulldown side view **6**; incline press left side **7**,
-right side **6**, angled view **4**. Specific intended fault descriptions were not supplied.
+right side **6**, angled view **4**. Intended fault descriptions are recorded below.
 These supersede the earlier missing-count note. The current bad-form lat-pulldown export
 counts **3/6** with 8 tracking breaks: a recorded failure, not six verified detections.
 
@@ -131,3 +131,26 @@ forward torso swing and overhead stretch; lateral raise — cross-body swing fro
 the opposite knee to above shoulder/head level, with torso turning/movement. These are
 annotations for comparison, not implemented detections. The pose model does not track
 dumbbells, and a single view cannot establish elbow tuck or axial rotation reliably.
+
+## Third milestone: cable lateral raise
+
+Wire ID `cable-lateral-raise` is connected through selection, upload, results and coach.
+Uses the selected side's projected hip–shoulder–elbow angle: confirmed low <=30°, rising
+>=40°, completion >=60°, with the same causal median/raw 100 ms dwell and missing-data
+resets as incline press. A shared rising-angle segmenter preserves incline behavior.
+These are projection-dependent counting zones, not anatomical shoulder abduction targets.
+Counted intervals cover the confirmed low run through the raised zone, including pauses;
+lowering rearms the next rise. Scores and automatic form/change flags remain unavailable.
+
+Selected export `cableLateralRaisesGoodFormSideView-1080p.mov`: **7 raises**, 343 playback
+poses; native multipart upload exactly matches saved-pose rep objects. Status is `partial`
+because 8 samples are unavailable with 6 tracking breaks, mostly after completed raises.
+Both this clip and the BadForm side view have seven separate low/raised frame pairs reviewed.
+The BadForm side view counts **7/7**. Both back views count **0** with substantial tracking/
+projection problems; the bad back view's human count is **6**. Do not use those for the demo.
+Matching the bad side-view count does not mean the intended faults were classified.
+
+Shoulder min/max/excursion and time-to/from-minimum keys use the existing numeric dictionary.
+Results and coaching render these with shoulder labels; elbow-only push-up behavior remains.
+Checks: **502 backend / 54 frontend tests**, lint, formatting, TypeScript, schema/type checks,
+and production build pass. Browser upload/playback/switching still need manual verification.

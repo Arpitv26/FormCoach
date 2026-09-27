@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.analysis.exercises.base import ExerciseProfile
+from app.analysis.exercises.cable_lateral_raise import segment_cable_lateral_raises
 from app.analysis.exercises.incline_press import segment_incline_presses
 from app.analysis.exercises.lat_pulldown import segment_lat_pulldowns
 from app.analysis.exercises.pushup_body_line import add_body_line_measurements
@@ -51,6 +52,12 @@ MOVEMENTS = {
         "a visible bent-arm starting position",
         segment_incline_presses,
     ),
+    "cable-lateral-raise": MovementSpec(
+        ("hip", "shoulder", "elbow"),
+        "top",
+        "the lowered working arm beside your torso",
+        segment_cable_lateral_raises,
+    ),
     "lat-pulldown": MovementSpec(
         ("shoulder", "elbow", "wrist"),
         "extended",
@@ -92,8 +99,8 @@ def _rep_result(segment: RepSegment, number: int, side: str, joint: str) -> RepA
         f"minSmoothed{side.title()}{joint.title()}AngleDeg": segment.min_angle_deg,
         "durationMs": segment.end_ms - segment.start_ms,
     }
-    if joint == "elbow":
-        measurements.update(pushup_measurements(segment, side))
+    if joint in {"elbow", "shoulder"}:
+        measurements.update(pushup_measurements(segment, side, joint=joint))
     return RepAnalysis(
         rep_number=number,
         start_ms=segment.start_ms,
@@ -192,13 +199,15 @@ class RuleBasedAnalyzer:
             comparisons = compare_pushup_reps(reps, samples, side, profile)
             reps = comparisons.reps
             comparison_limitations = comparisons.limitations
-        if profile.id == "incline-dumbbell-bench-press":
+        if profile.id in {"incline-dumbbell-bench-press", "cable-lateral-raise"}:
             for rep in reps:
                 rep.key_moments.append(
                     KeyMoment(
                         timestamp_ms=rep.end_ms,
-                        type="press_completed",
-                        label="Press reached the extension zone",
+                        type="raised_position" if joint == "shoulder" else "press_completed",
+                        label="Arm reached the raised zone"
+                        if joint == "shoulder"
+                        else "Press reached the extension zone",
                     )
                 )
         issues = [issue for rep in reps for issue in rep.issues]
@@ -289,6 +298,18 @@ class RuleBasedAnalyzer:
                 "Dumbbells, bench angle, bilateral symmetry and form are not evaluated. "
                 "Automatic rep comparison flags are not implemented for this exercise."
             )
+        if profile.id == "cable-lateral-raise":
+            limitations.append(
+                "Cable-raise counter v1 measures the projected hip-shoulder-elbow angle. "
+                "It requires a lowered zone <=30 degrees then a raised zone >=60 degrees, "
+                "100 ms raw dwell plus median confirmation. Returning low rearms the counter. "
+                "Intervals run from the confirmed low run to the raised zone, including pauses; "
+                "lowering before the low zone is excluded. These uncalibrated zones count visible "
+                "lifts, not correct lateral raises or anatomical shoulder abduction. "
+                "A side view strongly changes projected angles. Back-view footage has not "
+                "produced reliable counts. Body rotation, cable path and form are not assessed. "
+                "Automatic rep comparison flags are not implemented for this exercise."
+            )
         if not side:
             camera_issues.append(f"No usable {'-'.join(movement.joints)} triplet on either side.")
         if unavailable or result.tracking_breaks:
@@ -314,7 +335,7 @@ class RuleBasedAnalyzer:
                 and (
                     result.current_phase == movement.ready_phase
                     or (
-                        profile.id == "incline-dumbbell-bench-press"
+                        profile.id in {"incline-dumbbell-bench-press", "cable-lateral-raise"}
                         and result.current_phase == "bottom"
                     )
                 )
@@ -327,7 +348,7 @@ class RuleBasedAnalyzer:
             )
         unfinished = (
             {"ascent"}
-            if profile.id == "incline-dumbbell-bench-press"
+            if profile.id in {"incline-dumbbell-bench-press", "cable-lateral-raise"}
             else {"descent", "bottom", "ascent"}
         )
         if is_final and result.current_phase in unfinished:
