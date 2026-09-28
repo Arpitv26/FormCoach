@@ -12,7 +12,13 @@ The Mac must stay awake, connected to the internet, with the API and ngrok runni
 Closing the lid, restarting, or stopping either process interrupts analysis and
 chat; Vercel will still serve the interface. A `caffeinate` process keeps this
 session idle-awake, but does not make a closed laptop an always-on server. The
-ngrok process now runs as a per-user Mac LaunchAgent (`ca.formcoach.ngrok-demo`)
+public API is now supervised by `ca.formcoach.api-demo` and automatically restarts
+if its process exits. Its logs are `api.out.log` and `api.err.log` in the tools folder.
+The local API on port 8000 is likewise supervised by `ca.formcoach.api-local`.
+Upload pose extraction runs in an isolated process: a native MediaPipe crash
+returns a retryable upload error without killing the API. macOS graphics may still
+be unavailable during sleep/locking; retry that upload with the Mac awake and unlocked.
+The ngrok process now runs as a per-user Mac LaunchAgent (`ca.formcoach.ngrok-demo`)
 with automatic restart while this Mac user session is active.
 The launcher also restarts on an SDK disconnect notification and checks public
 API health every minute; two failed checks exit the process so LaunchAgent can
@@ -55,7 +61,19 @@ The initial deployment tools are temporary local files under
 `/private/tmp/formcoach-deploy-tools`. The token is stored in the repository's
 ignored `.env.ngrok`, with owner-only file permissions. Do not commit it.
 
-If the API has stopped, open a Terminal tab:
+If the API is not responding, restart its supervised service:
+
+```sh
+launchctl kickstart -k gui/$(id -u)/ca.formcoach.api-demo
+```
+
+If that service is missing after logout/restart and the temporary files remain:
+
+```sh
+launchctl bootstrap gui/$(id -u) /private/tmp/formcoach-deploy-tools/ca.formcoach.api-demo.plist
+```
+
+Manual alternative (only when the supervised API is stopped):
 
 ```sh
 # Tab 1: backend
@@ -93,3 +111,10 @@ On September 27, 2026, a 221 MiB original MOV uploaded through the public tunnel
 returned HTTP 200 in approximately 121 seconds, with six detected lat-pulldown
 reps, a pose track, and completed AI visual review. This checks the upload path,
 not general counting accuracy or performance on every connection.
+
+After a native MediaPipe graphics abort took down the API, video extraction was
+isolated from the server. A real 19.7 MiB push-up upload then completed publicly
+in approximately 39 seconds (one detected rep, 46 pose frames, completed visual
+review), while Live remained usable. A deliberately terminated worker returned
+503 without killing health/live routes or blocking subsequent uploads. All 555
+backend tests passed at this recovery checkpoint.

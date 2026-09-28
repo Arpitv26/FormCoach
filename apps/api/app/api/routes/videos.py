@@ -10,8 +10,8 @@ from app.core.config import get_settings
 from app.domain.analysis import AnalysisResponse
 from app.domain.models import ErrorResponse
 from app.domain.video import VideoAnalysisResponse
+from app.services.isolated_pose import IsolatedMediaPipePoseProvider, VideoWorkerCrashed
 from app.services.mediapipe_pose import (
-    MediaPipePoseProvider,
     VideoInputError,
     VideoProcessingTimeout,
     VideoSetupError,
@@ -33,10 +33,12 @@ def get_video_processor() -> VideoProcessor:
         and settings.openai_api_key.strip()
     )
     return UploadedVideoProcessor(
-        MediaPipePoseProvider(settings.pose_model_path, include_visual_frames=review_enabled),
+        IsolatedMediaPipePoseProvider(
+            settings.pose_model_path, include_visual_frames=review_enabled
+        ),
         RuleBasedAnalyzer(),
         OpenAIVisualReviewer(settings) if review_enabled else None,
-        gym_provider=MediaPipePoseProvider(
+        gym_provider=IsolatedMediaPipePoseProvider(
             settings.pose_model_path, include_visual_frames=review_enabled, allow_dominant_pose=True
         ),
     )
@@ -85,6 +87,17 @@ def _process_upload[T](file: UploadFile, operation: Callable[[], T]) -> T:
     except VideoProcessingTimeout as error:
         raise HTTPException(
             504, detail={"code": "VIDEO_PROCESSING_TIMEOUT", "message": str(error)}
+        ) from error
+    except VideoWorkerCrashed as error:
+        raise HTTPException(
+            503,
+            detail={
+                "code": "VIDEO_PROCESSING_UNAVAILABLE",
+                "message": (
+                    "Video processing stopped unexpectedly. The rest of FormCoach is still "
+                    "available. Keep the demo Mac awake and unlocked, then retry the upload."
+                ),
+            },
         ) from error
     except VideoInputError as error:
         raise HTTPException(400, detail={"code": "INVALID_VIDEO", "message": str(error)}) from error

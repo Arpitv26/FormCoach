@@ -59,8 +59,10 @@ analysis. Identical pose requests yield identical geometric analysis; optional v
 wording is nondeterministic. No hidden session cache
 or cross-worker state is needed. See the limits and finalization rules in API_CONTRACT.md.
 
-Uploads are synchronous for short clips, with native processing in a worker thread and
-one extraction per API process (extra requests get 503). If actual processing times require a
+Uploads are synchronous for short clips. The HTTP handler runs in a worker thread;
+native video extraction runs in a separate Python process with a 190-second deadline.
+This isolates fatal MediaPipe/graphics crashes from health, live analysis and chat.
+One extraction runs per API process (extra requests get 503). If actual processing times require a
 job API later, that is a coordinated contract change, not an undocumented behavior switch.
 The handler closes the multipart spool and removes its temporary copy after processing.
 Body spooling precedes the handler limits; this remains a local demo endpoint. See apps/api/HTTP_UPLOAD.md.
